@@ -2957,9 +2957,15 @@ function update(ts){
       `pts-ok:${ptsOk?'YES':'<span style=color:red>NaN!</span>'}<br>`+
       `canvas-internal:${cv.width}x${cv.height}<br>`+
       `canvas-css:${cssW}x${cssH} <span style="color:${cv.width!==cssW?'red':'#0f0'}">${cv.width!==cssW?'MISMATCH!':'ok'}</span><br>`+
-      `<b>RENDER-ERRORS:</b><br>`+
-      `boundary: <span style="color:${(window._renderErrors?.boundary||'?').startsWith('ERR')?'red':'#0f0'}">${window._renderErrors?.boundary||'(not run yet)'}</span><br>`+
-      `track: <span style="color:${(window._renderErrors?.track||'?').startsWith('ERR')?'red':'#0f0'}">${window._renderErrors?.track||'(not run yet)'}</span>`;
+      `<b>RENDER-STEPS:</b><br>`+
+      (function(){
+        const re=window._renderErrors||{};
+        return Object.keys(re).map(k=>{
+          const v=re[k]||'?';
+          const isErr=String(v).startsWith('ERR');
+          return `${k}:<span style="color:${isErr?'red':'#0f0'}"> ${v}</span>`;
+        }).join('<br>');
+      })();
   }
 
   // Bremslicht-Flag setzen (für render())
@@ -3018,19 +3024,13 @@ function render(){
   // Draw a large ground rect
   const hw=W/zoom,hh=H/zoom;
   ctx.fillRect(cam.x-hw,cam.y-hh,hw*2,hh*2);
-  // KRITISCH: drawWorldBoundary und drawTrack in EIGENEN save/restore-Blöcken,
-  // damit unbalancierte ctx.save() darin nicht den Welt-Transform für nachfolgendes
-  // Rendering (Test-Marker, Auto, Gegner) korrumpieren.
+  // KRITISCH: alle Render-Stufen in EIGENEN save/restore + try/catch.
+  // window._renderErrors trackt jeden Schritt. Letzten erreichten Schritt = letztes 'OK'.
   if(!window._renderErrors)window._renderErrors={};
-  ctx.save();
-  try{drawWorldBoundary(ctx,G.pts,wm,G.world.id,G.wallDist);window._renderErrors.boundary='OK';}
-  catch(e){window._renderErrors.boundary='ERR: '+e.message;}
-  ctx.restore();
+  const _step=(name,fn)=>{ctx.save();try{fn();window._renderErrors[name]='OK';}catch(e){window._renderErrors[name]='ERR: '+e.message;}ctx.restore();};
 
-  ctx.save();
-  try{drawTrack(ctx,G.pts,wm,G.wallDist,G.world.id);window._renderErrors.track='OK';}
-  catch(e){window._renderErrors.track='ERR: '+e.message;}
-  ctx.restore();
+  _step('boundary',()=>drawWorldBoundary(ctx,G.pts,wm,G.world.id,G.wallDist));
+  _step('track',   ()=>drawTrack(ctx,G.pts,wm,G.wallDist,G.world.id));
 
   // ── TEST-MARKER: garantiert sichtbare Punkte zur Render-Diagnose ──
   // 1) Großer roter Kreis an Spieler-Position (sollte direkt am Auto sein)
@@ -3054,32 +3054,24 @@ function render(){
   }
   ctx.restore();
 
-  // ── Skidmarks — unter Autos, über Asphalt ──
-  if(G.skids&&G.skids.length>1){
-    const now=G.t;
-    ctx.save();
-    ctx.lineCap='round';
-    ctx.lineWidth=3.5;
-    for(let i=1;i<G.skids.length;i++){
-      const prev=G.skids[i-1];
-      const cur =G.skids[i];
-      if(prev.sess!==cur.sess)continue; // andere Session → keine Linie ziehen
-      const age=now-cur.t;
-      if(age>SKID_FADE_MS)continue;
-      // Alpha: linear von 0.55 → 0 über SKID_FADE_MS
-      const alpha=0.55*(1-age/SKID_FADE_MS);
-      ctx.globalAlpha=alpha;
-      ctx.strokeStyle='rgba(10,8,8,1)';
-      // Linke Reifenspur
-      ctx.beginPath();ctx.moveTo(prev.ax,prev.ay);ctx.lineTo(cur.ax,cur.ay);ctx.stroke();
-      // Rechte Reifenspur
-      ctx.beginPath();ctx.moveTo(prev.bx,prev.by);ctx.lineTo(cur.bx,cur.by);ctx.stroke();
+  _step('skidmarks',()=>{
+    if(G.skids&&G.skids.length>1){
+      const now=G.t;
+      ctx.lineCap='round';ctx.lineWidth=3.5;
+      for(let i=1;i<G.skids.length;i++){
+        const prev=G.skids[i-1];const cur=G.skids[i];
+        if(prev.sess!==cur.sess)continue;
+        const age=now-cur.t;if(age>SKID_FADE_MS)continue;
+        const alpha=0.55*(1-age/SKID_FADE_MS);
+        ctx.globalAlpha=alpha;ctx.strokeStyle='rgba(10,8,8,1)';
+        ctx.beginPath();ctx.moveTo(prev.ax,prev.ay);ctx.lineTo(cur.ax,cur.ay);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(prev.bx,prev.by);ctx.lineTo(cur.bx,cur.by);ctx.stroke();
+      }
+      ctx.globalAlpha=1;
     }
-    ctx.globalAlpha=1;
-    ctx.restore();
-  }
+  });
 
-  // Powerups
+  _step('powerups',()=>{
   for(const pw of G.pws){
     if(pw.hit)continue;
     const pulse=Math.sin(G.t*.003+pw.phase)*3;
@@ -3092,56 +3084,40 @@ function render(){
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText(pw.type==='nitro'?'NOS':'SPD',0,s*.15);ctx.restore();
   }
-  // Particles
-  for(const p of G.parts){ctx.globalAlpha=p.life*.65;ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
-  // Opponents (AI)
-  // Gegner: Bremslichter wenn op.braking (gesetzt in stepOp)
-  for(const op of G.ops)drawCar(ctx,op.x,op.y,op.car,op.angle,1,false,false,op.braking||false);
-  // Network players (MP)
-  if(G.isMP){
-    for(const[id,mp]of Object.entries(mpPlayers)){
-      if(!mp||mp.x===undefined)continue;
-      const mpCar=CARS[mp.carIdx]||CARS[0];
-      drawCar(ctx,mp.x,mp.y,mpCar,mp.angle||0,1,false,false,mp.braking||false);
-      // Name label
-      ctx.save();ctx.translate(mp.x,mp.y);
-      ctx.font='bold 11px "Barlow Condensed",sans-serif';
-      ctx.textAlign='center';ctx.textBaseline='bottom';
-      ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(-28,-33,56,14);
-      ctx.fillStyle='#fff';ctx.fillText((mp.name||'?').slice(0,12),0,-22);
-      ctx.restore();
+  });
+
+  _step('particles',()=>{
+    for(const p of G.parts){ctx.globalAlpha=p.life*.65;ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();}
+    ctx.globalAlpha=1;
+  });
+
+  // Opponents — JEDEN einzeln tracken (häufigster Crash-Verdacht)
+  if(G.ops)for(let opi=0;opi<G.ops.length;opi++){
+    const op=G.ops[opi];
+    _step('op'+opi,()=>drawCar(ctx,op.x,op.y,op.car,op.angle,1,false,false,op.braking||false));
+  }
+  // Player
+  _step('player',()=>drawCar(ctx,G.player.x,G.player.y,G.car,G.player.angle,1.18,true,nitroOn&&G.player.nitro>0,G.player.isBraking||false));
+
+  _step('arrows',()=>{
+    if(G.segs){
+      ctx.lineCap='round';ctx.lineJoin='round';
+      for(let i=0;i<G.segs.length;i+=20){
+        const s=G.segs[i];const ang=Math.atan2(s.dy,s.dx);
+        const mx=s.ax+s.dx*.5,my=s.ay+s.dy*.5;
+        ctx.save();ctx.translate(mx,my);ctx.rotate(ang);
+        ctx.strokeStyle='rgba(0,0,0,0.4)';ctx.lineWidth=4.5;
+        ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(12,0);ctx.lineTo(6,-7);ctx.moveTo(12,0);ctx.lineTo(6,7);ctx.stroke();
+        ctx.strokeStyle='rgba(255,255,100,0.75)';ctx.lineWidth=2.5;
+        ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(12,0);ctx.lineTo(6,-7);ctx.moveTo(12,0);ctx.lineTo(6,7);ctx.stroke();
+        ctx.restore();
+      }
     }
-  }
-  // Player — slightly larger than AI so you can distinguish yourself instantly
-  // Spieler: Bremslichter lesen aus G.player.isBraking (gesetzt am Ende von update())
-  drawCar(ctx,G.player.x,G.player.y,G.car,G.player.angle,1.18,true,nitroOn&&G.player.nitro>0,G.player.isBraking||false);
-  // Local player name label in MP
-  if(G.isMP){
-    ctx.save();ctx.translate(G.player.x,G.player.y);
-    ctx.font='bold 11px "Barlow Condensed",sans-serif';
-    ctx.textAlign='center';ctx.textBaseline='bottom';
-    ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(-28,-35,56,14);
-    ctx.fillStyle='#d4a017';ctx.fillText((Net.mpName||'Du').slice(0,12),0,-24);
-    ctx.restore();
-  }
-  // Richtungspfeile alle 20 Segmente — klar sichtbare Orientierungshilfe
-  if(G.segs){
-    ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
-    for(let i=0;i<G.segs.length;i+=20){
-      const s=G.segs[i];const ang=Math.atan2(s.dy,s.dx);
-      const mx=s.ax+s.dx*.5,my=s.ay+s.dy*.5;
-      ctx.save();ctx.translate(mx,my);ctx.rotate(ang);
-      // Shadow for contrast
-      ctx.strokeStyle='rgba(0,0,0,0.4)';ctx.lineWidth=4.5;
-      ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(12,0);ctx.lineTo(6,-7);ctx.moveTo(12,0);ctx.lineTo(6,7);ctx.stroke();
-      // Main arrow
-      ctx.strokeStyle='rgba(255,255,100,0.75)';ctx.lineWidth=2.5;
-      ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(12,0);ctx.lineTo(6,-7);ctx.moveTo(12,0);ctx.lineTo(6,7);ctx.stroke();
-      ctx.restore();
-    }
-    ctx.restore();
-  }
-  ctx.restore();
+  });
+
+  ctx.restore(); // end world transform
+  window._renderErrors.worldEnd='OK';
+  // Acc tint overlay (subtle, full screen, in identity space)
   ctx.fillStyle=wm.acc;ctx.fillRect(0,0,W,H);
 
   // Weather effects (screen-space, after world transform restored)
