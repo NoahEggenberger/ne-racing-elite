@@ -2059,6 +2059,17 @@ function tickSkids(G){
 // ════════════════════════════════════════════════
 // CAR DRAWING
 // ════════════════════════════════════════════════
+// ── Hex-Normalisierung: Short-Hex (#fff) → Long-Hex (#ffffff) ──
+// Sonst crasht addColorStop bei `bodyCol+'cc'` weil #fff+cc=#fffcc (5 Zeichen, ungültig).
+// 4-Zeichen-Hex (#fff8) wird zu #ffffff88 (mit Alpha).
+function normHex(c){
+  if(typeof c!=='string'||c[0]!=='#')return c||'#888';
+  const h=c.slice(1);
+  if(h.length===3) return '#'+h[0]+h[0]+h[1]+h[1]+h[2]+h[2];                       // #fff → #ffffff
+  if(h.length===4) return '#'+h[0]+h[0]+h[1]+h[1]+h[2]+h[2]+h[3]+h[3];             // #fff8 → #ffffff88
+  return c; // 6 oder 8 chars: bereits gültig
+}
+
 // braking: true = Bremslichter leuchten hell rot (Bremsen oder kein Gas)
 function drawCar(ctx,x,y,car,angle,scale,isPlayer,nitroActive,braking){
   const t=getTuning(car.id);
@@ -2068,10 +2079,10 @@ function drawCar(ctx,x,y,car,angle,scale,isPlayer,nitroActive,braking){
   const w=car.w*scale*.5,h=car.h*scale*.5;
   const r2=3*scale;
 
-  // Body color (tuning override or original)
+  // Body color (tuning override or original) — Short-Hex auf Long-Hex normalisieren
   const bodyCol=(t.bodyHue!==null&&t.bodyHue!==undefined)
     ?`hsl(${t.bodyHue},${t.bodySat}%,${t.bodyLit}%)`
-    :car.body;
+    :normHex(car.body);
 
   // Body shadow
   if(isPlayer){ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=0;ctx.shadowOffsetX=2*scale;ctx.shadowOffsetY=3*scale;}
@@ -2116,8 +2127,8 @@ function drawCar(ctx,x,y,car,angle,scale,isPlayer,nitroActive,braking){
     ctx.globalAlpha=1;
   }
 
-  // Roof
-  const roofCol=t.roofColor||car.roof;
+  // Roof — Short-Hex normalisieren (sonst #ccc+dd = #cccdd = ungültig)
+  const roofCol=normHex(t.roofColor||car.roof);
   const rg=ctx.createLinearGradient(-w*.5,-h*.1,w*.5,h*.4);
   rg.addColorStop(0,roofCol+'dd');rg.addColorStop(1,roofCol);
   ctx.fillStyle=rg;
@@ -3000,20 +3011,6 @@ function render(){
   const sky=ctx.createLinearGradient(0,0,0,H);
   sky.addColorStop(0,wm.sky[0]);sky.addColorStop(1,wm.sky[1]);
   ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
-
-  // ── PIXEL-SPACE TEST-BAR (vor Welt-Transform — garantiert sichtbar wenn Canvas-Rendering läuft) ──
-  ctx.fillStyle='#ff00ff';                         // MAGENTA Balken oben
-  ctx.fillRect(50,40,W-100,30);
-  ctx.fillStyle='#00ffff';                         // CYAN Balken Mitte links
-  ctx.fillRect(50,H/2-15,80,30);
-  ctx.fillStyle='#ffff00';                         // GELB Balken Mitte rechts
-  ctx.fillRect(W-130,H/2-15,80,30);
-  ctx.fillStyle='#00ff00';                         // GRÜN Balken unten
-  ctx.fillRect(50,H-70,W-100,30);
-  // Schwarzer Text auf Magenta-Balken
-  ctx.fillStyle='#000';ctx.font='bold 20px sans-serif';ctx.textBaseline='top';
-  ctx.fillText('RENDER-TEST: Wenn du diese 4 farbigen Balken siehst, läuft Canvas-Rendering korrekt',56,46);
-
   ctx.save();
   const zoom=G.zoom||1.4;
   ctx.translate(W/2,H/2);
@@ -3031,28 +3028,6 @@ function render(){
 
   _step('boundary',()=>drawWorldBoundary(ctx,G.pts,wm,G.world.id,G.wallDist));
   _step('track',   ()=>drawTrack(ctx,G.pts,wm,G.wallDist,G.world.id));
-
-  // ── TEST-MARKER: garantiert sichtbare Punkte zur Render-Diagnose ──
-  // 1) Großer roter Kreis an Spieler-Position (sollte direkt am Auto sein)
-  ctx.save();
-  ctx.fillStyle='#ff0000';
-  ctx.beginPath();ctx.arc(G.player.x,G.player.y,40,0,Math.PI*2);ctx.fill();
-  // 2) Magenta Quadrat an pts[0]
-  if(G.pts[0]){
-    ctx.fillStyle='#ff00ff';
-    ctx.fillRect(G.pts[0].x-25,G.pts[0].y-25,50,50);
-  }
-  // 3) Cyan Quadrat an pts[120] (Strecken-Mitte)
-  if(G.pts[120]){
-    ctx.fillStyle='#00ffff';
-    ctx.fillRect(G.pts[120].x-25,G.pts[120].y-25,50,50);
-  }
-  // 4) Gelbe Linie von pts[0] zu pts[1] (Streckensegment)
-  if(G.pts[0]&&G.pts[1]){
-    ctx.strokeStyle='#ffff00';ctx.lineWidth=8;
-    ctx.beginPath();ctx.moveTo(G.pts[0].x,G.pts[0].y);ctx.lineTo(G.pts[1].x,G.pts[1].y);ctx.stroke();
-  }
-  ctx.restore();
 
   _step('skidmarks',()=>{
     if(G.skids&&G.skids.length>1){
@@ -3157,37 +3132,6 @@ function render(){
   }
 
   drawMinimap(document.getElementById('mm'),G);
-
-  // ── CANVAS-DEBUG-OVERLAY (unabhängig vom HTML-Cache) ──
-  // Zeichnet Diagnose-Info direkt auf den Canvas, garantiert sichtbar.
-  // Entfernen sobald Bug gefunden ist.
-  try{
-    const p=G.player;
-    const lines=[
-      'CANVAS-DEBUG (entfernen wenn gefixt)',
-      'started:'+G.started+' running:'+running+' finished:'+G.finished,
-      'player.x:'+(isFinite(p.x)?p.x.toFixed(1):'NaN!')+'  .y:'+(isFinite(p.y)?p.y.toFixed(1):'NaN!'),
-      'speed:'+p.speed.toFixed(2)+'  vx:'+(p.vx||0).toFixed(2)+'  vy:'+(p.vy||0).toFixed(2),
-      'cam.x:'+(isFinite(G.cam.x)?G.cam.x.toFixed(1):'NaN!')+'  .y:'+(isFinite(G.cam.y)?G.cam.y.toFixed(1):'NaN!'),
-      'pts:'+(G.pts?G.pts.length:'NULL')+'  segs:'+(G.segs?G.segs.length:'NULL')+'  ops:'+(G.ops?G.ops.length:'NULL'),
-      'world.id:'+G.world?.id+'  wallDist:'+G.wallDist+'  zoom:'+(G.zoom||1).toFixed(2),
-      'canvas:'+cv.width+'x'+cv.height+'  cam-to-player:'+Math.hypot((p.x||0)-(G.cam.x||0),(p.y||0)-(G.cam.y||0)).toFixed(0)
-    ];
-    ctx.save();
-    ctx.setTransform(1,0,0,1,0,0); // Identity = pixel coords
-    ctx.fillStyle='rgba(0,0,0,.85)';
-    ctx.fillRect(8,8,500,lines.length*16+10);
-    ctx.fillStyle='#0f0';
-    ctx.font='12px Consolas,monospace';
-    ctx.textBaseline='top';
-    for(let i=0;i<lines.length;i++)ctx.fillText(lines[i],14,12+i*16);
-    ctx.restore();
-  }catch(e){
-    ctx.save();ctx.setTransform(1,0,0,1,0,0);
-    ctx.fillStyle='red';ctx.font='14px monospace';
-    ctx.fillText('DEBUG ERROR: '+e.message,14,14);
-    ctx.restore();
-  }
 }
 
 // ════════════════════════════════════════════════
@@ -3937,9 +3881,9 @@ function startRaceWithCurrentMode(){
         `<span style="font-family:'Bebas Neue',sans-serif;font-size:.42rem;letter-spacing:.1em;padding:.2rem .45rem;border-radius:10px;border:1px solid ${drvC[drv]};color:${drvC[drv]};background:rgba(0,0,0,.55);">${drv.toUpperCase()}</span>`;
     }
     console.log('[NE]   step 3: HUD updated OK');
-    // Debug-Panel anzeigen (User kann nicht F12 → braucht visuelles Feedback)
+    // Debug-Panel nur sichtbar wenn URL ?debug=1 enthält
     const dbg=document.getElementById('debugPanel');
-    if(dbg)dbg.style.display='block';
+    if(dbg&&location.search.includes('debug=1'))dbg.style.display='block';
     try{initGame();console.log('[NE]   step 4: initGame OK, G='+(G?'CREATED':'NULL'));}
     catch(e){console.error('[NE] !!! initGame CRASH:',e);throw e;}
     try{render();console.log('[NE]   step 5: render OK');}
