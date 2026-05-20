@@ -496,11 +496,12 @@ body.dev-tablet #nitro-wrap{right:118px;}
   <!-- 3D Canvas Area -->
   <div style="flex:1.6;position:relative;min-width:0;display:flex;flex-direction:column;">
     <canvas id="garageCanvas" style="width:100%;flex:1;display:block;"></canvas>
-    <div style="position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);display:flex;gap:.4rem;">
-      <button class="gCamBtn" onclick="setCameraView('3/4')">3/4</button>
-      <button class="gCamBtn" onclick="setCameraView('Front')">Front</button>
-      <button class="gCamBtn" onclick="setCameraView('Seite')">Seite</button>
-      <button class="gCamBtn" onclick="setCameraView('Top')">Top</button>
+    <div style="position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;">
+      <button class="gCamBtn" onclick="setCameraView('3/4');hapTap();">3/4</button>
+      <button class="gCamBtn" onclick="setCameraView('Front');hapTap();">Front</button>
+      <button class="gCamBtn" onclick="setCameraView('Seite');hapTap();">Seite</button>
+      <button class="gCamBtn" onclick="setCameraView('Top');hapTap();">Top</button>
+      <button class="gCamBtn" id="gAutoRotBtn" onclick="toggleGarageAutoRotate();hapTap();" title="Auto-Drehen ein/aus">🔄 AUTO</button>
     </div>
     <div style="position:absolute;top:.8rem;left:50%;transform:translateX(-50%);font-size:.45rem;color:rgba(255,255,255,.25);letter-spacing:.2em;pointer-events:none;">ZIEHEN ZUM DREHEN · SCROLL ZUM ZOOMEN</div>
     <div id="garageLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#050508;flex-direction:column;gap:.8rem;">
@@ -2098,7 +2099,10 @@ function normHex(c){
 }
 
 // braking: true = Bremslichter leuchten hell rot (Bremsen oder kein Gas)
-function drawCar(ctx,x,y,car,angle,scale,isPlayer,nitroActive,braking){
+// steerVis: optional Lenkwinkel in Radian (für Vorderräder), default 0
+// rollVis:  optional Körperneigung (Slip-Angle, für Drift-Roll), default 0
+function drawCar(ctx,x,y,car,angle,scale,isPlayer,nitroActive,braking,steerVis,rollVis){
+  steerVis=steerVis||0; rollVis=rollVis||0;
   const t=getTuning(car.id);
   ctx.save();
   ctx.translate(x,y);
@@ -2168,12 +2172,27 @@ function drawCar(ctx,x,y,car,angle,scale,isPlayer,nitroActive,braking){
   // Rear glass
   ctx.fillStyle='rgba(80,130,180,.38)';ctx.fillRect(-w*.42,h*.3,w*.84,h*.14);
 
-  // Wheels with spokes
+  // Wheels with spokes — Front-Räder lenken sichtbar mit Steuerung mit
   const tyreW=(3.5+(t.tyreWidth||0)*1.5)*scale;
   const tyreH=6*scale;
   const wbOff=wbX*.6;
-  [[-w-1.2-wbOff,-h*.52],[w-tyreW+1.2+wbOff,-h*.52],
-   [-w-1.2-wbOff,h*.28], [w-tyreW+1.2+wbOff,h*.28]].forEach(([wx,wy])=>{
+  // 4 Räder: erste 2 = vorne (y<0), letzte 2 = hinten (y>0)
+  // Position ist `[wx, wy, isFront]`
+  const wheels=[
+    [-w-1.2-wbOff,-h*.52, true],  // vorne links
+    [w-tyreW+1.2+wbOff,-h*.52, true],  // vorne rechts
+    [-w-1.2-wbOff, h*.28, false], // hinten links
+    [w-tyreW+1.2+wbOff, h*.28, false] // hinten rechts
+  ];
+  wheels.forEach(([wx,wy,isFront])=>{
+    ctx.save();
+    if(isFront&&steerVis!==0){
+      // Rad um seine Mitte rotieren — Lenkwinkel sichtbar
+      const cwx=wx+tyreW*.5, cwy=wy+tyreH*.5;
+      ctx.translate(cwx,cwy);
+      ctx.rotate(steerVis);
+      ctx.translate(-cwx,-cwy);
+    }
     ctx.fillStyle='#0d0d0d';ctx.fillRect(wx,wy,tyreW,tyreH);
     ctx.fillStyle='#999';ctx.fillRect(wx+tyreW*.18,wy+tyreH*.12,tyreW*.64,tyreH*.76);
     const cx2=wx+tyreW*.5,cy2=wy+tyreH*.5;
@@ -2185,6 +2204,7 @@ function drawCar(ctx,x,y,car,angle,scale,isPlayer,nitroActive,braking){
     }
     ctx.strokeStyle='rgba(80,80,80,.4)';ctx.lineWidth=.4*scale;
     ctx.strokeRect(wx+.5,wy+.5,tyreW-1,tyreH-1);
+    ctx.restore();
   });
 
   // Headlights with player glow
@@ -2893,7 +2913,15 @@ function update(ts){
 
   // Boundary wall push-back
   const hitWall=pushBackToTrack(p,G.segs,G.wallDist);
-  if(hitWall){spawnP(G,p.x,p.y,'rgba(200,180,150,.6)',3);playWallHit();}
+  if(hitWall){
+    // Funken-Explosion bei Wand-Treffer (mehr & farbiger als zuvor)
+    for(let i=0;i<8;i++){
+      spawnP(G,p.x,p.y,i%2?'rgba(255,200,80,.85)':'rgba(255,140,40,.75)',1);
+    }
+    spawnP(G,p.x,p.y,'rgba(200,180,150,.6)',3); // Staub
+    playWallHit();
+    hapError(); // Mobile-Vibration bei Crash
+  }
 
   // Powerup collection
   for(const pw of G.pws){
@@ -3098,8 +3126,13 @@ function render(){
     const op=G.ops[opi];
     _step('op'+opi,()=>drawCar(ctx,op.x,op.y,op.car,op.angle,1,false,false,op.braking||false));
   }
-  // Player
-  _step('player',()=>drawCar(ctx,G.player.x,G.player.y,G.car,G.player.angle,1.18,true,nitroOn&&G.player.nitro>0,G.player.isBraking||false));
+  // Player — Front-Räder lenken sichtbar mit (wheelAngle in deg → rad, ±0.5)
+  // Body-Roll bei Drift: Slip-Angle gedämpft als visuelle Neigung
+  _step('player',()=>{
+    const steerVis=(wheelAngle/72)*0.55; // ±65° wheelAngle → ±0.5 rad Lenkeinschlag
+    const rollVis=(G.player.slipAngle||0)*0.15; // subtle drift roll
+    drawCar(ctx,G.player.x,G.player.y,G.car,G.player.angle,1.18,true,nitroOn&&G.player.nitro>0,G.player.isBraking||false,steerVis,rollVis);
+  });
 
   _step('arrows',()=>{
     if(G.segs){
@@ -4683,28 +4716,64 @@ function initGarageScene(){
     garageControls.minDistance=3;garageControls.maxDistance=20;
     garageControls.maxPolarAngle=Math.PI/1.9;
     garageControls.target.set(0,.72,0);
+    // Auto-Rotate für Premium-Showroom-Feeling (User kann jederzeit per Drag übernehmen)
+    garageControls.autoRotate=true;
+    garageControls.autoRotateSpeed=0.6; // langsam: ca. 18s pro Umdrehung
   }
 
-  // Lighting
-  garageScene.add(new THREE.AmbientLight(0x1a1a2e,2.0));
-  const spot=new THREE.SpotLight(0xffffff,150,35,Math.PI/5,0.45,2);
-  spot.position.set(0,11,2);spot.castShadow=true;
+  // ── PREMIUM Lighting Setup ──
+  garageScene.add(new THREE.AmbientLight(0x2a2a3e,1.6));
+  // Haupt-Spotlight von oben (Showroom-Optik)
+  const spot=new THREE.SpotLight(0xfff0d8,180,35,Math.PI/5,0.45,2);
+  spot.position.set(0,12,3);spot.castShadow=true;
   spot.shadow.mapSize.width=spot.shadow.mapSize.height=2048;
+  spot.shadow.bias=-0.0008;
   garageScene.add(spot,spot.target);
-  const spotB=new THREE.SpotLight(0x4060ff,70,25,Math.PI/5,0.6,2);
-  spotB.position.set(-7,9,-5);garageScene.add(spotB);
-  const spotC=new THREE.SpotLight(0xff3010,50,25,Math.PI/5,0.6,2);
-  spotC.position.set(7,9,-5);garageScene.add(spotC);
-  const fill=new THREE.DirectionalLight(0x8899bb,0.8);fill.position.set(0,4,8);garageScene.add(fill);
+  // Akzent-Licht blau (links)
+  const spotB=new THREE.SpotLight(0x4080ff,90,28,Math.PI/4.5,0.55,2);
+  spotB.position.set(-8,7,-4);garageScene.add(spotB);
+  // Akzent-Licht warm-rot (rechts)
+  const spotC=new THREE.SpotLight(0xff4020,75,28,Math.PI/4.5,0.55,2);
+  spotC.position.set(8,7,-4);garageScene.add(spotC);
+  // Rim Light hinten (Highlight-Kante an Karosserie)
+  const rim=new THREE.SpotLight(0xffd070,60,22,Math.PI/5,0.6,2);
+  rim.position.set(0,5,-9);rim.target.position.set(0,1,0);
+  garageScene.add(rim,rim.target);
+  // Fill-Licht von vorne
+  const fill=new THREE.DirectionalLight(0xaaccff,0.65);fill.position.set(0,4,8);garageScene.add(fill);
 
-  // Floor
-  const fCanvas=document.createElement('canvas');fCanvas.width=fCanvas.height=512;
+  // ── PREMIUM Boden: Showroom-Polish-Pattern ──
+  const fCanvas=document.createElement('canvas');fCanvas.width=fCanvas.height=1024;
   const fc=fCanvas.getContext('2d');
-  for(let i=0;i<8;i++)for(let j=0;j<8;j++){fc.fillStyle=(i+j)%2===0?'#111118':'#0d0d14';fc.fillRect(i*64,j*64,64,64);}
+  // Dunkler Hintergrund
+  fc.fillStyle='#0a0a14';fc.fillRect(0,0,1024,1024);
+  // Diagonale Streifen-Subtle
+  fc.strokeStyle='rgba(255,255,255,0.025)';fc.lineWidth=1.5;
+  for(let i=-1024;i<2048;i+=80){fc.beginPath();fc.moveTo(i,0);fc.lineTo(i+1024,1024);fc.stroke();}
+  // Helleres Zentrum-Glow
+  const grad=fc.createRadialGradient(512,512,80,512,512,500);
+  grad.addColorStop(0,'rgba(212,160,23,0.18)');grad.addColorStop(.6,'rgba(60,40,20,0.05)');grad.addColorStop(1,'rgba(0,0,0,0)');
+  fc.fillStyle=grad;fc.fillRect(0,0,1024,1024);
   const fTex=new THREE.CanvasTexture(fCanvas);
-  fTex.repeat.set(4,4);fTex.wrapS=fTex.wrapT=THREE.RepeatWrapping;
-  const floor=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.MeshStandardMaterial({map:fTex,roughness:0.12,metalness:0.85}));
+  fTex.wrapS=fTex.wrapT=THREE.ClampToEdgeWrapping;
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.MeshStandardMaterial({map:fTex,roughness:0.18,metalness:0.7}));
   floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;garageScene.add(floor);
+
+  // ── ROTATING TURNTABLE (kreisförmiger Sockel unter dem Auto) ──
+  const turntableGeom=new THREE.CylinderGeometry(2.6,2.7,0.08,64);
+  const turntableMat=new THREE.MeshStandardMaterial({color:0x1a1a26,metalness:0.92,roughness:0.18,emissive:0x0a0814,emissiveIntensity:0.4});
+  const turntable=new THREE.Mesh(turntableGeom,turntableMat);
+  turntable.position.y=-0.04;turntable.receiveShadow=true;garageScene.add(turntable);
+  // Goldenen Rand am Sockel
+  const ringGeom=new THREE.TorusGeometry(2.65,0.04,12,128);
+  const ringMat=new THREE.MeshStandardMaterial({color:0xd4a017,metalness:0.95,roughness:0.12,emissive:0x4a3008,emissiveIntensity:0.6});
+  const ring=new THREE.Mesh(ringGeom,ringMat);
+  ring.rotation.x=Math.PI/2;ring.position.y=0.01;garageScene.add(ring);
+  // Subtle Boden-Glow (radiales Light unten)
+  const glowGeom=new THREE.CircleGeometry(3.2,64);
+  const glowMat=new THREE.MeshBasicMaterial({color:0xd4a017,transparent:true,opacity:0.07,blending:THREE.AdditiveBlending,depthWrite:false});
+  const glow=new THREE.Mesh(glowGeom,glowMat);
+  glow.rotation.x=-Math.PI/2;glow.position.y=0.005;garageScene.add(glow);
 
   const loadingEl=document.getElementById('garageLoading');
   if(loadingEl)loadingEl.style.display='none';
@@ -4859,12 +4928,30 @@ function setCameraView(v){
     '3/4':{x:4.5,y:2.8,z:7.5},'Front':{x:0,y:1.6,z:8},'Seite':{x:9.5,y:2.2,z:0.1},'Top':{x:0.01,y:11,z:0.01}
   };
   const p=pos[v];if(!p)return;
+  // Auto-Rotate beim manuellen Wechseln pausieren (User-Intent respektieren)
+  if(garageControls&&garageControls.autoRotate){
+    garageControls.autoRotate=false;
+    const btn=document.getElementById('gAutoRotBtn');
+    if(btn){btn.style.borderColor='rgba(255,255,255,.15)';btn.style.color='rgba(255,255,255,.7)';btn.style.background='rgba(0,0,0,.5)';}
+  }
   garageCam.position.set(p.x,p.y,p.z);
   if(garageControls){garageControls.target.set(0,.85,0);garageControls.update();}
 }
 
+function toggleGarageAutoRotate(){
+  if(!garageControls)return;
+  garageControls.autoRotate=!garageControls.autoRotate;
+  const btn=document.getElementById('gAutoRotBtn');
+  if(btn){
+    btn.style.borderColor=garageControls.autoRotate?'var(--gold)':'rgba(255,255,255,.15)';
+    btn.style.color=garageControls.autoRotate?'var(--gold)':'rgba(255,255,255,.7)';
+    btn.style.background=garageControls.autoRotate?'rgba(212,160,23,.15)':'rgba(0,0,0,.5)';
+  }
+}
+
 function switchGarageTab(tab){
   garageActiveTab=tab;
+  hapTap();
   document.querySelectorAll('.gTab').forEach(b=>b.classList.toggle('active',b.dataset.gtab===tab));
   buildGarageTabContent();
 }
