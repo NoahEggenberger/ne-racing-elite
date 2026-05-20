@@ -1,0 +1,47 @@
+# Installers / Binaries
+*.exe
+*.msi
+*.lnk
+
+# Office documents
+*.docx
+*.doc
+*.xlsx
+*.xls
+*.pdf
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Temporary / Backup
+*.bak
+*.tmp
+~*
+
+# Dependencies (falls später Node.js dazukommt)
+node_modules/
+package-lock.json
+
+# Local environment
+.env
+.env.local
+
+# Andere, nicht-game-bezogene Dateien in diesem Ordner
+ToniPfiffnerGmbH_1
+garage_toni_pfiffner_final.html
+NoahStefanie_Spiel.html
+api.php
+noaheggenberger
+NE_Racing_Streckenproblem.docx
