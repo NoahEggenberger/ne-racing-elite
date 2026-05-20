@@ -276,6 +276,11 @@ body.dev-tablet #nitro-wrap{right:118px;}
 .wt-pl-car{font-size:.48rem;letter-spacing:.14em;color:rgba(255,255,255,.38);}
 .wt-stat{font-size:.58rem;letter-spacing:.22em;color:rgba(255,255,255,.32);animation:pulse 1.4s ease-in-out infinite;margin:.4rem 0;}
 .wt-btns{display:flex;gap:.7rem;margin-top:.8rem;flex-wrap:wrap;justify-content:center;}
+/* ── FLOATING BACK-BUTTON (Shop/Garage) ── */
+.back-btn-floating{position:fixed;top:.7rem;left:.7rem;z-index:200;font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.18em;padding:.55rem 1.1rem;border-radius:6px;border:1.5px solid var(--gold);background:rgba(20,15,8,.92);color:var(--gold);cursor:pointer;backdrop-filter:blur(8px);box-shadow:0 4px 14px rgba(0,0,0,.55);transition:transform .15s,background .15s,box-shadow .15s;}
+.back-btn-floating:hover{background:rgba(212,160,23,.18);transform:translateX(-3px);box-shadow:0 6px 18px rgba(0,0,0,.7),0 0 24px rgba(212,160,23,.4);}
+.back-btn-floating:active{transform:translateX(-1px) scale(0.97);}
+
 /* ── SHOP ── */
 .shop-card{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid var(--border);border-radius:8px;padding:.7rem;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:.32rem;}
 .shop-card:hover{border-color:rgba(212,160,23,.55);transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.45);}
@@ -407,6 +412,13 @@ body.dev-tablet #nitro-wrap{right:118px;}
     <div id="driftScore" style="position:absolute;top:3rem;left:50%;transform:translateX(-50%);display:none;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);pointer-events:none;z-index:20;letter-spacing:.1em;"></div>
     <!-- Race mode badge + drivetrain indicator -->
     <div id="raceModeHud" style="position:absolute;top:.5rem;left:50%;transform:translateX(-50%);display:flex;gap:.4rem;align-items:center;pointer-events:none;z-index:20;"></div>
+    <!-- ZIEL-Anzeige für Time/Drift/Position-Targets -->
+    <div id="targetHud" style="position:absolute;top:4.5rem;right:1rem;display:none;font-family:'Bebas Neue',sans-serif;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);border:1px solid var(--gold);border-radius:6px;padding:.5rem .8rem;pointer-events:none;z-index:20;min-width:130px;text-align:right;">
+      <div id="targetLabel" style="font-size:.46rem;letter-spacing:.22em;color:rgba(255,215,80,.65);margin-bottom:.18rem;">ZIEL</div>
+      <div id="targetValue" style="font-size:1.05rem;letter-spacing:.06em;color:var(--gold);line-height:1;">–</div>
+      <div id="targetCurrent" style="font-size:.6rem;letter-spacing:.12em;color:rgba(255,255,255,.7);margin-top:.18rem;line-height:1;">aktuell: –</div>
+      <div id="targetStars" style="font-size:.7rem;letter-spacing:.08em;margin-top:.18rem;">☆☆☆</div>
+    </div>
     <div id="wzone"><svg id="wsvg" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" style="width:240px;height:240px;"></svg></div>
     <div id="steerzone">
       <button class="sbtn" id="sbtn-l">◄</button>
@@ -476,11 +488,12 @@ body.dev-tablet #nitro-wrap{right:118px;}
 
 <!-- ══ SHOP ══ -->
 <div id="sShop" class="screen off" style="background:var(--ink);overflow-y:auto;padding:1.2rem;align-items:flex-start;">
-  <div style="display:flex;justify-content:space-between;align-items:center;width:100%;max-width:920px;align-self:center;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;">
+  <!-- Prominenter Floating-Back-Button immer oben links sichtbar -->
+  <button onclick="showScreen('sMenu');buildMenuUI();hapTap();" class="back-btn-floating">← ZURÜCK ZUM MENÜ</button>
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%;max-width:920px;align-self:center;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;margin-top:2.6rem;">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.25em;color:var(--gold);">🏎 CLASSIC CAR GARAGE</div>
     <div style="display:flex;align-items:center;gap:1rem;">
       <div id="shopBalance" style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.15em;color:#2ecc71;"></div>
-      <button onclick="showScreen('sMenu')" style="font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.2em;padding:.4rem 1.2rem;border-radius:4px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);cursor:pointer;">← MENÜ</button>
     </div>
   </div>
   <div id="shopFilterRow" style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.4rem;width:100%;max-width:920px;align-self:center;"></div>
@@ -493,6 +506,8 @@ body.dev-tablet #nitro-wrap{right:118px;}
 
 <!-- ══ GARAGE ══ -->
 <div id="sGarage" class="screen off" style="background:#050508;flex-direction:row;overflow:hidden;">
+  <!-- Floating Back-Button - immer prominent oben links -->
+  <button onclick="showScreen('sMenu');buildMenuUI();hapTap();" class="back-btn-floating">← ZURÜCK ZUM MENÜ</button>
   <!-- 3D Canvas Area -->
   <div style="flex:1.6;position:relative;min-width:0;display:flex;flex-direction:column;">
     <canvas id="garageCanvas" style="width:100%;flex:1;display:block;"></canvas>
@@ -937,6 +952,99 @@ const BIOME_MODE_PATTERN={
 function getLevelMode(worldId,levelIdx){
   const pattern=BIOME_MODE_PATTERN[worldId]||BIOME_MODE_PATTERN.city;
   return pattern[levelIdx%pattern.length]||'classic_race';
+}
+
+// ════════════════════════════════════════════════
+// RACE TARGETS — pro Level & Mode konkrete Ziele (Bronze/Silber/Gold)
+// ════════════════════════════════════════════════
+// Jeder Modus hat eine Vorgabe (Zeit, Punkte, Position).
+// 3 Sterne = Gold, 2 = Silber, 1 = Bronze. Target ist Silber-Schwelle (2★).
+//
+// Beispiel "Time Trial Level 5":
+//   3 Runden in unter 2:15 → ⭐⭐
+//   in unter 1:55 → ⭐⭐⭐ (Gold)
+//   in unter 2:35 → ⭐ (Bronze)
+//   sonst kein Stern
+function getRaceTarget(modeId,worldId,levelIdx){
+  // Basis-Rundenzeit (Sek) skaliert mit Level (höher = länger weil schwierigere Strecke)
+  const baseLapSec=45+levelIdx*2.5;
+  const totalLaps=({classic_race:3,time_trial:3,drift_challenge:3,sprint:1,elimination:3})[modeId]||3;
+
+  switch(modeId){
+    case 'time_trial':
+      return {
+        type:'time',
+        label:'ZIELZEIT',
+        gold:Math.round(baseLapSec*totalLaps*0.85),  // ⭐⭐⭐
+        silver:Math.round(baseLapSec*totalLaps*0.95), // ⭐⭐
+        bronze:Math.round(baseLapSec*totalLaps*1.10), // ⭐
+        unit:'s'
+      };
+    case 'sprint':
+      return {
+        type:'time',
+        label:'SPRINT-ZIEL',
+        gold:Math.round(baseLapSec*0.82),
+        silver:Math.round(baseLapSec*0.94),
+        bronze:Math.round(baseLapSec*1.08),
+        unit:'s'
+      };
+    case 'drift_challenge':
+      // Drift-Punkte skalieren mit Level (mehr Können erwartet)
+      const baseDrift=2000+levelIdx*180;
+      return {
+        type:'score',
+        label:'DRIFT-ZIEL',
+        gold:Math.round(baseDrift*1.6),    // ⭐⭐⭐
+        silver:Math.round(baseDrift),       // ⭐⭐
+        bronze:Math.round(baseDrift*0.55),  // ⭐
+        unit:'P'
+      };
+    case 'classic_race':
+      return {
+        type:'position',
+        label:'ZIEL: POSITION',
+        gold:1,    // Sieg = ⭐⭐⭐
+        silver:2,  // Podium → ⭐⭐
+        bronze:3,  // Platz 3 → ⭐
+        unit:'.'
+      };
+    case 'elimination':
+      // Bei Elimination: alle 40s wird Letzter eliminiert. Überlebst du = Gold
+      return {
+        type:'position',
+        label:'ZIEL: ÜBERLEBEN',
+        gold:1,silver:2,bronze:3,
+        unit:'.'
+      };
+    default:
+      return {type:'position',label:'ZIEL',gold:1,silver:2,bronze:3,unit:'.'};
+  }
+}
+
+// Zeit-Formatter: 95s → "1:35"
+function fmtTime(sec){
+  if(!isFinite(sec)||sec<0)return '–';
+  const m=Math.floor(sec/60), s=Math.floor(sec%60), ms=Math.floor((sec%1)*100);
+  return `${m}:${s.toString().padStart(2,'0')}.${ms.toString().padStart(2,'0')}`;
+}
+// Kompakter ohne ms: 95s → "1:35"
+function fmtTimeShort(sec){
+  if(!isFinite(sec)||sec<0)return '–';
+  const m=Math.floor(sec/60), s=Math.floor(sec%60);
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+// Sterne ermitteln basierend auf erreichtem Wert und Target
+function calcStarsFromTarget(achievedValue,target){
+  if(!target)return 0;
+  const better=target.type==='time'||target.type==='position'
+    ? (v,t)=>v<=t  // niedriger ist besser
+    : (v,t)=>v>=t; // höher ist besser (score)
+  if(better(achievedValue,target.gold))return 3;
+  if(better(achievedValue,target.silver))return 2;
+  if(better(achievedValue,target.bronze))return 1;
+  return 0;
 }
 
 // ════════════════════════════════════════════════
@@ -2652,6 +2760,9 @@ function initGame(){
     t:0,raceMs:0,started:false,finished:false,opFinished:false,grassMs:0,
     lastPrize:0,lastPos:1,lastStars:0,
     isMP:isMP,
+    // Race Target: konkretes Ziel (Zeit/Punkte/Position) + Schwellen für 1/2/3 Sterne
+    target:isMP?null:getRaceTarget(raceMode,world.id,selLevel),
+    driftScore:0,
   };
   if(isMP)mpPlayers={};
   wheelAngle=0;targetWheelAngle=0;nitroOn=false;brakeOn=false;pressing=false;gasHeld=false;steerL=false;steerR=false;brakeHeld=false;
@@ -3050,10 +3161,44 @@ function update(ts){
   const all=[{l:p.lap,pr:p.prog,me:true},...G.ops.map(o=>({l:o.lap,pr:o.prog,me:false}))];
   if(G.isMP)for(const mp of Object.values(mpPlayers))if(mp.lap!==undefined)all.push({l:mp.lap,pr:mp.prog||0,me:false});
   all.sort((a,b)=>b.l-a.l||(b.pr%G.segs.length)-(a.pr%G.segs.length));
-  document.getElementById('hPos').textContent=(all.findIndex(x=>x.me)+1)+'.';
+  const curPos=all.findIndex(x=>x.me)+1;
+  document.getElementById('hPos').textContent=curPos+'.';
+
+  // ── ZIEL-HUD aktualisieren (Time/Drift/Position-Target Live-Anzeige) ──
+  updateTargetHUD(curPos);
 
   // Send own state to peers
   Net.sendState(p);
+}
+
+// Target-HUD: Live-Anzeige des aktuellen Stands vs. Ziel (mit ★-Vorschau)
+function updateTargetHUD(currentPos){
+  const hud=document.getElementById('targetHud');if(!hud||!G||!G.target)return;
+  const t=G.target;
+  hud.style.display='block';
+  document.getElementById('targetLabel').textContent=t.label;
+  let goldStr,curStr,curVal;
+  if(t.type==='time'){
+    goldStr='⭐⭐⭐ '+fmtTimeShort(t.gold);
+    curVal=G.raceMs/1000;
+    curStr='aktuell: '+fmtTimeShort(curVal);
+  }else if(t.type==='score'){
+    goldStr='⭐⭐⭐ '+t.gold.toLocaleString('de')+' P';
+    curVal=Math.round(G.driftScore||0);
+    curStr='aktuell: '+curVal.toLocaleString('de')+' P';
+  }else{ // position
+    goldStr='⭐⭐⭐ '+t.gold+'.';
+    curVal=currentPos;
+    curStr='Position: '+currentPos+'.';
+  }
+  document.getElementById('targetValue').textContent=goldStr;
+  document.getElementById('targetCurrent').textContent=curStr;
+  // Live-Sterne-Vorschau
+  const stars=calcStarsFromTarget(curVal,t);
+  const starStr='★'.repeat(stars)+'☆'.repeat(3-stars);
+  const starEl=document.getElementById('targetStars');
+  starEl.textContent=starStr;
+  starEl.style.color=stars===3?'#ffd700':stars===2?'#c0c0c0':stars===1?'#cd7f32':'rgba(255,255,255,.25)';
 }
 
 // ════════════════════════════════════════════════
@@ -3263,13 +3408,26 @@ function endRace(playerFinished){
   all.sort((a,b)=>b.l-a.l||(b.pr%G.segs.length)-(a.pr%G.segs.length));
   const pos=all.findIndex(x=>x.me)+1;
 
-  let stars=0,newPrize=0;
+  let stars=0,newPrize=0,targetMet='none';
   if(!G.isMP){
-    // Stars + prize only in singleplayer
-    stars=playerFinished?1:0;
-    if(pos<=3)stars=2;if(pos===1)stars=3;
+    // ── Stars basierend auf RACE TARGET vergeben (statt nur Position) ──
+    if(G.target&&playerFinished){
+      let achieved;
+      if(G.target.type==='time'){
+        achieved=G.raceMs/1000; // Sekunden
+      }else if(G.target.type==='score'){
+        achieved=Math.round(G.driftScore||0);
+      }else{ // position
+        achieved=pos;
+      }
+      stars=calcStarsFromTarget(achieved,G.target);
+      targetMet=stars>=3?'gold':stars===2?'silver':stars===1?'bronze':'missed';
+    }else if(playerFinished){
+      // Fallback (kein Target): klassisches Positions-System
+      stars=pos===1?3:pos<=3?2:1;
+    }
     const prevStars=getStars(G.world.id,selLevel);
-    setStars(G.world.id,selLevel,stars);
+    setStars(G.world.id,selLevel,Math.max(prevStars,stars)); // höchste Sterne behalten
     checkWorldUnlocks();
     const driftD=G.player?.driftDist||0;
     const cleanL=G.player?.cleanLap!==false;
@@ -3280,6 +3438,7 @@ function endRace(playerFinished){
     save();
     checkCarUnlocks(G.world?.id||'city',selLevel);
   }
+  G.lastTargetMet=targetMet;
   G.lastPrize=newPrize;G.lastPos=pos;G.lastStars=stars;
 
   playFinishJingle(pos);
@@ -3296,9 +3455,15 @@ function endRace(playerFinished){
   document.getElementById('finTop').textContent=Math.round(p.topKmh);
   document.getElementById('finPos').textContent=pos+'.';
   document.getElementById('finCar').textContent=`${G.car.brand} ${G.car.name} ${G.car.year}`;
+  // Titel: jetzt basierend auf Target-Erfüllung statt nur Position
+  const titleEl=document.getElementById('finTitle');
+  if(targetMet==='gold')      titleEl.textContent='🏆 GOLD! Ziel klar übertroffen';
+  else if(targetMet==='silver')titleEl.textContent='🥈 SILBER — Ziel erreicht';
+  else if(targetMet==='bronze')titleEl.textContent='🥉 BRONZE — knapp am Ziel';
+  else if(targetMet==='missed')titleEl.textContent='ZIEL VERFEHLT — versuche es erneut';
+  else                         titleEl.textContent=pos===1?'SIEG! 🏆':pos<=3?'PODIUM!':playerFinished?'FINISH':'DISQUALIFIZIERT';
   document.getElementById('finBadge').textContent=['🥇','🥈','🥉','4.','5.'][pos-1]||pos+'.';
-  document.getElementById('finTitle').textContent=pos===1?'SIEG! 🏆':pos<=3?'PODIUM!':playerFinished?'FINISH':'DISQUALIFIZIERT';
-  document.getElementById('finStars').textContent=['','⭐','⭐⭐','⭐⭐⭐'][stars]||'';
+  document.getElementById('finStars').textContent=['☆☆☆','⭐☆☆','⭐⭐☆','⭐⭐⭐'][stars]||'☆☆☆';
 
   // MP: skip tuning, go straight to finish screen
   if(G.isMP){showScreen('sFin');return;}
@@ -3902,7 +4067,15 @@ function showRaceModeIntro(onComplete){
 
     setText('rmiIcon', def.icon);
     setText('rmiName', def.name); setStyle('rmiName','color',def.color);
-    setText('rmiDesc', def.desc);
+    // Description erweitert mit konkretem Ziel (Zeit/Punkte/Position)
+    const tgt=getRaceTarget(raceMode,world?.id||'city',selLevel);
+    let goalDesc=def.desc;
+    if(tgt){
+      if(tgt.type==='time')      goalDesc+=' · Gold: '+fmtTimeShort(tgt.gold);
+      else if(tgt.type==='score') goalDesc+=' · Gold: '+tgt.gold.toLocaleString('de')+' Punkte';
+      else if(tgt.type==='position') goalDesc+=' · Gold: '+tgt.gold+'. Platz';
+    }
+    setText('rmiDesc', goalDesc);
     setText('rmiBiome',(world?.icon||'🌍')+'  '+(world?.name||'')+' · Level '+(selLevel+1));
     setText('rmiDrv',  drvLabel||'RWD');
     const badge=document.getElementById('rmiBadge');
@@ -4786,6 +4959,31 @@ function initGarageScene(){
   animGarage();
 }
 
+// ════════════════════════════════════════════════
+// CAR-SHAPE LOOKUP — per Kategorie unterschiedliche Karosserie-Proportionen
+// Damit Muscle-Cars wuchtig wirken, Sportler tief, Klassiker rundlich, etc.
+// ════════════════════════════════════════════════
+const CAR_SHAPES={
+  '70s Muscle':       {L:1.18,W:1.10,roof:0.94,ride:0.02,hood:1.25,trunk:0.85,wheelR:1.05,wing:false,fender:1.04},
+  'Classic Sports':   {L:1.00,W:0.96,roof:0.85,ride:-0.04,hood:1.05,trunk:0.95,wheelR:0.95,wing:false,fender:1.00},
+  'Supercars':        {L:1.08,W:1.10,roof:0.78,ride:-0.06,hood:0.95,trunk:0.85,wheelR:1.08,wing:true, fender:1.06},
+  'Group B':          {L:0.92,W:1.12,roof:0.96,ride:0.03,hood:0.90,trunk:0.95,wheelR:1.02,wing:true, fender:1.08},
+  'JDM Classics':     {L:1.00,W:1.02,roof:0.90,ride:-0.02,hood:1.00,trunk:1.00,wheelR:1.00,wing:false,fender:1.02},
+  'F1 Heritage':      {L:1.14,W:1.18,roof:0.55,ride:-0.10,hood:1.10,trunk:1.05,wheelR:1.12,wing:true, fender:1.10},
+  'Le Mans Legends':  {L:1.22,W:1.16,roof:0.70,ride:-0.07,hood:1.05,trunk:1.08,wheelR:1.08,wing:true, fender:1.08},
+  'British Icons':    {L:1.00,W:0.96,roof:0.92,ride:-0.01,hood:1.05,trunk:0.98,wheelR:0.96,fender:1.00},
+  'Swedish Classics': {L:1.05,W:1.00,roof:1.08,ride:0.02,hood:0.95,trunk:1.05,wheelR:0.98,fender:1.00},
+  '60s Legends':      {L:1.05,W:1.02,roof:0.92,ride:0.01,hood:1.10,trunk:1.00,wheelR:0.96,fender:1.02},
+  'GT Classics':      {L:1.10,W:1.04,roof:0.82,ride:-0.03,hood:1.10,trunk:0.92,wheelR:1.02,fender:1.04},
+  'Rally Heroes':     {L:0.94,W:1.05,roof:1.05,ride:0.05,hood:0.95,trunk:0.95,wheelR:1.05,fender:1.06},
+  'Touring Cars':     {L:1.02,W:1.04,roof:1.00,ride:-0.01,hood:1.00,trunk:1.00,wheelR:1.00,fender:1.04},
+  'Hot Hatches':      {L:0.88,W:0.96,roof:1.04,ride:0.01,hood:0.85,trunk:0.80,wheelR:0.94,fender:0.98},
+};
+function getCarShape(car){
+  const def={L:1.0,W:1.0,roof:1.0,ride:0,hood:1.0,trunk:1.0,wheelR:1.0,wing:false,fender:1.0};
+  return Object.assign({},def,CAR_SHAPES[car.cat]||{});
+}
+
 function updateGarageCar(carId){
   if(!garageScene||!window.THREE)return;
   const THREE=window.THREE;const T=THREE;
@@ -4796,15 +4994,25 @@ function updateGarageCar(carId){
   const roofCol=new T.Color(t.roofColor||car.roof);
   const group=new T.Group();
 
-  // ─── DIMENSIONS (1 unit = 1 metre — real car proportions) ──────────────────
-  const W=0.92,L=2.02,WC=0.78,TR=0.30; // half-width, half-length, half-cabin-width, tyre-radius
+  // ─── DIMENSIONS (1 unit = 1 metre, modulated by car category shape) ────────
+  const shape=getCarShape(car);
+  const W=0.92*shape.W;
+  const L=2.02*shape.L;
+  const WC=0.78*shape.W*0.92; // cabin slightly narrower than body
+  const TR=0.30*shape.wheelR;
   const isWide=!!t.widebody;
-  const tyreWidth=0.11+(t.tyreWidth||0)*0.020+(isWide?0.02:0);
-  const WX=isWide?W+0.14:W+0.04; // wheel axle X position
-  const YS=0.08,YSH=0.96,YR=1.42; // sill bottom, shoulder/windowsill, roof top
-  const bodyH=YSH-YS,cabH=YR-YSH; // body height=0.88, cabin height=0.46
-  const bodyY=(YS+YSH)/2,cabY=(YSH+YR)/2; // body center Y=0.52, cabin center Y=1.19
-  const ZF=-L,ZR=L,ZCF=-0.56,ZCR=0.62; // front face, rear face, cabin front Z, cabin rear Z
+  const tyreWidth=(0.11+(t.tyreWidth||0)*0.020+(isWide?0.02:0))*shape.wheelR;
+  const WX=(isWide?W+0.14:W+0.04); // wheel axle X position
+  const YS=0.08+shape.ride; // sill bottom (ride height varies per category)
+  const YSH=0.96+shape.ride; // shoulder line
+  const YR=YSH+0.46*shape.roof; // roof top (cabin height varies)
+  const bodyH=YSH-YS;
+  const cabH=YR-YSH;
+  const bodyY=(YS+YSH)/2;
+  const cabY=(YSH+YR)/2;
+  // Cabin shifted based on hood/trunk ratio (muscle: cabin further back)
+  const cabShift=(shape.hood-shape.trunk)*0.18;
+  const ZF=-L,ZR=L,ZCF=-0.56+cabShift,ZCR=0.62+cabShift;
 
   // ─── MATERIALS ──────────────────────────────────────────────────────────────
   const paint=(o={})=>new T.MeshStandardMaterial({color:bodyCol,metalness:0.82,roughness:0.12,...o});
@@ -4883,15 +5091,25 @@ function updateGarageCar(carId){
     [[-W,-L*0.48],[W,-L*0.48],[-W,L*0.52],[W,L*0.52]].forEach(([px,pz])=>
       add(box(0.08,0.30,L*0.50),paint(),px,bodyY-0.06,pz));
   }
-  if(t.rearWingGT||t.rearWingSmall){
-    const wH=t.rearWingGT?0.60:0.28,wyB=YSH+0.06;
+  if(t.rearWingGT||t.rearWingSmall||shape.wing){
+    // Race-Kategorien bekommen automatisch einen Wing
+    const wH=t.rearWingGT?0.60:(shape.wing?0.42:0.28),wyB=YSH+0.06;
     [-W*0.80,W*0.80].forEach(px=>add(box(0.04,wH,0.22),blk(),px,wyB+wH/2,ZCR+0.08));
     add(box(W*1.70,0.05,0.30),paint(),0,wyB+wH+0.02,ZCR+0.08,0.14);
     add(box(W*1.66,0.04,0.04),blk(),0,wyB+wH+0.06,ZCR-0.04);
   }
+  // Verbreiterte Kotflügel über Rädern für Muscle/Race-Cars (shape.fender>1.0)
+  if(shape.fender>1.02){
+    const fW=W*(shape.fender-1.0)*1.8;
+    [[-W,-1.32],[W,-1.32],[-W,1.28],[W,1.28]].forEach(([px,pz])=>{
+      const sgn=px<0?-1:1;
+      add(box(fW,bodyH*0.6,0.55),paint(),px+sgn*fW*0.4,bodyY+0.02,pz);
+    });
+  }
 
   // ─── WHEELS ─────────────────────────────────────────────────────────────────
-  const FZ=-1.32,RZ=1.28; // front/rear axle Z positions
+  // Wheel-Position skaliert mit Auto-Länge (lange Autos haben weiter auseinander Räder)
+  const FZ=-1.32*shape.L, RZ=1.28*shape.L;
   [[-WX,TR,FZ],[WX,TR,FZ],[-WX,TR,RZ],[WX,TR,RZ]].forEach(([wx,wy,wz])=>{
     const side=wx<0?-1:1;
     const tw=tyreWidth;
