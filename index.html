@@ -281,6 +281,11 @@ body.dev-tablet #nitro-wrap{right:118px;}
 .back-btn-floating:hover{background:rgba(212,160,23,.18);transform:translateX(-3px);box-shadow:0 6px 18px rgba(0,0,0,.7),0 0 24px rgba(212,160,23,.4);}
 .back-btn-floating:active{transform:translateX(-1px) scale(0.97);}
 
+/* ── FLOATING MONEY-DISPLAY (Shop/Garage) — immer sichtbar oben rechts ── */
+.money-floating{position:fixed;top:.7rem;right:.7rem;z-index:200;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.12em;padding:.55rem 1.1rem;border-radius:6px;border:1.5px solid #2ecc71;background:rgba(8,20,12,.92);color:#27ff8a;backdrop-filter:blur(8px);box-shadow:0 4px 14px rgba(0,0,0,.55),0 0 18px rgba(46,204,113,.18);pointer-events:none;display:flex;align-items:center;gap:.3rem;}
+.money-floating .ml-icon{font-size:1.1rem;}
+.money-floating .ml-label{font-size:.42rem;letter-spacing:.2em;color:rgba(46,204,113,.55);margin-right:.4rem;}
+
 /* ── SHOP ── */
 .shop-card{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid var(--border);border-radius:8px;padding:.7rem;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:.32rem;}
 .shop-card:hover{border-color:rgba(212,160,23,.55);transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.45);}
@@ -404,7 +409,8 @@ body.dev-tablet #nitro-wrap{right:118px;}
       <div id="mm-wrap"><canvas id="mm" width="150" height="108"></canvas></div>
       <div class="hpill"><div class="hpill-lbl">Position</div><div class="hpill-val col-red" id="hPos">1.</div></div>
     </div>
-    <div id="nitro-wrap"><div class="ntrack"><div class="nfill" id="nBar" style="height:0%"></div></div><div class="nlbl">BOOST</div></div>
+    <!-- BOOST/Nitro entfernt — durch E-Brake ersetzt. Element bleibt versteckt für Rückwärtskompatibilität -->
+    <div id="nitro-wrap" style="display:none;"><div class="ntrack"><div class="nfill" id="nBar" style="height:0%"></div></div><div class="nlbl">BOOST</div></div>
     <div id="gauge-wrap"><canvas id="gauge" width="100" height="100"></canvas></div>
     <div id="offtrack">⚠ NEBEN DER STRECKE</div>
     <div id="rescueCount"></div>
@@ -427,7 +433,7 @@ body.dev-tablet #nitro-wrap{right:118px;}
     <div id="actzone">
       <button class="abtn" id="abtn-brk">BREMSE</button>
       <button class="abtn" id="abtn-gas">GAS</button>
-      <button class="abtn" id="abtn-n">⚡</button>
+      <button class="abtn" id="abtn-n" title="Handbremse (E-Brake) für Drift">🅿</button>
     </div>
     <div id="kbHint">↑ GAS &nbsp;·&nbsp; ↓ BREMSE &nbsp;·&nbsp; ← → LENKEN &nbsp;·&nbsp; LEERTASTE BOOST</div>
     <!-- Pause button -->
@@ -490,6 +496,8 @@ body.dev-tablet #nitro-wrap{right:118px;}
 <div id="sShop" class="screen off" style="background:var(--ink);overflow-y:auto;padding:1.2rem;align-items:flex-start;">
   <!-- Prominenter Floating-Back-Button immer oben links sichtbar -->
   <button onclick="showScreen('sMenu');buildMenuUI();hapTap();" class="back-btn-floating">← ZURÜCK ZUM MENÜ</button>
+  <!-- Floating Geld-Anzeige immer oben rechts sichtbar -->
+  <div class="money-floating"><span class="ml-icon">💰</span><span class="ml-label">KONTO</span><span id="shopBalanceFloat">0 €</span></div>
   <div style="display:flex;justify-content:space-between;align-items:center;width:100%;max-width:920px;align-self:center;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;margin-top:2.6rem;">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.25em;color:var(--gold);">🏎 CLASSIC CAR GARAGE</div>
     <div style="display:flex;align-items:center;gap:1rem;">
@@ -508,6 +516,8 @@ body.dev-tablet #nitro-wrap{right:118px;}
 <div id="sGarage" class="screen off" style="background:#050508;flex-direction:row;overflow:hidden;">
   <!-- Floating Back-Button - immer prominent oben links -->
   <button onclick="showScreen('sMenu');buildMenuUI();hapTap();" class="back-btn-floating">← ZURÜCK ZUM MENÜ</button>
+  <!-- Floating Geld-Anzeige immer oben rechts -->
+  <div class="money-floating"><span class="ml-icon">💰</span><span class="ml-label">KONTO</span><span id="garageBalanceFloat">0 €</span></div>
   <!-- 3D Canvas Area -->
   <div style="flex:1.6;position:relative;min-width:0;display:flex;flex-direction:column;">
     <canvas id="garageCanvas" style="width:100%;flex:1;display:block;"></canvas>
@@ -966,38 +976,39 @@ function getLevelMode(worldId,levelIdx){
 //   in unter 2:35 → ⭐ (Bronze)
 //   sonst kein Stern
 function getRaceTarget(modeId,worldId,levelIdx){
-  // Basis-Rundenzeit (Sek) skaliert mit Level (höher = länger weil schwierigere Strecke)
-  const baseLapSec=45+levelIdx*2.5;
-  const totalLaps=({classic_race:3,time_trial:3,drift_challenge:3,sprint:1,elimination:3})[modeId]||3;
+  // Realistische Basis-Rundenzeit (Sek): kleine Strecken = ~25s, große = ~45s
+  // Level 0 → 25s/Rd, Level 19 → 53s/Rd
+  const baseLapSec=25+levelIdx*1.5;
+  const totalLaps=3; // Standard 3 Runden für alle Modi (außer Sprint)
 
   switch(modeId){
     case 'time_trial':
       return {
         type:'time',
-        label:'ZIELZEIT',
-        gold:Math.round(baseLapSec*totalLaps*0.85),  // ⭐⭐⭐
-        silver:Math.round(baseLapSec*totalLaps*0.95), // ⭐⭐
-        bronze:Math.round(baseLapSec*totalLaps*1.10), // ⭐
+        label:'ZIELZEIT (3 Runden)',
+        gold:Math.round(baseLapSec*totalLaps*0.88),   // Gold = sehr schnell
+        silver:Math.round(baseLapSec*totalLaps*1.00), // Silber = normal
+        bronze:Math.round(baseLapSec*totalLaps*1.18), // Bronze = locker
         unit:'s'
       };
     case 'sprint':
       return {
         type:'time',
-        label:'SPRINT-ZIEL',
-        gold:Math.round(baseLapSec*0.82),
-        silver:Math.round(baseLapSec*0.94),
-        bronze:Math.round(baseLapSec*1.08),
+        label:'SPRINT (1 Runde)',
+        gold:Math.round(baseLapSec*0.85),
+        silver:Math.round(baseLapSec*0.97),
+        bronze:Math.round(baseLapSec*1.15),
         unit:'s'
       };
     case 'drift_challenge':
-      // Drift-Punkte skalieren mit Level (mehr Können erwartet)
-      const baseDrift=2000+levelIdx*180;
+      // Drift-Punkte skalieren mit Level (3 Runden Zeit zum Sammeln)
+      const baseDrift=1500+levelIdx*150;
       return {
         type:'score',
-        label:'DRIFT-ZIEL',
-        gold:Math.round(baseDrift*1.6),    // ⭐⭐⭐
-        silver:Math.round(baseDrift),       // ⭐⭐
-        bronze:Math.round(baseDrift*0.55),  // ⭐
+        label:'DRIFT-ZIEL (3 Runden)',
+        gold:Math.round(baseDrift*1.7),     // ⭐⭐⭐
+        silver:Math.round(baseDrift),        // ⭐⭐
+        bronze:Math.round(baseDrift*0.50),   // ⭐
         unit:'P'
       };
     case 'classic_race':
@@ -1335,52 +1346,55 @@ const BIOME_SURFACE={
 // ════════════════════════════════════════════════
 // TYRE COMPOUNDS
 // ════════════════════════════════════════════════
+// Preise 3-4x erhöht: damit Tuning echte Progression bleibt
+// (vorher: alles in 1-2 Rennen kaufbar → keine Spannung)
 const TYRE_COMPOUNDS={
-  slick:       {asphalt:1.42,gravel:0.28,sand:0.14,mud:0.10,snow:0.09,ice:0.07,saltflat:1.38,dirt:0.22,name:'Slick',       icon:'🏎',price:9000},
-  sport_soft:  {asphalt:1.22,gravel:0.52,sand:0.33,mud:0.28,snow:0.18,ice:0.13,saltflat:1.18,dirt:0.42,name:'Sport Soft',  icon:'🔴',price:3500},
+  slick:       {asphalt:1.42,gravel:0.28,sand:0.14,mud:0.10,snow:0.09,ice:0.07,saltflat:1.38,dirt:0.22,name:'Slick',       icon:'🏎',price:35000},
+  sport_soft:  {asphalt:1.22,gravel:0.52,sand:0.33,mud:0.28,snow:0.18,ice:0.13,saltflat:1.18,dirt:0.42,name:'Sport Soft',  icon:'🔴',price:14000},
   sport_medium:{asphalt:1.00,gravel:0.70,sand:0.50,mud:0.44,snow:0.34,ice:0.24,saltflat:0.96,dirt:0.60,name:'Sport Medium',icon:'🟡',price:0},
-  sport_hard:  {asphalt:0.84,gravel:0.82,sand:0.66,mud:0.54,snow:0.52,ice:0.36,saltflat:0.80,dirt:0.72,name:'Sport Hard',  icon:'⚪',price:1800},
-  rally:       {asphalt:0.68,gravel:1.18,sand:0.88,mud:0.76,snow:0.76,ice:0.52,saltflat:0.62,dirt:0.96,name:'Rally',       icon:'🟠',price:4500},
-  gravel_rally:{asphalt:0.58,gravel:1.32,sand:1.12,mud:1.02,snow:0.58,ice:0.44,saltflat:0.52,dirt:1.18,name:'Gravel Rally',icon:'🟤',price:6000},
-  snow_tyre:   {asphalt:0.54,gravel:0.74,sand:0.64,mud:0.68,snow:1.28,ice:1.14,saltflat:0.48,dirt:0.72,name:'Snow/Ice',   icon:'❄️',price:5000},
-  all_season:  {asphalt:0.80,gravel:0.84,sand:0.74,mud:0.70,snow:0.84,ice:0.62,saltflat:0.76,dirt:0.80,name:'All-Season', icon:'🔵',price:2800},
+  sport_hard:  {asphalt:0.84,gravel:0.82,sand:0.66,mud:0.54,snow:0.52,ice:0.36,saltflat:0.80,dirt:0.72,name:'Sport Hard',  icon:'⚪',price:7000},
+  rally:       {asphalt:0.68,gravel:1.18,sand:0.88,mud:0.76,snow:0.76,ice:0.52,saltflat:0.62,dirt:0.96,name:'Rally',       icon:'🟠',price:18000},
+  gravel_rally:{asphalt:0.58,gravel:1.32,sand:1.12,mud:1.02,snow:0.58,ice:0.44,saltflat:0.52,dirt:1.18,name:'Gravel Rally',icon:'🟤',price:24000},
+  snow_tyre:   {asphalt:0.54,gravel:0.74,sand:0.64,mud:0.68,snow:1.28,ice:1.14,saltflat:0.48,dirt:0.72,name:'Snow/Ice',   icon:'❄️',price:20000},
+  all_season:  {asphalt:0.80,gravel:0.84,sand:0.74,mud:0.70,snow:0.84,ice:0.62,saltflat:0.76,dirt:0.80,name:'All-Season', icon:'🔵',price:11000},
 };
 
 // ════════════════════════════════════════════════
-// BODYKIT & TUNING PARTS
+// BODYKIT & TUNING PARTS — Preise 3-4x erhöht (echte Progression)
 // ════════════════════════════════════════════════
 const BODYKIT_PARTS={
-  frontSplitter:{name:'Frontschürze',   price:4500, effect:'Abtrieb +5%'},
-  rearWingSmall:{name:'Heckspoiler',    price:6500, effect:'Abtrieb +8%, VMax −1%'},
-  rearWingGT:   {name:'GT-Flügel',     price:13000, effect:'Abtrieb +15%, VMax −3%'},
-  sideskirts:   {name:'Seitenschweller',price:3800, effect:'Stabilität +3%'},
-  widebody:     {name:'Wide-Body-Kit', price:19000, effect:'Reifenbreite +40mm'},
-  hoodScoop:    {name:'Motorhauben-Hutze',price:2800,effect:'Turbo +5%'},
+  frontSplitter:{name:'Frontschürze',   price:18000,effect:'Abtrieb +5%'},
+  rearWingSmall:{name:'Heckspoiler',    price:26000,effect:'Abtrieb +8%, VMax −1%'},
+  rearWingGT:   {name:'GT-Flügel',     price:52000,effect:'Abtrieb +15%, VMax −3%'},
+  sideskirts:   {name:'Seitenschweller',price:15000,effect:'Stabilität +3%'},
+  widebody:     {name:'Wide-Body-Kit', price:75000,effect:'Reifenbreite +40mm'},
+  hoodScoop:    {name:'Motorhauben-Hutze',price:11000,effect:'Turbo +5%'},
 };
 const SUSPENSION_OPTIONS={
-  street:{name:'Seriendämpfer',  price:0,    gripMult:1.00,driftMult:1.00},
-  sport: {name:'Sport-Fahrwerk', price:5500, gripMult:1.08,driftMult:0.90},
-  race:  {name:'Renn-Fahrwerk',  price:15000,gripMult:1.18,driftMult:0.75},
-  drift: {name:'Drift-Setup',    price:8500, gripMult:0.88,driftMult:1.45},
+  street:{name:'Seriendämpfer',  price:0,     gripMult:1.00,driftMult:1.00},
+  sport: {name:'Sport-Fahrwerk', price:22000, gripMult:1.08,driftMult:0.90},
+  race:  {name:'Renn-Fahrwerk',  price:60000, gripMult:1.18,driftMult:0.75},
+  drift: {name:'Drift-Setup',    price:34000, gripMult:0.88,driftMult:1.45},
 };
 const DIFF_OPTIONS={
-  open:  {name:'Offenes Diff.',    price:0,    driftMult:1.22,tractMult:0.90},
-  lsd:   {name:'LSD Sperrdiff.',   price:9500, driftMult:0.84,tractMult:1.16},
-  locked:{name:'Sperrdiff. 100%', price:17000,driftMult:1.65,tractMult:1.04},
+  open:  {name:'Offenes Diff.',    price:0,     driftMult:1.22,tractMult:0.90},
+  lsd:   {name:'LSD Sperrdiff.',   price:38000, driftMult:0.84,tractMult:1.16},
+  locked:{name:'Sperrdiff. 100%', price:68000, driftMult:1.65,tractMult:1.04},
 };
 const GEARBOX_OPTIONS={
-  stock:{name:'Seriengetriebe',  price:0,    accelMult:1.00,vmaxMult:1.00},
-  short:{name:'Kurze Übersetzung',price:7500,accelMult:1.10,vmaxMult:0.92},
-  long: {name:'Lange Übersetzung',price:7500,accelMult:0.94,vmaxMult:1.08},
+  stock:{name:'Seriengetriebe',  price:0,     accelMult:1.00,vmaxMult:1.00},
+  short:{name:'Kurze Übersetzung',price:30000, accelMult:1.10,vmaxMult:0.92},
+  long: {name:'Lange Übersetzung',price:30000, accelMult:0.94,vmaxMult:1.08},
 };
 const BRAKE_OPTIONS=[
-  {name:'Serienbremsen',    price:0,    brakeK:1.00},
-  {name:'Sport-Bremsanlage',price:4500, brakeK:1.15},
-  {name:'Renn-Bremsen',     price:9500, brakeK:1.28},
-  {name:'Carbon-Keramik',  price:24000, brakeK:1.42},
+  {name:'Serienbremsen',    price:0,     brakeK:1.00},
+  {name:'Sport-Bremsanlage',price:18000, brakeK:1.15},
+  {name:'Renn-Bremsen',     price:38000, brakeK:1.28},
+  {name:'Carbon-Keramik',   price:95000, brakeK:1.42},
 ];
 
-const UPGRADE_COSTS={engine:[300,600,1000,1500,2200],grip:[200,400,700,1100,1600],nitro:[150,300,500,800,1200]};
+// Upgrade-Costs ~5x: jetzt brauchst du ca. 8-12 Rennen pro Stufe statt 1
+const UPGRADE_COSTS={engine:[1500,3000,5500,9000,14000],grip:[1000,2200,4500,7500,12000],nitro:[800,1800,3500,6000,9500]};
 function getUpgrades(carId){
   const u=saveData.upgrades[carId];
   if(!u||typeof u!=='object')return{engine:0,grip:0,nitro:0};
@@ -1538,7 +1552,7 @@ let settings={steerSens:3,vol:70,ctrl:'wheel'};
 let selWorld=0,selLevel=0;
 let G=null,animId=null,running=false,paused=false;
 let wheelAngle=0,targetWheelAngle=0,isDrag=false,dragX0=0;
-let nitroOn=false,brakeOn=false;
+let nitroOn=false,brakeOn=false,ebrakeOn=false;
 let pressing=false; // true when wheel is touched (wheel mode)
 let gasHeld=false,steerL=false,steerR=false; // pedal mode inputs
 let brakeHeld=false; // Bremsknopf (Pedal-Modus)
@@ -2675,14 +2689,11 @@ function initGame(){
   // Mode determines laps and AI — mapped from both old and new mode IDs
   const levelIdxUsed=isMP?(mpRaceParams.levelIdx||0):selLevel;
   const isSprint=!isMP&&(levelIdxUsed>=15||raceMode==='sprint');
+  // 3 Runden Standard für alle Modi (außer Sprint = 1 Runde, Free Drive = unbegrenzt)
   const totalLaps=isMP?(mpRaceParams.laps||3):
-    (raceMode==='time_trial')                   ?99:
     (raceMode==='sprint')                        ?1:
-    (raceMode==='drift'||raceMode==='drift_challenge')?1:
-    (raceMode==='checkpoint')                   ?1:
     (raceMode==='free_drive')                   ?999:
-    (raceMode==='elimination')                  ?3:
-    isSprint                                     ?1:3;
+    isSprint                                     ?1:3; // 3 Runden für time_trial, drift, classic, elimination
   const noAI=raceMode==='time_trial'||raceMode==='free_drive'||raceMode==='drift'||raceMode==='drift_challenge';
   const ops=isMP?[]:noAI?[]:(()=>{
     const opCars=[CARS[0],CARS[1],CARS[3],CARS[2]].filter(c=>c.id!==car.id).slice(0,4);
@@ -2765,7 +2776,7 @@ function initGame(){
     driftScore:0,
   };
   if(isMP)mpPlayers={};
-  wheelAngle=0;targetWheelAngle=0;nitroOn=false;brakeOn=false;pressing=false;gasHeld=false;steerL=false;steerR=false;brakeHeld=false;
+  wheelAngle=0;targetWheelAngle=0;nitroOn=false;brakeOn=false;ebrakeOn=false;pressing=false;gasHeld=false;steerL=false;steerR=false;brakeHeld=false;
   document.getElementById('wsvg').style.transform='rotate(0deg)';
   document.getElementById('offtrack').classList.remove('show');
   const trackName=world.tracks[isMP?0:selLevel]||'';
@@ -2839,15 +2850,19 @@ function update(ts){
   const surf=SURFACES[G.world?.surface||'asphalt']||SURFACES.asphalt;
   const grip=onTrack?cs.grip*wGrip*surf.gripK:onGrass?cs.grip*.28:cs.grip*.08;
 
-  // Nitro — only active when BOTH button held AND bar not empty
-  const nitroActive=nitroOn&&p.nitro>0;
-  if(nitroActive){
-    p.nitro=Math.max(0,p.nitro-.9*dt);
-    if(Math.random()>.65)spawnP(G,p.x,p.y,G.world.part,2);
-    playNitroSound();
-  } else {
-    // Recharge when not boosting (cs.nitroRegen includes upgrade bonus)
-    p.nitro=Math.min(cs.nitroMax,p.nitro+cs.nitroRegen*dt);
+  // ── E-BRAKE (Handbremse) — ersetzt Nitro ──
+  // Aktiv via 's' oder Space ODER Mobile-Button
+  // Wirkung: blockiert Hinterräder → Heck bricht aus → Drift einleitbar
+  const ebrakeActive=ebrakeOn&&velSpd>0.5; // erst ab Mindest-Geschwindigkeit
+  // Nitro deaktiviert (war im alten System: Speed-Boost)
+  const nitroActive=false; // bleibt für Rückwärtskompatibilität referenzierbar
+  // Reifenrauch beim E-Brake
+  if(ebrakeActive){
+    if(Math.random()>.55){
+      const rearX=p.x-Math.cos(p.angle)*8;
+      const rearY=p.y-Math.sin(p.angle)*8;
+      spawnP(G,rearX,rearY,'rgba(220,210,200,.75)',2);
+    }
   }
 
   // ════════════════════════════════════════════════
@@ -2903,15 +2918,20 @@ function update(ts){
 
   // ── 5. ANTRIEBSKRAFT (in Fahrzeug-Richtung) ──────────────────────
   let driveF=0;
-  if(gasActive&&!effectiveBrake){
-    const nitroThrust=nitroActive?aPerF*cs.nitroBoost*0.38:0;
-    driveF=(aPerF+nitroThrust)*dt;
-    // Caps werden nach Velocity-Update gesetzt
+  if(gasActive&&!effectiveBrake&&!ebrakeActive){
+    driveF=aPerF*dt;
   } else if(effectiveBrake){
     driveF=-aPerF*8*(cs.brakeK||1.0)*dt;
     if(velSpd>1.5)spawnP(G,p.x,p.y,surf?.partCol||'rgba(160,145,120,.55)',1);
-    // Bremsen erzeugt leichten Slip → Drift-Chance
     if(slipMag<0.08&&Math.abs(steer)>0.3)p.slipAngle+=steer*0.04*dt;
+  } else if(ebrakeActive){
+    // E-Brake: starkes Bremsen aber Hinterräder blockieren → Massiv-Drift
+    driveF=-aPerF*4.5*dt; // bremsen aber weniger als Vollbremse (Heck driftet weiter)
+    // Hauptwirkung: Slip-Angle massiv vergrößert für sofortigen Drift
+    // Steer-Richtung verstärkt → kontrollierbarer Drift
+    p.slipAngle+=(Math.abs(steer)>0.1?steer:0.3)*0.18*dt;
+    // Wenn schon im Drift: noch mehr verstärken
+    if(slipMag>0.05)p.slipAngle*=1+0.04*dt;
   } else {
     driveF=-aPerF*2.0*dt;
     if(velSpd>3.5)spawnP(G,p.x,p.y,surf?.partCol||'rgba(150,140,120,.18)',0.5);
@@ -2948,9 +2968,9 @@ function update(ts){
 
   // ── 7. LATERAL CORRECTION ────────────────────────────────────────
   // Seitengrip zieht Velocity-Vektor zur Fahrzeug-Richtung.
-  // Stärke pro Frame: lateralGripK × surfK × 7.0
-  // Im Drift: schwach → Drift bleibt; auf Grip: stark → exaktes Handling
-  const corrK=Math.min(lateralGripK*surfK*7.0*dt*tractionMult,0.88);
+  // E-Brake reduziert Seitengrip drastisch → Auto rutscht länger im Drift
+  const ebrakeGripMult=ebrakeActive?0.25:1.0;
+  const corrK=Math.min(lateralGripK*surfK*7.0*dt*tractionMult*ebrakeGripMult,0.88);
   const targetVx=Math.cos(p.angle)*velSpd;
   const targetVy=Math.sin(p.angle)*velSpd;
   p.vx+=(targetVx-p.vx)*corrK+thrustX;
@@ -3019,7 +3039,7 @@ function update(ts){
     if(p.isDrifting)G.driftScore+=Math.abs(p.slipAngle)*p.speed*dt*0.5;
     const ds=document.getElementById('driftScore');
     if(ds)ds.textContent=`🌀 ${Math.round(G.driftScore)}`;
-    if(G.raceMs>120000)endRace(true);
+    // Drift-Challenge endet jetzt nach 3 Runden (statt 2-Min-Timer)
   }
 
   // Boundary wall push-back
@@ -3763,8 +3783,9 @@ window.addEventListener('keydown',e=>{
   if(e.key==='ArrowLeft'||e.key==='a'){pressing=true;targetWheelAngle=-65;}
   if(e.key==='ArrowRight'||e.key==='d'){pressing=true;targetWheelAngle=65;}
   if(e.key==='ArrowUp'||e.key==='w')pressing=true;
-  if(e.key==='ArrowDown'||e.key==='s')brakeOn=true;
-  if(e.key===' '){e.preventDefault();nitroOn=true;}
+  if(e.key==='ArrowDown')brakeOn=true;
+  // 's' und Space → E-BRAKE (Handbremse für Drift), Nitro entfernt
+  if(e.key==='s'||e.key===' '){e.preventDefault();ebrakeOn=true;}
   if(e.key==='Escape')togglePause();
 });
 window.addEventListener('keyup',e=>{
@@ -3776,16 +3797,19 @@ window.addEventListener('keyup',e=>{
     if(!held['ArrowLeft']&&!held['ArrowRight']&&!held['ArrowUp']&&!held['w'])pressing=false;
   }
   if(e.key==='ArrowUp'||e.key==='w'){if(!held['ArrowLeft']&&!held['ArrowRight'])pressing=false;}
-  if(e.key==='ArrowDown'||e.key==='s')brakeOn=false;
-  if(e.key===' ')nitroOn=false;
+  if(e.key==='ArrowDown')brakeOn=false;
+  if(e.key==='s'||e.key===' ')ebrakeOn=false;
 });
 
 // ════════════════════════════════════════════════
 // ACTION BUTTONS
 // ════════════════════════════════════════════════
+// Mobile E-Brake-Button (war Nitro-Button)
 const btnN=document.getElementById('abtn-n');
-btnN.addEventListener('pointerdown',()=>nitroOn=true);
-['pointerup','pointercancel','pointerleave'].forEach(ev=>btnN.addEventListener(ev,()=>nitroOn=false));
+if(btnN){
+  btnN.addEventListener('pointerdown',()=>{ebrakeOn=true;hapTap();});
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>btnN.addEventListener(ev,()=>ebrakeOn=false));
+}
 
 // ════════════════════════════════════════════════
 // SOUND — Web Audio API
@@ -4713,11 +4737,20 @@ function hapError(){  try{if(navigator.vibrate)navigator.vibrate([40,20,40]);}ca
 
 // Geld-Anzeige flash-animieren (visuelles Feedback bei Kauf/Verkauf)
 function flashMoney(){
+  const fmt=saveData.money.toLocaleString('de');
+  // Alte Inline-Anzeigen (im Sidebar/Header)
   ['garageBalance','shopBalance'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
-    el.classList.remove('money-flash');void el.offsetWidth; // reflow → re-trigger
+    el.classList.remove('money-flash');void el.offsetWidth;
     el.classList.add('money-flash');
-    el.textContent='💰 '+saveData.money.toLocaleString('de')+' €';
+    el.textContent='💰 '+fmt+' €';
+  });
+  // Neue Floating-Anzeigen (immer sichtbar oben rechts)
+  ['garageBalanceFloat','shopBalanceFloat'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.textContent=fmt+' €';
+    const parent=el.parentElement;
+    if(parent){parent.classList.remove('money-flash');void parent.offsetWidth;parent.classList.add('money-flash');}
   });
 }
 
@@ -4747,6 +4780,9 @@ const SHOP_SORTS={
 function buildShopUI(){
   const bal=document.getElementById('shopBalance');
   if(bal)bal.textContent=`💰 ${saveData.money.toLocaleString('de')} €`;
+  // Floating-Anzeige initial setzen (immer sichtbar)
+  const balF=document.getElementById('shopBalanceFloat');
+  if(balF)balF.textContent=saveData.money.toLocaleString('de')+' €';
 
   // Filter buttons (Categories)
   const filterRow=document.getElementById('shopFilterRow');
@@ -4846,6 +4882,9 @@ function openGarage(){
   showScreen('sGarage');
   buildGarageCarInfo();
   buildGarageTabContent();
+  // Floating-Anzeige initial setzen
+  const balF=document.getElementById('garageBalanceFloat');
+  if(balF)balF.textContent=saveData.money.toLocaleString('de')+' €';
   if(!garageThreeLoaded){
     function loadS(url,cb){const s=document.createElement('script');s.src=url;s.onload=cb;s.onerror=()=>console.warn('Failed to load',url);document.head.appendChild(s);}
     // Three.js r134 — last version with legacy examples/js/ (non-module) files
@@ -5197,10 +5236,31 @@ function buildProceduralCarMesh(carId){
   [-WC-0.01,WC+0.01].forEach(px=>add(box(0.018,cabH*0.88,cabL*0.80),glass(),px,cabY,(ZCF+ZCR)/2));
 
   // ─── BUMPERS + BRAND GRILLE ────────────────────────────────────────────────
-  add(box(W*1.94,0.52,0.20),blk(),0,YS+0.26,ZF+0.10); // front bumper
+  // Klassiker (vor 1985) bekommen Chrom-Stoßstangen statt schwarz
+  const carYearForBumper=parseInt(car.year)||1980;
+  const bumperMat=carYearForBumper<=1980?chr():blk();
+  add(box(W*1.94,0.52,0.20),bumperMat,0,YS+0.26,ZF+0.10); // front bumper
   add(box(W*1.86,0.06,0.28),blk(),0,YS+0.02,ZF-0.04); // splitter lip
-  add(box(W*1.92,0.50,0.20),blk(),0,YS+0.24,ZR-0.10); // rear bumper
+  add(box(W*1.92,0.50,0.20),bumperMat,0,YS+0.24,ZR-0.10); // rear bumper
   add(box(W*1.78,0.10,0.32),blk(),-0.03,YS+0.05,ZR-0.13); // diffuser
+  // Chrom-Trim entlang der Türen für Klassiker
+  if(carYearForBumper<=1980){
+    [-W-0.005,W+0.005].forEach(px=>add(box(0.03,0.04,L*1.4),chr(),px,YSH-0.04,0));
+  }
+  // Racing-Streifen für Race-Kategorien (über Hood/Roof/Trunk)
+  if(shape.wing||(car.stripes&&car.stripes.length>0)){
+    const stripeColor=new T.Color(car.stripes&&car.stripes[0]?car.stripes[0]:'#ffffff');
+    const stripeMat=new T.MeshStandardMaterial({color:stripeColor,metalness:0.4,roughness:0.5,emissive:stripeColor,emissiveIntensity:0.1});
+    // Mittelstreifen über das ganze Auto
+    add(box(0.16,0.005,L*1.95),stripeMat,0,bodyY+bodyH/2+0.001,0);
+    if(car.stripes&&car.stripes.length>1){
+      // Zweiter Streifen
+      const s2=new T.Color(car.stripes[1]);
+      const stripeMat2=new T.MeshStandardMaterial({color:s2,metalness:0.4,roughness:0.5,emissive:s2,emissiveIntensity:0.1});
+      add(box(0.10,0.005,L*1.95),stripeMat2,-0.20,bodyY+bodyH/2+0.002,0);
+      add(box(0.10,0.005,L*1.95),stripeMat2,0.20,bodyY+bodyH/2+0.002,0);
+    }
+  }
 
   // ── BRAND-SPECIFIC GRILLE (BMW kidney, Porsche oval, Ferrari triangle, etc.)
   const brand=(car.brand||'').toLowerCase();
@@ -5428,7 +5488,7 @@ function buildTuningTabHTML(carId,t){
   };
   const brkOpts=BRAKE_OPTIONS.map((b,i)=>`<button onclick="buyAndSetTuning('${carId}','brakes',${i},${b.price})" style="display:block;width:100%;text-align:left;margin:.12rem 0;font-size:.6rem;padding:.28rem .45rem;border-radius:3px;cursor:pointer;border:1px solid ${t.brakes===i?'var(--gold)':'rgba(255,255,255,.1)'};background:${t.brakes===i?'rgba(212,160,23,.1)':'rgba(255,255,255,.02)'};color:${t.brakes===i?'var(--gold)':'rgba(255,255,255,.45)'};">${b.name}${b.price?` — ${b.price.toLocaleString('de')}€`:''}</button>`).join('');
   const tyreWOpts=['Normal','+ 20mm','+ 40mm (Wide-Body)'].map((n,i)=>
-    `<button onclick="buyAndSetTuning('${carId}','tyreWidth',${i},${[0,2500,5500][i]})" style="margin:.1rem;font-size:.58rem;padding:.22rem .45rem;border-radius:3px;cursor:pointer;border:1px solid ${t.tyreWidth===i?'var(--gold)':'rgba(255,255,255,.1)'};background:${t.tyreWidth===i?'rgba(212,160,23,.1)':'rgba(255,255,255,.02)'};color:${t.tyreWidth===i?'var(--gold)':'rgba(255,255,255,.45)'};">${n}</button>`
+    `<button onclick="buyAndSetTuning('${carId}','tyreWidth',${i},${[0,10000,22000][i]})" style="margin:.1rem;font-size:.58rem;padding:.22rem .45rem;border-radius:3px;cursor:pointer;border:1px solid ${t.tyreWidth===i?'var(--gold)':'rgba(255,255,255,.1)'};background:${t.tyreWidth===i?'rgba(212,160,23,.1)':'rgba(255,255,255,.02)'};color:${t.tyreWidth===i?'var(--gold)':'rgba(255,255,255,.45)'};">${n}</button>`
   ).join('');
   return `${sec('🏁','Reifen')}${sel('COMPOUND','tyre',TYRE_COMPOUNDS)}
     <div style="font-size:.45rem;color:rgba(255,255,255,.35);letter-spacing:.12em;margin:.3rem 0 .1rem;">REIFENBREITE</div>
@@ -5436,12 +5496,12 @@ function buildTuningTabHTML(carId,t){
     ${sec('🔩','Fahrwerk')}${sel('DÄMPFER','suspension',SUSPENSION_OPTIONS)}${sel('DIFFERENZIAL','diff',DIFF_OPTIONS)}${sel('GETRIEBE','gearbox',GEARBOX_OPTIONS)}
     ${sec('🛑','Bremsen')}${brkOpts}
     ${sec('🚗','Bodykit')}
-    ${tog('Frontschürze','frontSplitter',4500,'Abtrieb +5%')}
-    ${tog('Heckspoiler','rearWingSmall',6500,'Abtrieb +8%, VMax −1%')}
-    ${tog('GT-Flügel','rearWingGT',13000,'Abtrieb +15%, VMax −3%')}
-    ${tog('Seitenschweller','sideskirts',3800,'Stabilität +3%')}
-    ${tog('Wide-Body-Kit','widebody',19000,'Reifenbreite +40mm')}
-    ${tog('Motorhauben-Hutze','hoodScoop',2800,'Turbo +5%')}`;
+    ${tog('Frontschürze','frontSplitter',18000,'Abtrieb +5%')}
+    ${tog('Heckspoiler','rearWingSmall',26000,'Abtrieb +8%, VMax −1%')}
+    ${tog('GT-Flügel','rearWingGT',52000,'Abtrieb +15%, VMax −3%')}
+    ${tog('Seitenschweller','sideskirts',15000,'Stabilität +3%')}
+    ${tog('Wide-Body-Kit','widebody',75000,'Reifenbreite +40mm')}
+    ${tog('Motorhauben-Hutze','hoodScoop',11000,'Turbo +5%')}`;
 }
 
 // Premium Farb-Paletten — Classic-Auto-Farben, ein Klick = fertige Lackierung
