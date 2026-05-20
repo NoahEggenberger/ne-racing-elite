@@ -4848,19 +4848,94 @@ function openGarage(){
   buildGarageTabContent();
   if(!garageThreeLoaded){
     function loadS(url,cb){const s=document.createElement('script');s.src=url;s.onload=cb;s.onerror=()=>console.warn('Failed to load',url);document.head.appendChild(s);}
-    // Use Three.js r134 — last version with legacy examples/js/ (non-module) files
+    // Three.js r134 — last version with legacy examples/js/ (non-module) files
     loadS('https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js',()=>{
       loadS('https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js',()=>{
-        garageThreeLoaded=true;
-        // OrbitControls in r134 attaches to THREE.OrbitControls
-        initGarageScene();
-        updateGarageCar(garageSelCar);
+        // GLTFLoader für echte 3D-Modelle (.glb-Dateien)
+        loadS('https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js',()=>{
+          garageThreeLoaded=true;
+          initGarageScene();
+          updateGarageCar(garageSelCar);
+        });
       });
     });
   } else {
     document.getElementById('garageLoading').style.display='none';
     updateGarageCar(garageSelCar);
   }
+}
+
+// ════════════════════════════════════════════════
+// GLB-MODELL-LOOKUP — Echte 3D-Modelle pro Auto
+// ════════════════════════════════════════════════
+// Mapping: car.id → .glb-URL (lokal in assets/cars/ oder von CDN)
+// Beispiel: 'bmw2002t': 'assets/cars/bmw2002t.glb'
+// Wenn URL leer/fehlt: prozedurales Modell wird verwendet (Fallback).
+//
+// SO FÜGST DU EIGENE MODELLE HINZU:
+// 1. Lade .glb-Datei von Sketchfab/Poly Pizza/etc. (CC0 oder CC-BY)
+// 2. Speichere in /assets/cars/{car_id}.glb (Repo-Root)
+// 3. Trage hier ein: CAR_GLB_URLS['bmw2002t']='assets/cars/bmw2002t.glb'
+// 4. Git push → Vercel deployt automatisch
+//
+// Per-Kategorie-Fallbacks (vor prozedural): wenn kein spezifisches Modell,
+// versucht der Loader CAR_GLB_CATEGORY_URLS[car.cat] als zweite Wahl.
+const CAR_GLB_URLS={
+  // Hier eigene Modelle eintragen, z.B.:
+  // 'bmw2002t': 'assets/cars/bmw2002t.glb',
+  // 'p911': 'assets/cars/porsche_911.glb',
+};
+const CAR_GLB_CATEGORY_URLS={
+  // Kategorie-Templates: 1 GLB für alle Autos einer Kategorie (Fallback)
+  // 'Classic Sports': 'assets/cars/_template_classic_sports.glb',
+  // 'Supercars': 'assets/cars/_template_supercar.glb',
+};
+
+// Cache für bereits geladene GLBs (vermeidet Re-Download)
+const _glbCache={};
+
+function loadCarGLB(car,onLoad,onFail){
+  if(typeof THREE==='undefined'||!THREE.GLTFLoader){onFail&&onFail('No GLTFLoader');return;}
+  const url=CAR_GLB_URLS[car.id]||CAR_GLB_CATEGORY_URLS[car.cat]||null;
+  if(!url){onFail&&onFail('No URL');return;}
+  // Cache-Hit: direkt aus Speicher
+  if(_glbCache[url]){
+    // Deep clone der Szene (Materials werden geteilt — Vorsicht beim Färben)
+    onLoad(_glbCache[url].clone(true));
+    return;
+  }
+  // Laden
+  const loader=new THREE.GLTFLoader();
+  loader.load(url,
+    (gltf)=>{
+      _glbCache[url]=gltf.scene;
+      onLoad(gltf.scene.clone(true));
+    },
+    null, // onProgress
+    (err)=>{
+      console.warn('[GLB] Failed to load '+url+':',err);
+      onFail&&onFail(err);
+    }
+  );
+}
+
+// Färbt alle Body-Materialien eines geladenen GLB-Modells in Car-Farbe um
+function tintGLBModel(model,bodyHexColor){
+  if(!model||!window.THREE)return;
+  const newColor=new window.THREE.Color(bodyHexColor);
+  model.traverse(o=>{
+    if(o.isMesh&&o.material){
+      // Heuristik: helle Materialien sind Body (nicht Glas, nicht schwarz)
+      const mat=o.material;
+      if(mat.color){
+        const lum=(mat.color.r+mat.color.g+mat.color.b)/3;
+        // Nur "Body"-Materialien einfärben (mittlere bis helle Lightness, nicht transparent)
+        if(lum>0.18&&!mat.transparent&&(!mat.metalness||mat.metalness<0.6)){
+          mat.color.copy(newColor);
+        }
+      }
+    }
+  });
 }
 
 function initGarageScene(){
@@ -4989,7 +5064,45 @@ function updateGarageCar(carId){
   const THREE=window.THREE;const T=THREE;
   const car=CARS.find(c=>c.id===carId)||CARS[0];
   const t=getTuning(carId);
+  // Alte Mesh entfernen
   if(garageMesh){garageScene.remove(garageMesh);garageMesh.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){const m=Array.isArray(o.material)?o.material:[o.material];m.forEach(x=>x.dispose());}});}
+  const bodyCol=new T.Color(t.bodyHue!=null?`hsl(${t.bodyHue},${t.bodySat||70}%,${t.bodyLit||45}%)`:car.body);
+  const roofCol=new T.Color(t.roofColor||car.roof);
+
+  // ── ERST GLB-Modell versuchen (echtes 3D), DANN prozedural als Fallback ──
+  loadCarGLB(car,
+    (glbScene)=>{
+      // GLB erfolgreich geladen — Body-Farbe anwenden + skalieren
+      const bodyHex='#'+bodyCol.getHexString();
+      tintGLBModel(glbScene,bodyHex);
+      // Auto-Sizing: Modell auf passende Höhe normalisieren (etwa 1.4 units)
+      const bbox=new T.Box3().setFromObject(glbScene);
+      const size=new T.Vector3();bbox.getSize(size);
+      if(size.y>0.01){
+        const scale=1.4/size.y;
+        glbScene.scale.set(scale,scale,scale);
+        // Auf Boden setzen
+        const newBbox=new T.Box3().setFromObject(glbScene);
+        glbScene.position.y=-newBbox.min.y;
+      }
+      // Schatten aktivieren
+      glbScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
+      garageMesh=glbScene;
+      garageScene.add(garageMesh);
+    },
+    ()=>{
+      // GLB nicht verfügbar/fehlgeschlagen — prozedurales Modell bauen
+      buildProceduralCarMesh(carId);
+    }
+  );
+}
+
+// Prozedurales Modell (Fallback wenn keine GLB-Datei vorhanden)
+function buildProceduralCarMesh(carId){
+  if(!garageScene||!window.THREE)return;
+  const THREE=window.THREE;const T=THREE;
+  const car=CARS.find(c=>c.id===carId)||CARS[0];
+  const t=getTuning(carId);
   const bodyCol=new T.Color(t.bodyHue!=null?`hsl(${t.bodyHue},${t.bodySat||70}%,${t.bodyLit||45}%)`:car.body);
   const roofCol=new T.Color(t.roofColor||car.roof);
   const group=new T.Group();
@@ -5037,36 +5150,122 @@ function updateGarageCar(carId){
   const cyl=(rt,rb,h,s=16)=>new T.CylinderGeometry(rt,rb,h,s);
   const tor=(r,tb,rs=12,ts=32)=>new T.TorusGeometry(r,tb,rs,ts);
 
-  // ─── BODY — single unified slab (hood + doors + trunk in one piece) ─────────
-  add(box(W*2,bodyH,L*2),paint(),0,bodyY,0);
+  // ─── BODY — sloped hood + trunk (nicht mehr flach) ─────────────────────────
+  // Hauptkörper-Box (Mitte, voller Höhe)
+  add(box(W*2,bodyH,L*1.3),paint(),0,bodyY,0);
+  // Hood-Slope (vorne, nach unten geneigt — wie eine echte Motorhaube)
+  const hoodSlope=0.18*shape.hood; // wie stark vorne abfallend
+  const hoodLen=L*0.55*shape.hood;
+  // Wedge: vorne kürzer/tiefer, hinten höher
+  const hoodGeom=new T.BoxGeometry(W*1.96,bodyH-hoodSlope,hoodLen);
+  const hoodM=new T.Mesh(hoodGeom,paint());
+  hoodM.position.set(0,bodyY-hoodSlope/2,-L*0.65-hoodLen/2+L*0.45);
+  hoodM.castShadow=hoodM.receiveShadow=true; group.add(hoodM);
+  // Trunk-Slope (hinten, ähnlich abfallend für coupé-Charakter, weniger für Sedan)
+  const trunkSlope=0.12*shape.trunk;
+  const trunkLen=L*0.45*shape.trunk;
+  const trunkGeom=new T.BoxGeometry(W*1.96,bodyH-trunkSlope,trunkLen);
+  const trunkM=new T.Mesh(trunkGeom,paint());
+  trunkM.position.set(0,bodyY-trunkSlope/2,L*0.65+trunkLen/2-L*0.45);
+  trunkM.castShadow=trunkM.receiveShadow=true; group.add(trunkM);
 
-  // ─── CABIN (greenhouse) ─────────────────────────────────────────────────────
+  // ─── CABIN (greenhouse) mit verjüngter Front (Coupé-Silhouette) ────────────
   const cabL=ZCR-ZCF;
-  add(box(WC*2,cabH,cabL),roofM(),0,cabY,(ZCF+ZCR)/2);
+  // Hauptkabine
+  add(box(WC*2,cabH,cabL*0.85),roofM(),0,cabY,(ZCF+ZCR)/2);
+  // Verjüngung vorne (kleinere Box, Richtung Windschutzscheibe)
+  const cabFrontW=WC*1.78;
+  const cabFrontShape=new T.BoxGeometry(cabFrontW,cabH*0.92,cabL*0.18);
+  const cabFrontM=new T.Mesh(cabFrontShape,roofM());
+  cabFrontM.position.set(0,cabY-cabH*0.04,ZCF+cabL*0.09);
+  cabFrontM.castShadow=cabFrontM.receiveShadow=true; group.add(cabFrontM);
 
-  // ─── GLASS ──────────────────────────────────────────────────────────────────
-  // Front windshield (angled — spans from body shoulder to cabin top)
-  add(box(WC*1.92,0.03,0.68),glass(),-0.52,YSH+0.22,ZCF-0.24);
-  // Rear window
-  add(box(WC*1.84,0.03,0.55),glass(),0.44,YSH+0.22,ZCR+0.18);
-  // Side windows (flush with cabin sides)
+  // ─── GLASS ── großzügige, geneigte Windschutzscheibe ─────────────────────
+  // Front: Box mit Rotation um X (geneigt) statt flach
+  const wsGeom=new T.BoxGeometry(WC*1.88,0.04,0.72);
+  const wsM=new T.Mesh(wsGeom,glass());
+  wsM.position.set(0,YSH+0.24,ZCF-0.15);
+  wsM.rotation.x=-0.42; // geneigte Scheibe (Auto-typisch)
+  group.add(wsM);
+  // Rear window — leicht andere Neigung
+  const rwGeom=new T.BoxGeometry(WC*1.82,0.04,0.58);
+  const rwM=new T.Mesh(rwGeom,glass());
+  rwM.position.set(0,YSH+0.24,ZCR+0.12);
+  rwM.rotation.x=0.38;
+  group.add(rwM);
+  // Side windows
   [-WC-0.01,WC+0.01].forEach(px=>add(box(0.018,cabH*0.88,cabL*0.80),glass(),px,cabY,(ZCF+ZCR)/2));
 
-  // ─── BUMPERS ────────────────────────────────────────────────────────────────
-  add(box(W*1.94,0.52,0.20),blk(),0,YS+0.26,ZF+0.10); // front
-  add(box(W*0.88,0.26,0.06),blk(),0,YS+0.38,ZF+0.01); // grille
-  add(box(W*1.86,0.06,0.28),blk(),0,YS+0.02,ZF-0.04); // lip
-  add(box(W*1.92,0.50,0.20),blk(),0,YS+0.24,ZR-0.10); // rear
+  // ─── BUMPERS + BRAND GRILLE ────────────────────────────────────────────────
+  add(box(W*1.94,0.52,0.20),blk(),0,YS+0.26,ZF+0.10); // front bumper
+  add(box(W*1.86,0.06,0.28),blk(),0,YS+0.02,ZF-0.04); // splitter lip
+  add(box(W*1.92,0.50,0.20),blk(),0,YS+0.24,ZR-0.10); // rear bumper
   add(box(W*1.78,0.10,0.32),blk(),-0.03,YS+0.05,ZR-0.13); // diffuser
 
-  // ─── LIGHTS ─────────────────────────────────────────────────────────────────
+  // ── BRAND-SPECIFIC GRILLE (BMW kidney, Porsche oval, Ferrari triangle, etc.)
+  const brand=(car.brand||'').toLowerCase();
+  if(brand==='bmw'){
+    // BMW Nieren-Grille: 2 vertikale ovale
+    [-0.16,0.16].forEach(px=>{
+      add(cyl(0.10,0.10,0.05,16),chr(),px,YS+0.36,ZF-0.005,Math.PI/2,0,0);
+      add(cyl(0.08,0.08,0.06,16),new T.MeshStandardMaterial({color:0x222,roughness:0.6}),px,YS+0.36,ZF-0.008,Math.PI/2,0,0);
+    });
+  }else if(brand==='porsche'){
+    // Porsche: schmale horizontale Schlitze
+    [YS+0.40,YS+0.32,YS+0.24].forEach(py=>add(box(W*1.0,0.025,0.04),blk(),0,py,ZF-0.005));
+  }else if(brand==='ferrari'||brand==='lamborghini'){
+    // Ferrari/Lambo: trapezförmiger Lufteinlass
+    add(box(W*1.1,0.18,0.04),blk(),0,YS+0.30,ZF-0.005);
+    // Side air intakes
+    [-W*0.85,W*0.85].forEach(px=>add(box(0.12,0.18,0.45),blk(),px,YS+0.28,-L*0.05));
+  }else if(brand==='mercedes'){
+    // Mercedes: hoher Grille mit Stern
+    add(box(W*0.86,0.45,0.04),blk(),0,YS+0.30,ZF-0.005);
+    add(cyl(0.07,0.07,0.06,8),chr(),0,YS+0.34,ZF-0.015,Math.PI/2,0,0); // Stern-Hub
+  }else if(brand==='audi'){
+    // Audi: 4 Ringe + breite Singleframe-Grille
+    add(box(W*1.1,0.30,0.04),blk(),0,YS+0.30,ZF-0.005);
+    for(let r=0;r<4;r++)add(tor(0.05,0.012,8,20),chr(),-0.20+r*0.13,YS+0.40,ZF-0.018,0,Math.PI/2,0);
+  }else if(brand==='ford'){
+    // Ford: ovaler Grille mit Querstreifen
+    add(box(W*0.95,0.24,0.04),blk(),0,YS+0.34,ZF-0.005);
+    add(box(W*0.92,0.04,0.05),chr(),0,YS+0.34,ZF-0.015);
+  }else{
+    // Default: einfacher rechteckiger Grille
+    add(box(W*0.88,0.26,0.06),blk(),0,YS+0.38,ZF+0.01);
+    add(box(W*0.84,0.04,0.07),chr(),0,YS+0.40,ZF+0.018); // chrome trim
+  }
+
+  // ─── LIGHTS — runde Scheinwerfer für Klassiker (vor 1990), eckige danach ──
+  const carYear=parseInt(car.year)||1980;
+  const isClassicEra=carYear<=1985;
   [-W*0.58,W*0.58].forEach(px=>{
-    add(box(0.30,0.16,0.04),lit(0xfff5e0,0.7),px,YSH-0.10,ZF-0.01); // headlights
-    add(box(0.24,0.05,0.04),lit(0xffcc00,0.5),px,YSH-0.24,ZF-0.01); // DRL
+    if(isClassicEra){
+      // Runde Klassiker-Scheinwerfer (Zylinder pointing forward)
+      add(cyl(0.13,0.13,0.06,20),chr(),px,YSH-0.10,ZF-0.005,Math.PI/2,0,0);
+      add(cyl(0.10,0.10,0.05,20),lit(0xfff5e0,0.85),px,YSH-0.10,ZF-0.018,Math.PI/2,0,0);
+    }else{
+      // Moderne eckige Scheinwerfer
+      add(box(0.34,0.12,0.04),lit(0xfff5e0,0.7),px,YSH-0.10,ZF-0.01);
+      add(box(0.30,0.04,0.04),lit(0xffcc00,0.5),px,YSH-0.20,ZF-0.01); // LED-Strip
+    }
   });
+  // Taillights — meist eckig
   [-W*0.62,W*0.62].forEach(px=>{
-    add(box(0.28,0.20,0.04),lit(0xff1800,0.6),px,YSH-0.08,ZR+0.01); // taillights
+    add(box(0.28,0.20,0.04),lit(0xff1800,0.6),px,YSH-0.08,ZR+0.01);
     add(box(0.22,0.05,0.04),lit(0xff1800,0.6),px,YSH-0.26,ZR+0.01);
+  });
+
+  // ─── WHEEL ARCH FLARES (cylinder-Bögen über Rädern für Tiefe) ────────────
+  const archR=TR+tyreWidth*0.4;
+  const archZpos=[(-1.32*shape.L),(1.28*shape.L)];
+  [[-WX,archZpos[0]],[WX,archZpos[0]],[-WX,archZpos[1]],[WX,archZpos[1]]].forEach(([px,pz])=>{
+    // Halbkreis-Bogen über Rad (cylinder, halbierter Winkel sichtbar von außen)
+    const archGeom=new T.TorusGeometry(archR*1.08,0.05,8,16,Math.PI);
+    const archM=new T.Mesh(archGeom,paint());
+    archM.position.set(px,TR,pz);
+    archM.rotation.y=Math.PI/2; archM.rotation.z=Math.PI; // Bogen oben
+    archM.castShadow=true; group.add(archM);
   });
 
   // ─── MIRRORS, HANDLES, EXHAUST ───────────────────────────────────────────────
