@@ -277,13 +277,33 @@ body.dev-tablet #nitro-wrap{right:118px;}
 .wt-stat{font-size:.58rem;letter-spacing:.22em;color:rgba(255,255,255,.32);animation:pulse 1.4s ease-in-out infinite;margin:.4rem 0;}
 .wt-btns{display:flex;gap:.7rem;margin-top:.8rem;flex-wrap:wrap;justify-content:center;}
 /* ── SHOP ── */
-.shop-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:.65rem;cursor:pointer;transition:all .15s;position:relative;}
-.shop-card:hover{border-color:rgba(212,160,23,.4);}
-.shop-card.owned{border-color:#2ecc71;}
-.shop-card.active-car{border-color:var(--gold);box-shadow:0 0 14px rgba(212,160,23,.28);}
-.shop-card.locked{opacity:.4;}
+.shop-card{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid var(--border);border-radius:8px;padding:.7rem;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:.32rem;}
+.shop-card:hover{border-color:rgba(212,160,23,.55);transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.45);}
+.shop-card.owned{border-color:rgba(46,204,113,.6);background:linear-gradient(180deg,rgba(46,204,113,.06),rgba(46,204,113,.01));}
+.shop-card.active-car{border-color:var(--gold);box-shadow:0 0 22px rgba(212,160,23,.42);}
+.shop-card.locked{opacity:.42;cursor:default;}
+.shop-card.locked:hover{transform:none;border-color:var(--border);box-shadow:none;}
+.shop-card .sc-canvas{width:100%;height:80px;background:radial-gradient(ellipse at center,#1a1a26 0%,#0a0a14 100%);border-radius:4px;display:block;}
+.shop-card .sc-badge{position:absolute;top:.45rem;right:.45rem;font-family:'Bebas Neue',sans-serif;font-size:.42rem;letter-spacing:.18em;padding:.16rem .42rem;border-radius:10px;line-height:1;z-index:2;}
+.shop-card .sc-badge.owned{background:rgba(46,204,113,.85);color:#fff;}
+.shop-card .sc-badge.active{background:rgba(212,160,23,.92);color:#fff;}
+.shop-card .sc-badge.locked{background:rgba(255,255,255,.12);color:rgba(255,255,255,.55);}
+.shop-card .sc-badge.new{background:rgba(231,76,60,.88);color:#fff;}
 .shop-filter{font-family:'Bebas Neue',sans-serif;font-size:.62rem;letter-spacing:.1em;padding:.28rem .65rem;border-radius:3px;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.03);color:rgba(255,255,255,.5);transition:all .12s;}
+.shop-filter:hover{border-color:rgba(212,160,23,.4);color:rgba(255,255,255,.85);}
 .shop-filter.active{border-color:var(--gold);background:rgba(212,160,23,.15);color:var(--gold);}
+.shop-sort{font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.1em;padding:.22rem .55rem;border-radius:3px;cursor:pointer;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);color:rgba(255,255,255,.4);transition:all .12s;}
+.shop-sort:hover{border-color:rgba(212,160,23,.3);color:rgba(255,255,255,.7);}
+.shop-sort.active{border-color:var(--gold);color:var(--gold);background:rgba(212,160,23,.08);}
+/* Money flash animation */
+@keyframes moneyFlash{0%{transform:scale(1);color:#2ecc71;}50%{transform:scale(1.18);color:#27ff8a;text-shadow:0 0 20px rgba(46,204,113,.9);}100%{transform:scale(1);color:#2ecc71;}}
+.money-flash{animation:moneyFlash .55s ease-out;}
+/* Toast notification */
+#toastWrap{position:fixed;top:1.2rem;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:.3rem;pointer-events:none;}
+.toast{font-family:'Bebas Neue',sans-serif;font-size:.78rem;letter-spacing:.15em;padding:.55rem 1.4rem;border-radius:4px;background:rgba(20,20,28,.95);border:1px solid var(--gold);color:var(--white);box-shadow:0 6px 22px rgba(0,0,0,.5);animation:toastIn .25s cubic-bezier(.2,.8,.3,1.2);}
+.toast.success{border-color:#2ecc71;color:#27ff8a;}
+.toast.error{border-color:#e74c3c;color:#ff6a5e;}
+@keyframes toastIn{from{transform:translateY(-20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 /* ── GARAGE ── */
 .gCamBtn{font-family:'Bebas Neue',sans-serif;font-size:.62rem;letter-spacing:.1em;padding:.3rem .65rem;border-radius:3px;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.5);color:rgba(255,255,255,.7);cursor:pointer;transition:all .12s;}
 .gCamBtn:hover{border-color:var(--gold);color:var(--gold);}
@@ -451,6 +471,9 @@ body.dev-tablet #nitro-wrap{right:118px;}
   <button id="btnAdminBack" style="margin-top:1.2rem;align-self:center;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.3em;padding:.5rem 1.8rem;border-radius:4px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--white);cursor:pointer;">← ZURÜCK</button>
 </div>
 
+<!-- Toast Notification Container (global) -->
+<div id="toastWrap"></div>
+
 <!-- ══ SHOP ══ -->
 <div id="sShop" class="screen off" style="background:var(--ink);overflow-y:auto;padding:1.2rem;align-items:flex-start;">
   <div style="display:flex;justify-content:space-between;align-items:center;width:100%;max-width:920px;align-self:center;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;">
@@ -460,8 +483,12 @@ body.dev-tablet #nitro-wrap{right:118px;}
       <button onclick="showScreen('sMenu')" style="font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.2em;padding:.4rem 1.2rem;border-radius:4px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);cursor:pointer;">← MENÜ</button>
     </div>
   </div>
-  <div id="shopFilterRow" style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.8rem;width:100%;max-width:920px;align-self:center;"></div>
-  <div id="shopContent" style="width:100%;max-width:920px;align-self:center;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.55rem;"></div>
+  <div id="shopFilterRow" style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.4rem;width:100%;max-width:920px;align-self:center;"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%;max-width:920px;align-self:center;margin-bottom:.6rem;flex-wrap:wrap;gap:.4rem;">
+    <div style="font-size:.5rem;letter-spacing:.15em;color:rgba(255,255,255,.32);">SORTIEREN NACH</div>
+    <div id="shopSortRow" style="display:flex;gap:.25rem;flex-wrap:wrap;"></div>
+  </div>
+  <div id="shopContent" style="width:100%;max-width:920px;align-self:center;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.65rem;"></div>
 </div>
 
 <!-- ══ GARAGE ══ -->
@@ -4456,46 +4483,145 @@ let shopFilter='all';
 const SHOP_CATS=['all','German Performance','Rally Legends','European GT','British Icons','American Muscle','JDM Classics','Swedish Classics'];
 const SHOP_CAT_LABELS={'all':'Alle','German Performance':'🇩🇪 DE','Rally Legends':'🏁 Rally','European GT':'🇪🇺 EU GT','British Icons':'🏴󠁧󠁢󠁥󠁮󠁧󠁿 GB','American Muscle':'🇺🇸 US','JDM Classics':'🇯🇵 JDM','Swedish Classics':'🇸🇪 SE'};
 
+// ════════════════════════════════════════════════
+// UI HELPERS: Toast, Haptics, Money-Flash, Click-Sound
+// ════════════════════════════════════════════════
+// showToast wurde überall verwendet, war aber NIE definiert (silent bug!)
+function showToast(msg,kind){
+  // kind: 'success' | 'error' | '#hexcolor' (legacy) | undefined → default
+  const wrap=document.getElementById('toastWrap');if(!wrap)return;
+  const el=document.createElement('div');
+  let cls='toast';
+  if(kind==='success'||kind==='#2ecc71'||kind==='#27ae60')cls+=' success';
+  else if(kind==='error'||kind==='#e74c3c'||kind==='#c0392b')cls+=' error';
+  el.className=cls;
+  el.textContent=msg;
+  wrap.appendChild(el);
+  setTimeout(()=>{el.style.transition='opacity .35s,transform .35s';el.style.opacity='0';el.style.transform='translateY(-10px)';setTimeout(()=>el.remove(),400);},2600);
+}
+
+// Haptik (Mobile Vibration) — silent fail wenn nicht unterstützt
+function hapTap(){    try{if(navigator.vibrate)navigator.vibrate(8);}catch(e){} }
+function hapSuccess(){try{if(navigator.vibrate)navigator.vibrate([15,30,15]);}catch(e){} }
+function hapError(){  try{if(navigator.vibrate)navigator.vibrate([40,20,40]);}catch(e){} }
+
+// Geld-Anzeige flash-animieren (visuelles Feedback bei Kauf/Verkauf)
+function flashMoney(){
+  ['garageBalance','shopBalance'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.classList.remove('money-flash');void el.offsetWidth; // reflow → re-trigger
+    el.classList.add('money-flash');
+    el.textContent='💰 '+saveData.money.toLocaleString('de')+' €';
+  });
+}
+
+// Click-Sound (kurzer UI-Beep für Buttons)
+function uiClick(){
+  try{
+    const ctx=(window._uiAudio||(window._uiAudio=new (window.AudioContext||window.webkitAudioContext)()));
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type='sine';o.frequency.value=820;
+    g.gain.setValueAtTime(0.06,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.08);
+    o.connect(g);g.connect(ctx.destination);
+    o.start();o.stop(ctx.currentTime+0.08);
+  }catch(e){}
+}
+
+// Shop sort state (persistent within session)
+let shopSort='brand'; // brand | price-asc | price-desc | speed | year
+const SHOP_SORTS={
+  brand:     {label:'Marke',     fn:(a,b)=>a.brand.localeCompare(b.brand)||a.year-b.year},
+  'price-asc':{label:'Preis ↑',  fn:(a,b)=>a.price-b.price},
+  'price-desc':{label:'Preis ↓', fn:(a,b)=>b.price-a.price},
+  speed:     {label:'Speed ↓',   fn:(a,b)=>b.maxKmh-a.maxKmh},
+  year:      {label:'Jahr ↑',    fn:(a,b)=>parseInt(a.year)-parseInt(b.year)},
+};
+
 function buildShopUI(){
   const bal=document.getElementById('shopBalance');
   if(bal)bal.textContent=`💰 ${saveData.money.toLocaleString('de')} €`;
 
-  // Filter buttons
+  // Filter buttons (Categories)
   const filterRow=document.getElementById('shopFilterRow');
   if(filterRow){
     filterRow.innerHTML=SHOP_CATS.map(c=>
-      `<button class="shop-filter${shopFilter===c?' active':''}" onclick="shopFilter='${c}';buildShopUI();">${SHOP_CAT_LABELS[c]||c}</button>`
+      `<button class="shop-filter${shopFilter===c?' active':''}" onclick="shopFilter='${c}';buildShopUI();hapTap();">${SHOP_CAT_LABELS[c]||c}</button>`
+    ).join('');
+  }
+
+  // Sort buttons
+  const sortRow=document.getElementById('shopSortRow');
+  if(sortRow){
+    sortRow.innerHTML=Object.entries(SHOP_SORTS).map(([k,v])=>
+      `<button class="shop-sort${shopSort===k?' active':''}" onclick="shopSort='${k}';buildShopUI();hapTap();">${v.label}</button>`
     ).join('');
   }
 
   const content=document.getElementById('shopContent');
   if(!content)return;
-  const filtered=CARS.filter(c=>shopFilter==='all'||c.cat===shopFilter);
+  const filtered=CARS.filter(c=>shopFilter==='all'||c.cat===shopFilter)
+                     .sort(SHOP_SORTS[shopSort].fn);
 
-  content.innerHTML=filtered.map(car=>{
+  content.innerHTML=filtered.map((car,idx)=>{
     const owned=isCarOwned(car.id);
     const inShop=isCarInShop(car.id);
     const selected=isCarSelected(car.id);
     const locked=!inShop;
     const canBuy=inShop&&!owned&&saveData.money>=car.price;
     const cls='shop-card'+(selected?' active-car':owned?' owned':locked?' locked':'');
-    const statBar=(v,mx,col)=>`<div style="background:rgba(255,255,255,.08);border-radius:2px;height:3px;width:100%;margin:1px 0;"><div style="background:${col};width:${Math.round(v/mx*100)}%;height:3px;border-radius:2px;"></div></div>`;
+
+    // Badge oben rechts
+    const badge=selected?'<div class="sc-badge active">✓ AKTIV</div>'
+      :owned?'<div class="sc-badge owned">IM BESITZ</div>'
+      :locked?`<div class="sc-badge locked">🔒 ${car.unlockBiome||'?'}</div>`
+      :car.price>=100000?'<div class="sc-badge new">PREMIUM</div>'
+      :'';
+
+    const statBar=(v,mx,col)=>`<div style="background:rgba(255,255,255,.08);border-radius:2px;height:3px;width:100%;"><div style="background:${col};width:${Math.min(100,Math.round(v/mx*100))}%;height:3px;border-radius:2px;"></div></div>`;
+
     const btn=locked
-      ?`<div style="font-size:.45rem;color:rgba(255,255,255,.3);text-align:center;margin-top:.4rem;">🔒 ${car.unlockBiome||'?'}</div>`
+      ?`<div style="font-size:.5rem;color:rgba(255,255,255,.32);text-align:center;padding:.3rem;font-style:italic;">Im Biom "${car.unlockBiome||'?'}" freischalten</div>`
       :owned
-        ?`<button onclick="selectCar('${car.id}')" style="width:100%;margin-top:.4rem;font-family:'Bebas Neue',sans-serif;font-size:.6rem;letter-spacing:.1em;padding:.28rem;border-radius:3px;cursor:pointer;border:1px solid ${selected?'var(--gold)':'#2ecc71'};background:${selected?'rgba(212,160,23,.15)':'rgba(46,204,113,.1)'};color:${selected?'var(--gold)':'#2ecc71'};">${selected?'✓ AKTIV':'AUSWÄHLEN'}</button>`
-        :`<button onclick="${canBuy?`buyCar('${car.id}')`:`showToast('Zu wenig Geld!','#e74c3c')`}" style="width:100%;margin-top:.4rem;font-family:'Bebas Neue',sans-serif;font-size:.6rem;letter-spacing:.1em;padding:.28rem;border-radius:3px;cursor:${canBuy?'pointer':'default'};border:1px solid ${canBuy?'var(--gold)':'rgba(255,255,255,.12)'};background:${canBuy?'rgba(212,160,23,.12)':'rgba(255,255,255,.03)'};color:${canBuy?'var(--gold)':'rgba(255,255,255,.35)'};">💰 ${car.price.toLocaleString('de')} €</button>`;
-    return `<div class="${cls}">
-      <div style="font-size:.45rem;color:rgba(255,255,255,.3);margin-bottom:.1rem;">${car.flag||''} ${car.year}</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:.78rem;color:var(--white);line-height:1.1;">${car.brand}</div>
-      <div style="font-size:.7rem;color:var(--gold);margin-bottom:.3rem;">${car.name}</div>
-      ${statBar(car.maxKmh,400,'#e74c3c')}
-      ${statBar(10-car.accel100,10,'#f39c12')}
-      ${statBar(car.grip*500,100,'#3498db')}
-      <div style="font-size:.4rem;color:rgba(255,255,255,.28);margin:.2rem 0;">${car.maxKmh}km/h · ${car.accel100}s</div>
+        ?`<button onclick="selectCar('${car.id}');hapSuccess();" style="width:100%;font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.12em;padding:.4rem;border-radius:4px;cursor:pointer;border:1px solid ${selected?'var(--gold)':'#2ecc71'};background:${selected?'rgba(212,160,23,.18)':'rgba(46,204,113,.12)'};color:${selected?'var(--gold)':'#2ecc71'};font-weight:bold;">${selected?'✓ FAHREN':'AUSWÄHLEN'}</button>`
+        :`<button onclick="${canBuy?`buyCarConfirm('${car.id}')`:`hapError();showToast('Zu wenig Geld — fehlen '+(${car.price}-${saveData.money}).toLocaleString('de')+'€','error')`}" style="width:100%;font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.1em;padding:.4rem;border-radius:4px;cursor:${canBuy?'pointer':'not-allowed'};border:1px solid ${canBuy?'var(--gold)':'rgba(255,255,255,.12)'};background:${canBuy?'rgba(212,160,23,.15)':'rgba(255,255,255,.03)'};color:${canBuy?'var(--gold)':'rgba(255,255,255,.32)'};font-weight:bold;">💰 ${car.price.toLocaleString('de')} €</button>`;
+
+    return `<div class="${cls}" data-car="${car.id}">
+      ${badge}
+      <canvas class="sc-canvas" id="sc-cv-${idx}" width="170" height="80"></canvas>
+      <div style="font-size:.42rem;letter-spacing:.15em;color:rgba(255,255,255,.32);">${car.flag||''} ${car.year} · ${car.cat}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:.85rem;color:var(--white);line-height:1.05;">${car.brand}</div>
+      <div style="font-size:.78rem;color:var(--gold);font-weight:600;line-height:1.1;">${car.name}</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:.18rem .4rem;font-size:.42rem;letter-spacing:.08em;color:rgba(255,255,255,.5);align-items:center;margin-top:.18rem;">
+        <span>VMAX</span>${statBar(car.maxKmh,400,'#e74c3c')}
+        <span>BESCH.</span>${statBar(10-car.accel100,10,'#f39c12')}
+        <span>GRIP</span>${statBar(car.grip*500,100,'#3498db')}
+      </div>
+      <div style="font-size:.45rem;color:rgba(255,255,255,.38);margin:.15rem 0;text-align:center;">${car.maxKmh} km/h · 0-100 in ${car.accel100}s</div>
       ${btn}
     </div>`;
   }).join('');
+
+  // Mini-Canvas-Auto in jede Karte zeichnen (drawCar von oben verwendet)
+  setTimeout(()=>{
+    filtered.forEach((car,idx)=>{
+      const cv=document.getElementById('sc-cv-'+idx);if(!cv)return;
+      const ctx=cv.getContext('2d');
+      ctx.clearRect(0,0,cv.width,cv.height);
+      try{drawCar(ctx,cv.width/2,cv.height/2,car,Math.PI*1.5,1.7,false,false,false);}
+      catch(e){console.warn('Shop-card preview failed for '+car.id,e);}
+    });
+  },0);
+}
+
+// Bestätigungs-Dialog für Auto-Kauf
+function buyCarConfirm(carId){
+  const car=CARS.find(c=>c.id===carId);if(!car)return;
+  if(!confirm(`${car.brand} ${car.name} kaufen für ${car.price.toLocaleString('de')} €?`))return;
+  buyCar(carId);
+  hapSuccess();
+  flashMoney();
+  showToast(`✓ ${car.brand} ${car.name} gekauft!`,'success');
 }
 
 // Shop button event
@@ -4814,28 +4940,70 @@ function buildTuningTabHTML(carId,t){
     ${tog('Motorhauben-Hutze','hoodScoop',2800,'Turbo +5%')}`;
 }
 
+// Premium Farb-Paletten — Classic-Auto-Farben, ein Klick = fertige Lackierung
+const COLOR_PRESETS=[
+  {name:'Racing Red',     h:0,   s:78, l:42},
+  {name:'British Racing', h:142, s:65, l:22},
+  {name:'Pearl White',    h:35,  s:14, l:88},
+  {name:'Jet Black',      h:0,   s:0,  l:8},
+  {name:'Champion Gold',  h:42,  s:78, l:48},
+  {name:'Sky Blue',       h:205, s:72, l:55},
+  {name:'Royal Blue',     h:220, s:80, l:32},
+  {name:'Silver Metallic',h:200, s:8,  l:65},
+  {name:'Sunset Orange',  h:22,  s:85, l:52},
+  {name:'Lime Green',     h:75,  s:80, l:50},
+  {name:'Hot Pink',       h:330, s:75, l:58},
+  {name:'Midnight Purple',h:275, s:55, l:22},
+  {name:'Burgundy',       h:355, s:60, l:24},
+  {name:'Mocha Brown',    h:25,  s:35, l:32},
+  {name:'Mint',           h:160, s:50, l:62},
+  {name:'Bright Yellow',  h:52,  s:92, l:58},
+];
+
 function buildLackTabHTML(carId,t,car){
   const h=t.bodyHue!==null?t.bodyHue:0;
   const s=t.bodySat!==null?t.bodySat:70;
   const l=t.bodyLit!==null?t.bodyLit:45;
-  return `<div class="gSec">🎨 Karosseriefarbe</div>
-    <div style="margin:.3rem 0;">
-      <div style="font-size:.45rem;color:rgba(255,255,255,.35);margin-bottom:.2rem;">FARBTON</div>
-      <input type="range" min="0" max="360" value="${h}" oninput="setTuning('${carId}','bodyHue',+this.value);updateGarageCar('${carId}');" style="width:100%;accent-color:var(--gold);">
+  const isCustom=t.bodyHue!==null;
+  const previewCol=isCustom?`hsl(${h},${s}%,${l}%)`:(car.body||'#888');
+
+  // Preset-Grid: 4x4 Klick-Swatches
+  const presetSwatches=COLOR_PRESETS.map(p=>{
+    const isActive=isCustom&&Math.abs(t.bodyHue-p.h)<3&&Math.abs(t.bodySat-p.s)<3&&Math.abs(t.bodyLit-p.l)<3;
+    return `<button title="${p.name}" onclick="setTuning('${carId}','bodyHue',${p.h});setTuning('${carId}','bodySat',${p.s});setTuning('${carId}','bodyLit',${p.l});updateGarageCar('${carId}');buildGarageTabContent();hapTap();" style="aspect-ratio:1;border-radius:5px;cursor:pointer;border:2px solid ${isActive?'var(--gold)':'rgba(255,255,255,.08)'};background:hsl(${p.h},${p.s}%,${p.l}%);box-shadow:inset 0 -8px 12px rgba(0,0,0,.3),inset 0 8px 8px rgba(255,255,255,.18);${isActive?'transform:scale(1.08);':''}"></button>`;
+  }).join('');
+
+  return `<div class="gSec">🎨 Farb-Vorschau</div>
+    <div style="display:flex;align-items:center;gap:.6rem;margin:.4rem 0 .8rem;">
+      <div style="width:60px;height:60px;border-radius:6px;background:${previewCol};box-shadow:inset 0 -16px 20px rgba(0,0,0,.35),inset 0 16px 16px rgba(255,255,255,.22),0 4px 10px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);"></div>
+      <div style="flex:1;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.12em;color:var(--gold);">${isCustom?'INDIVIDUELL':'ORIGINAL'}</div>
+        <div style="font-size:.5rem;color:rgba(255,255,255,.45);letter-spacing:.1em;">${isCustom?`H${h}° S${s}% L${l}%`:'Werksfarbe'}</div>
+        <button onclick="setTuning('${carId}','bodyHue',null);setTuning('${carId}','bodySat',null);setTuning('${carId}','bodyLit',null);updateGarageCar('${carId}');buildGarageTabContent();hapTap();" style="font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.1em;padding:.18rem .55rem;border-radius:3px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;margin-top:.2rem;">↺ ZURÜCKSETZEN</button>
+      </div>
     </div>
-    <div style="margin:.3rem 0;">
-      <div style="font-size:.45rem;color:rgba(255,255,255,.35);margin-bottom:.2rem;">SÄTTIGUNG</div>
-      <input type="range" min="0" max="100" value="${s}" oninput="setTuning('${carId}','bodySat',+this.value);updateGarageCar('${carId}');" style="width:100%;accent-color:var(--gold);">
+
+    <div class="gSec">⭐ Klassiker-Lacke</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.3rem;margin:.3rem 0 .6rem;">${presetSwatches}</div>
+
+    <div class="gSec">🎚 Individuell anpassen</div>
+    <div style="margin:.25rem 0;">
+      <div style="display:flex;justify-content:space-between;font-size:.45rem;color:rgba(255,255,255,.35);letter-spacing:.1em;margin-bottom:.15rem;"><span>FARBTON</span><span>${h}°</span></div>
+      <input type="range" min="0" max="360" value="${h}" oninput="setTuning('${carId}','bodyHue',+this.value);updateGarageCar('${carId}');this.previousElementSibling.lastElementChild.textContent=this.value+'°';" style="width:100%;accent-color:var(--gold);">
     </div>
-    <div style="margin:.3rem 0;">
-      <div style="font-size:.45rem;color:rgba(255,255,255,.35);margin-bottom:.2rem;">HELLIGKEIT</div>
-      <input type="range" min="10" max="90" value="${l}" oninput="setTuning('${carId}','bodyLit',+this.value);updateGarageCar('${carId}');" style="width:100%;accent-color:var(--gold);">
+    <div style="margin:.25rem 0;">
+      <div style="display:flex;justify-content:space-between;font-size:.45rem;color:rgba(255,255,255,.35);letter-spacing:.1em;margin-bottom:.15rem;"><span>SÄTTIGUNG</span><span>${s}%</span></div>
+      <input type="range" min="0" max="100" value="${s}" oninput="setTuning('${carId}','bodySat',+this.value);updateGarageCar('${carId}');this.previousElementSibling.lastElementChild.textContent=this.value+'%';" style="width:100%;accent-color:var(--gold);">
     </div>
-    <div style="width:100%;height:32px;border-radius:4px;margin:.4rem 0;" id="colorPreview" style="background:hsl(${h},${s}%,${l}%);"></div>
-    <button onclick="setTuning('${carId}','bodyHue',null);setTuning('${carId}','bodySat',null);setTuning('${carId}','bodyLit',null);updateGarageCar('${carId}');" style="font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.1em;padding:.3rem .8rem;border-radius:3px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;margin-top:.3rem;">↺ ORIGINALFARBE</button>
+    <div style="margin:.25rem 0;">
+      <div style="display:flex;justify-content:space-between;font-size:.45rem;color:rgba(255,255,255,.35);letter-spacing:.1em;margin-bottom:.15rem;"><span>HELLIGKEIT</span><span>${l}%</span></div>
+      <input type="range" min="10" max="90" value="${l}" oninput="setTuning('${carId}','bodyLit',+this.value);updateGarageCar('${carId}');this.previousElementSibling.lastElementChild.textContent=this.value+'%';" style="width:100%;accent-color:var(--gold);">
+    </div>
+
     <div class="gSec" style="margin-top:.8rem;">🎽 Livery</div>
-    ${['original','clean','stripes','racing'].map(lv=>`<button onclick="setTuning('${carId}','livery','${lv}');" style="margin:.1rem;font-size:.6rem;padding:.25rem .55rem;border-radius:3px;cursor:pointer;border:1px solid ${t.livery===lv?'var(--gold)':'rgba(255,255,255,.1)'};background:${t.livery===lv?'rgba(212,160,23,.1)':'rgba(255,255,255,.02)'};color:${t.livery===lv?'var(--gold)':'rgba(255,255,255,.45)'};">${lv.toUpperCase()}</button>`).join('')}
-    <script>document.getElementById('colorPreview')&&(document.getElementById('colorPreview').style.background='hsl(${h},${s}%,${l}%)')<\/script>`;
+    <div style="display:flex;flex-wrap:wrap;gap:.25rem;">
+      ${['original','clean','stripes','racing'].map(lv=>`<button onclick="setTuning('${carId}','livery','${lv}');buildGarageTabContent();updateGarageCar('${carId}');hapTap();" style="flex:1;min-width:60px;font-family:'Bebas Neue',sans-serif;font-size:.6rem;letter-spacing:.1em;padding:.32rem .5rem;border-radius:3px;cursor:pointer;border:1px solid ${t.livery===lv?'var(--gold)':'rgba(255,255,255,.1)'};background:${t.livery===lv?'rgba(212,160,23,.12)':'rgba(255,255,255,.02)'};color:${t.livery===lv?'var(--gold)':'rgba(255,255,255,.55)'};">${lv.toUpperCase()}</button>`).join('')}
+    </div>`;
 }
 
 function buildStatsTabHTML(car){
@@ -4857,25 +5025,23 @@ function buildStatsTabHTML(car){
 }
 
 function _refreshGarageMoney(){
-  const fmt=saveData.money.toLocaleString('de');
-  const gb=document.getElementById('garageBalance');if(gb)gb.textContent=`💰 ${fmt} €`;
-  const sb=document.getElementById('shopBalance');if(sb)sb.textContent=`💰 ${fmt} €`;
+  // Wrapper für Rückwärtskompatibilität — neue Funktion ist flashMoney()
+  flashMoney();
 }
 function buyAndSetTuning(carId,key,value,price){
   price=parseInt(price)||0;
   if(price>0&&saveData.money<price){
-    showToast(`Zu wenig Geld — ${price.toLocaleString('de')} € benötigt`,'#e74c3c');
-    // Flash the balance red so player notices
-    const gb=document.getElementById('garageBalance');
-    if(gb){gb.style.color='#e74c3c';setTimeout(()=>gb.style.color='#2ecc71',800);}
+    hapError();
+    showToast(`Zu wenig Geld — ${(price-saveData.money).toLocaleString('de')} € fehlen`,'error');
     return;
   }
   if(price>0)saveData.money-=price;
   setTuning(carId,key,value);
   buildGarageTabContent();
-  _refreshGarageMoney();
+  flashMoney();
   updateGarageCar(carId);
-  if(price>0)showToast(`Gekauft! ${price.toLocaleString('de')} € bezahlt`,'#2ecc71');
+  if(price>0){hapSuccess();uiClick();showToast(`✓ Gekauft — ${price.toLocaleString('de')} €`,'success');}
+  else{hapTap();}
 }
 function buyAndToggleTuning(carId,key,price){
   const t=getTuning(carId);
@@ -4883,20 +5049,20 @@ function buyAndToggleTuning(carId,key,price){
     setTuning(carId,key,false);
     buildGarageTabContent();
     updateGarageCar(carId);
+    hapTap();
     return;
   }
   if(saveData.money<price){
-    showToast(`Zu wenig Geld — ${price.toLocaleString('de')} € benötigt`,'#e74c3c');
-    const gb=document.getElementById('garageBalance');
-    if(gb){gb.style.color='#e74c3c';setTimeout(()=>gb.style.color='#2ecc71',800);}
+    hapError();
+    showToast(`Zu wenig Geld — ${(price-saveData.money).toLocaleString('de')} € fehlen`,'error');
     return;
   }
   saveData.money-=price;
   setTuning(carId,key,true);
   buildGarageTabContent();
-  _refreshGarageMoney();
+  flashMoney();
   updateGarageCar(carId);
-  if(price>0)showToast(`Gekauft! ${price.toLocaleString('de')} € bezahlt`,'#2ecc71');
+  if(price>0){hapSuccess();uiClick();showToast(`✓ Gekauft — ${price.toLocaleString('de')} €`,'success');}
 }
 
 // ════════════════════════════════════════════════
