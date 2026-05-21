@@ -1,4 +1,4 @@
-<!-- FIXED: Physics Jitter Level 14+ · Admin-Modus · Stärkere Bremsen · Ziellinie volle Breite · Richtungspfeile -->
+﻿<!-- FIXED: Physics Jitter Level 14+ · Admin-Modus · Stärkere Bremsen · Ziellinie volle Breite · Richtungspfeile -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -695,10 +695,16 @@ body.dev-tablet #nitro-wrap{right:118px;}
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
 <!-- ════════════════════════════════════════════════
-     ES MODULE SYSTEM (Refactor in progress — Phase A+)
-     Wird parallel zum unten stehenden inline-Script geladen.
-     Stueck fuer Stueck wandern Funktionen in src/ aus.
+     DATA MODULES (Phase B) - klassische Scripts (kein ES Module)
+     Synchron geladen VOR dem inline-Game-Code damit alle globalen
+     Konstanten (CARS, WORLDS, TYRE_COMPOUNDS, etc.) verfuegbar sind.
      ════════════════════════════════════════════════ -->
+<script src="src/data/cars.js"></script>
+<script src="src/data/worlds.js"></script>
+<script src="src/data/tuning.js"></script>
+<script src="src/data/race-modes.js"></script>
+
+<!-- ES Module Boot (Phase A - Stub fuer spaeteres Refactor) -->
 <script type="module" src="src/main.js"></script>
 
 <script>
@@ -710,6 +716,12 @@ document.body.classList.add('dev-'+DEVICE);
 // ════════════════════════════════════════════════
 // CARS
 // ════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// CARS, CAR_DRIVETRAIN, CAR_SHAPES → moved to src/data/cars.js (Phase B)
+// Loaded via classic <script> tag VOR diesem inline-Block.
+// Verfügbar als globale Konstanten: CARS, CAR_DRIVETRAIN, CAR_SHAPES, getCarShape()
+// ════════════════════════════════════════════════
+/* CARS-INLINE-DEFINITION ENTFERNT — siehe src/data/cars.js
 const CARS = [
   // ── GERMAN PERFORMANCE ───────────────────────────────────────────────────────
   {id:'bmw2002t',   brand:'BMW',    name:'2002 Turbo',         year:'1973',cat:'German Performance',flag:'🇩🇪',price:22000, unlockBiome:null,
@@ -948,10 +960,12 @@ const CAR_DRIVETRAIN={
 };
 // Inject drv into car objects at startup (once, non-destructive)
 CARS.forEach(c=>{ if(!c.drv) c.drv=CAR_DRIVETRAIN[c.id]||'rwd'; });
+*/
 
 // ════════════════════════════════════════════════
-// LEVEL RACE MODES — deterministic per (worldId, levelIdx)
+// RACE_MODE_DEF + BIOME_MODE_PATTERN → moved to src/data/race-modes.js (Phase B)
 // ════════════════════════════════════════════════
+/* RACE-MODES-INLINE-DEFINITION ENTFERNT — siehe src/data/race-modes.js
 const RACE_MODE_DEF={
   classic_race:  {icon:'🏁',name:'KLASSISCHES RENNEN',  desc:'3 Runden gegen KI-Gegner',     color:'#d4a017',laps:3},
   time_trial:    {icon:'⏱', name:'ZEITFAHREN',           desc:'Solo – beste Rundenzeit zählt', color:'#3498db',laps:3},
@@ -967,6 +981,8 @@ const BIOME_MODE_PATTERN={
   rally:   ['drift_challenge','classic_race','drift_challenge','sprint','classic_race','drift_challenge','elimination','classic_race'],
   desert:  ['classic_race','sprint','elimination','classic_race','drift_challenge','sprint','classic_race','elimination'],
 };
+*/
+// getLevelMode bleibt im inline-Code (Phase E wird auch das in ein Modul)
 function getLevelMode(worldId,levelIdx){
   const pattern=BIOME_MODE_PATTERN[worldId]||BIOME_MODE_PATTERN.city;
   return pattern[levelIdx%pattern.length]||'classic_race';
@@ -1067,8 +1083,10 @@ function calcStarsFromTarget(achievedValue,target){
 }
 
 // ════════════════════════════════════════════════
-// WORLDS & LEVELS
+// WORLDS → moved to src/data/worlds.js (Phase B)
+// Verfügbar als globale Konstante: WORLDS, SURFACES, BIOME_SURFACE
 // ════════════════════════════════════════════════
+/* WORLDS-INLINE-DEFINITION ENTFERNT — siehe src/data/worlds.js
 const WORLDS = [
   {id:'city',name:'Nordschleife',icon:'🏁',car:0,surface:'asphalt',
    circuit:`<path d="M6,20 C6,8 14,4 24,4 L29,5 C37,6 42,10 42,16 C42,23 36,27 28,26 L20,25 C12,28 6,26 6,20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>`,
@@ -1276,6 +1294,7 @@ const WORLDS = [
    circuit:`<path d="M6,20 C6,12 12,6 22,6 L28,7 C36,8 42,12 42,18 C42,24 36,28 28,27 L22,26 C14,29 6,26 6,20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>`,
    unlocked:false},
 ];
+*/
 
 // ════════════════════════════════════════════════
 // SAVE DATA
@@ -1332,77 +1351,13 @@ function setStars(wid,lvl,s){saveData.stars[wid+'_'+lvl]=Math.max(getStars(wid,l
 const STAR_PRIZE=[0,200,400,700];
 
 // ════════════════════════════════════════════════
-// SURFACE PHYSICS
+// SURFACES + BIOME_SURFACE → moved to src/data/worlds.js (Phase B)
 // ════════════════════════════════════════════════
-const SURFACES={
-  asphalt: {gripK:1.00,driftK:0.80,driftThresh:0.18,partCol:'rgba(30,30,30,.55)',name:'Asphalt'},
-  gravel:  {gripK:0.62,driftK:1.45,driftThresh:0.11,partCol:'rgba(140,110,70,.65)',name:'Schotter'},
-  sand:    {gripK:0.48,driftK:1.65,driftThresh:0.09,partCol:'rgba(200,165,80,.60)',name:'Sand'},
-  mud:     {gripK:0.38,driftK:1.75,driftThresh:0.08,partCol:'rgba(90,55,20,.70)',name:'Matsch'},
-  snow:    {gripK:0.52,driftK:1.55,driftThresh:0.10,partCol:'rgba(220,240,255,.55)',name:'Schnee'},
-  ice:     {gripK:0.22,driftK:2.10,driftThresh:0.06,partCol:'rgba(180,220,240,.45)',name:'Eis'},
-  saltflat:{gripK:0.92,driftK:0.72,driftThresh:0.22,partCol:'rgba(240,240,220,.40)',name:'Salz'},
-  dirt:    {gripK:0.58,driftK:1.35,driftThresh:0.12,partCol:'rgba(160,120,60,.60)',name:'Piste'},
-};
-const BIOME_SURFACE={
-  city:'asphalt',alpine:'asphalt',forest:'asphalt',rally:'gravel',desert:'sand',
-  monaco:'asphalt',highland:'asphalt',targa:'asphalt',pikes:'dirt',bonneville:'saltflat',
-  baja:'dirt',hakone:'asphalt',safari:'dirt',swedish:'snow',finland:'gravel',
-  atlas:'gravel',pyrenees:'asphalt',outback:'dirt',iom:'asphalt',nurburgring:'asphalt',
-};
 
 // ════════════════════════════════════════════════
-// TYRE COMPOUNDS
+// TUNING (TYRE_COMPOUNDS, BODYKIT_PARTS, SUSPENSION_OPTIONS, DIFF_OPTIONS,
+//         GEARBOX_OPTIONS, BRAKE_OPTIONS, UPGRADE_COSTS) → moved to src/data/tuning.js (Phase B)
 // ════════════════════════════════════════════════
-// Preise 3-4x erhöht: damit Tuning echte Progression bleibt
-// (vorher: alles in 1-2 Rennen kaufbar → keine Spannung)
-const TYRE_COMPOUNDS={
-  slick:       {asphalt:1.42,gravel:0.28,sand:0.14,mud:0.10,snow:0.09,ice:0.07,saltflat:1.38,dirt:0.22,name:'Slick',       icon:'🏎',price:35000},
-  sport_soft:  {asphalt:1.22,gravel:0.52,sand:0.33,mud:0.28,snow:0.18,ice:0.13,saltflat:1.18,dirt:0.42,name:'Sport Soft',  icon:'🔴',price:14000},
-  sport_medium:{asphalt:1.00,gravel:0.70,sand:0.50,mud:0.44,snow:0.34,ice:0.24,saltflat:0.96,dirt:0.60,name:'Sport Medium',icon:'🟡',price:0},
-  sport_hard:  {asphalt:0.84,gravel:0.82,sand:0.66,mud:0.54,snow:0.52,ice:0.36,saltflat:0.80,dirt:0.72,name:'Sport Hard',  icon:'⚪',price:7000},
-  rally:       {asphalt:0.68,gravel:1.18,sand:0.88,mud:0.76,snow:0.76,ice:0.52,saltflat:0.62,dirt:0.96,name:'Rally',       icon:'🟠',price:18000},
-  gravel_rally:{asphalt:0.58,gravel:1.32,sand:1.12,mud:1.02,snow:0.58,ice:0.44,saltflat:0.52,dirt:1.18,name:'Gravel Rally',icon:'🟤',price:24000},
-  snow_tyre:   {asphalt:0.54,gravel:0.74,sand:0.64,mud:0.68,snow:1.28,ice:1.14,saltflat:0.48,dirt:0.72,name:'Snow/Ice',   icon:'❄️',price:20000},
-  all_season:  {asphalt:0.80,gravel:0.84,sand:0.74,mud:0.70,snow:0.84,ice:0.62,saltflat:0.76,dirt:0.80,name:'All-Season', icon:'🔵',price:11000},
-};
-
-// ════════════════════════════════════════════════
-// BODYKIT & TUNING PARTS — Preise 3-4x erhöht (echte Progression)
-// ════════════════════════════════════════════════
-const BODYKIT_PARTS={
-  frontSplitter:{name:'Frontschürze',   price:18000,effect:'Abtrieb +5%'},
-  rearWingSmall:{name:'Heckspoiler',    price:26000,effect:'Abtrieb +8%, VMax −1%'},
-  rearWingGT:   {name:'GT-Flügel',     price:52000,effect:'Abtrieb +15%, VMax −3%'},
-  sideskirts:   {name:'Seitenschweller',price:15000,effect:'Stabilität +3%'},
-  widebody:     {name:'Wide-Body-Kit', price:75000,effect:'Reifenbreite +40mm'},
-  hoodScoop:    {name:'Motorhauben-Hutze',price:11000,effect:'Turbo +5%'},
-};
-const SUSPENSION_OPTIONS={
-  street:{name:'Seriendämpfer',  price:0,     gripMult:1.00,driftMult:1.00},
-  sport: {name:'Sport-Fahrwerk', price:22000, gripMult:1.08,driftMult:0.90},
-  race:  {name:'Renn-Fahrwerk',  price:60000, gripMult:1.18,driftMult:0.75},
-  drift: {name:'Drift-Setup',    price:34000, gripMult:0.88,driftMult:1.45},
-};
-const DIFF_OPTIONS={
-  open:  {name:'Offenes Diff.',    price:0,     driftMult:1.22,tractMult:0.90},
-  lsd:   {name:'LSD Sperrdiff.',   price:38000, driftMult:0.84,tractMult:1.16},
-  locked:{name:'Sperrdiff. 100%', price:68000, driftMult:1.65,tractMult:1.04},
-};
-const GEARBOX_OPTIONS={
-  stock:{name:'Seriengetriebe',  price:0,     accelMult:1.00,vmaxMult:1.00},
-  short:{name:'Kurze Übersetzung',price:30000, accelMult:1.10,vmaxMult:0.92},
-  long: {name:'Lange Übersetzung',price:30000, accelMult:0.94,vmaxMult:1.08},
-};
-const BRAKE_OPTIONS=[
-  {name:'Serienbremsen',    price:0,     brakeK:1.00},
-  {name:'Sport-Bremsanlage',price:18000, brakeK:1.15},
-  {name:'Renn-Bremsen',     price:38000, brakeK:1.28},
-  {name:'Carbon-Keramik',   price:95000, brakeK:1.42},
-];
-
-// Upgrade-Costs ~5x: jetzt brauchst du ca. 8-12 Rennen pro Stufe statt 1
-const UPGRADE_COSTS={engine:[1500,3000,5500,9000,14000],grip:[1000,2200,4500,7500,12000],nitro:[800,1800,3500,6000,9500]};
 function getUpgrades(carId){
   const u=saveData.upgrades[carId];
   if(!u||typeof u!=='object')return{engine:0,grip:0,nitro:0};
@@ -4472,28 +4427,8 @@ document.getElementById('btnAccLoad').addEventListener('click',()=>{
 addUserBadge('sMenu');addUserBadge('sMode');
 
 // ════════════════════════════════════════════════
-// ACHIEVEMENTS — 18 Ziele, persistent in saveData
+// ACHIEVEMENTS → moved to src/data/race-modes.js (Phase B)
 // ════════════════════════════════════════════════
-const ACHIEVEMENTS=[
-  {id:'first_win',    icon:'🏆',name:'Erster Sieg',       desc:'Gewinne dein erstes Rennen.',            check:g=>g.pos===1},
-  {id:'hat_trick',    icon:'🎩',name:'Hat-Trick',          desc:'3 Rennen hintereinander gewonnen.',       check:g=>g.winStreak>=3},
-  {id:'drift_100',    icon:'🌀',name:'Drift Einsteiger',   desc:'50 m am Stück gedriftet.',               check:g=>g.maxDriftDist>=50},
-  {id:'drift_king',   icon:'👑',name:'Drift King',         desc:'500 m am Stück gedriftet.',              check:g=>g.maxDriftDist>=500},
-  {id:'nitro_rush',   icon:'⚡',name:'Nitro Rush',         desc:'Nitro 8× in einem Rennen gezündet.',    check:g=>g.nitroUses>=8},
-  {id:'speedster',    icon:'🚀',name:'Speedster',          desc:'300 km/h Top-Speed erreicht.',            check:g=>g.topKmh>=300},
-  {id:'hyperspeed',   icon:'🛸',name:'Hyperspeed',         desc:'380 km/h Top-Speed erreicht.',            check:g=>g.topKmh>=380},
-  {id:'clean_lap',    icon:'✨',name:'Saubere Runde',      desc:'Rennen ohne Wand-Kontakt & ohne Drift.', check:g=>g.cleanLap},
-  {id:'all_stars3',   icon:'⭐',name:'Perfektes Rennen',   desc:'3 Sterne in einem Level geholt.',        check:g=>g.stars===3},
-  {id:'collector',    icon:'🔑',name:'Weltenbummler',      desc:'Alle 5 Biome freigeschaltet.',           check:()=>WORLDS.every(w=>saveData.unlocked[w.id])},
-  {id:'millionaire',  icon:'💰',name:'Millionär',          desc:'1.000.000 € Gesamtverdienst.',           check:()=>(saveData.totalEarned||0)>=1e6},
-  {id:'max_engine',   icon:'🔧',name:'Volltuning',         desc:'Motor auf Level 5 ausgebaut.',           check:()=>Object.values(saveData.upgrades||{}).some(u=>(u.engine||0)>=5)},
-  {id:'night_rain',   icon:'🌧',name:'Regenmeister',       desc:'Rennen im Regen gewonnen.',               check:g=>g.weather==='rain'&&g.pos===1},
-  {id:'underdog',     icon:'🐶',name:'Underdog',           desc:'Mit dem langsamsten Auto (BMW 2002) gewonnen.',check:g=>g.carId==='bmw2002t'&&g.pos===1},
-  {id:'comeback',     icon:'🔄',name:'Comeback',           desc:'Von Platz 4 auf Platz 1 gewonnen.',      check:g=>g.worstPos>=4&&g.pos===1},
-  {id:'century',      icon:'💯',name:'Century',            desc:'100 Rennen gespielt.',                   check:()=>(saveData.totalRaces||0)>=100},
-  {id:'level_20',     icon:'🎯',name:'Elite',              desc:'Level 20 eines Bioms abgeschlossen.',    check:g=>g.levelIdx===19},
-  {id:'all_biomes_win',icon:'🌍',name:'Weltmeister',       desc:'In allen 5 Biomen mindestens 1× gewonnen.',check:()=>(saveData.wonInWorld||[]).length>=5},
-];
 
 function checkAchievements(gameResult){
   if(!saveData.achievements)saveData.achievements=[];
@@ -5119,29 +5054,8 @@ function initGarageScene(){
 }
 
 // ════════════════════════════════════════════════
-// CAR-SHAPE LOOKUP — per Kategorie unterschiedliche Karosserie-Proportionen
-// Damit Muscle-Cars wuchtig wirken, Sportler tief, Klassiker rundlich, etc.
+// CAR_SHAPES + getCarShape → moved to src/data/cars.js (Phase B)
 // ════════════════════════════════════════════════
-const CAR_SHAPES={
-  '70s Muscle':       {L:1.18,W:1.10,roof:0.94,ride:0.02,hood:1.25,trunk:0.85,wheelR:1.05,wing:false,fender:1.04},
-  'Classic Sports':   {L:1.00,W:0.96,roof:0.85,ride:-0.04,hood:1.05,trunk:0.95,wheelR:0.95,wing:false,fender:1.00},
-  'Supercars':        {L:1.08,W:1.10,roof:0.78,ride:-0.06,hood:0.95,trunk:0.85,wheelR:1.08,wing:true, fender:1.06},
-  'Group B':          {L:0.92,W:1.12,roof:0.96,ride:0.03,hood:0.90,trunk:0.95,wheelR:1.02,wing:true, fender:1.08},
-  'JDM Classics':     {L:1.00,W:1.02,roof:0.90,ride:-0.02,hood:1.00,trunk:1.00,wheelR:1.00,wing:false,fender:1.02},
-  'F1 Heritage':      {L:1.14,W:1.18,roof:0.55,ride:-0.10,hood:1.10,trunk:1.05,wheelR:1.12,wing:true, fender:1.10},
-  'Le Mans Legends':  {L:1.22,W:1.16,roof:0.70,ride:-0.07,hood:1.05,trunk:1.08,wheelR:1.08,wing:true, fender:1.08},
-  'British Icons':    {L:1.00,W:0.96,roof:0.92,ride:-0.01,hood:1.05,trunk:0.98,wheelR:0.96,fender:1.00},
-  'Swedish Classics': {L:1.05,W:1.00,roof:1.08,ride:0.02,hood:0.95,trunk:1.05,wheelR:0.98,fender:1.00},
-  '60s Legends':      {L:1.05,W:1.02,roof:0.92,ride:0.01,hood:1.10,trunk:1.00,wheelR:0.96,fender:1.02},
-  'GT Classics':      {L:1.10,W:1.04,roof:0.82,ride:-0.03,hood:1.10,trunk:0.92,wheelR:1.02,fender:1.04},
-  'Rally Heroes':     {L:0.94,W:1.05,roof:1.05,ride:0.05,hood:0.95,trunk:0.95,wheelR:1.05,fender:1.06},
-  'Touring Cars':     {L:1.02,W:1.04,roof:1.00,ride:-0.01,hood:1.00,trunk:1.00,wheelR:1.00,fender:1.04},
-  'Hot Hatches':      {L:0.88,W:0.96,roof:1.04,ride:0.01,hood:0.85,trunk:0.80,wheelR:0.94,fender:0.98},
-};
-function getCarShape(car){
-  const def={L:1.0,W:1.0,roof:1.0,ride:0,hood:1.0,trunk:1.0,wheelR:1.0,wing:false,fender:1.0};
-  return Object.assign({},def,CAR_SHAPES[car.cat]||{});
-}
 
 function updateGarageCar(carId){
   if(!garageScene||!window.THREE)return;
