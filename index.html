@@ -2925,36 +2925,37 @@ function update(ts){
   p.angle+=steer*0.060*steerAuth*driftOversteer*dt*(onTrack?1:onGrass?.38:.14)*steerSpeedK;
 
   // ── 5. ANTRIEBSKRAFT (in Fahrzeug-Richtung) ──────────────────────
-  // E-Brake erlaubt JETZT Gas-gleichzeitig (echtes Drift-Handling: Gas+Handbremse)
+  // E-Brake erlaubt Gas-gleichzeitig (echtes Drift-Handling: Gas+Handbremse)
   let driveF=0;
   if(effectiveBrake){
-    // Normale Bremse: stark, stoppt
+    // Normale Bremse: stark
     driveF=-aPerF*8*(cs.brakeK||1.0)*dt;
     if(velSpd>1.5)spawnP(G,p.x,p.y,surf?.partCol||'rgba(160,145,120,.55)',1);
     if(slipMag<0.08&&Math.abs(steer)>0.3)p.slipAngle+=steer*0.04*dt;
-  } else if(ebrakeActive){
-    // E-Brake (Handbremse): leichtes Bremsen + Heck bricht aus
-    // WICHTIG: Gas darf gleichzeitig gedrückt sein für klassischen Drift
-    if(gasActive){
-      // Gas + Handbremse: minimale Bremswirkung, vollwertiger Drift
-      driveF=aPerF*0.55*dt; // 55% Schub — Auto bleibt schnell
-    }else{
-      // Nur Handbremse (kein Gas): sanftes Bremsen
-      driveF=-aPerF*1.5*dt;
-    }
-    // Slip-Angle ZIELWERT — Auto driftet kontrolliert, nicht exponentiell
-    const desiredSlip=(Math.abs(steer)>0.1?Math.sign(steer):1)*0.55*(velSpd>0.8?1:0);
-    // Smooth approach (lerp), kein exponentielles Wachstum
-    p.slipAngle+=(desiredSlip-p.slipAngle*0.6)*0.20*dt;
-    // Hard-Clamp damit Slip nie ausser Kontrolle gerät
-    p.slipAngle=Math.max(-1.4,Math.min(1.4,p.slipAngle));
+  } else if(gasActive&&ebrakeActive){
+    // GAS + EBRAKE: Drift-Kombi → 90% Schub, das Auto BLEIBT SCHNELL
+    driveF=aPerF*0.90*dt;
   } else if(gasActive){
-    // Normales Gasgeben (kein Brake/Ebrake)
+    // Nur Gas (normal)
     driveF=aPerF*dt;
+  } else if(ebrakeActive){
+    // Nur Ebrake ohne Gas: GANZ sanftes Bremsen (Motorbremse-ähnlich)
+    driveF=-aPerF*0.8*dt;
   } else {
     // Rollen (kein Input)
     driveF=-aPerF*2.0*dt;
     if(velSpd>3.5)spawnP(G,p.x,p.y,surf?.partCol||'rgba(150,140,120,.18)',0.5);
+  }
+  // E-Brake Slip-Initiierung (nur wenn aktiv + bewegt + lenkt)
+  if(ebrakeActive&&velSpd>2.0){
+    // Kleine Slip-Impulse in Richtung Lenkeinschlag
+    const steerSign=Math.abs(steer)>0.05?Math.sign(steer):0;
+    if(steerSign!==0){
+      p.slipAngle+=steerSign*0.025*dt; // sanft, additiv
+    }
+    // Hard-Clamp (Sicherheit gegen NaN/Explosion)
+    if(!isFinite(p.slipAngle))p.slipAngle=0;
+    p.slipAngle=Math.max(-1.2,Math.min(1.2,p.slipAngle));
   }
   const thrustX=Math.cos(p.angle)*driveF;
   const thrustY=Math.sin(p.angle)*driveF;
@@ -2988,8 +2989,8 @@ function update(ts){
 
   // ── 7. LATERAL CORRECTION ────────────────────────────────────────
   // Seitengrip zieht Velocity-Vektor zur Fahrzeug-Richtung.
-  // E-Brake reduziert Seitengrip → Auto rutscht länger, kommt aber zurück
-  const ebrakeGripMult=ebrakeActive?0.45:1.0;
+  // E-Brake reduziert Seitengrip nur leicht → Drift fühlbar aber kontrollierbar
+  const ebrakeGripMult=ebrakeActive?0.65:1.0;
   const corrK=Math.min(lateralGripK*surfK*7.0*dt*tractionMult*ebrakeGripMult,0.88);
   const targetVx=Math.cos(p.angle)*velSpd;
   const targetVy=Math.sin(p.angle)*velSpd;
@@ -3805,7 +3806,11 @@ window.addEventListener('keydown',e=>{
   if(e.key==='ArrowUp'||e.key==='w')pressing=true;
   if(e.key==='ArrowDown')brakeOn=true;
   // 's' und Space → E-BRAKE (Handbremse für Drift), Nitro entfernt
-  if(e.key==='s'||e.key===' '){e.preventDefault();ebrakeOn=true;}
+  if(e.key==='s'||e.key===' '){
+    e.preventDefault();
+    if(!ebrakeOn)console.log('[NE] E-BRAKE ON (key='+(e.key===' '?'SPACE':'s')+')');
+    ebrakeOn=true;
+  }
   if(e.key==='Escape')togglePause();
 });
 window.addEventListener('keyup',e=>{
