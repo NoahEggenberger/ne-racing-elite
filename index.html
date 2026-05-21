@@ -3799,15 +3799,27 @@ document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});
 // INPUT — KEYBOARD
 // ════════════════════════════════════════════════
 const held={};
+// Set aller "Spiel-Tasten" — diese sollen niemals einen fokussierten Button triggern
+const _RACE_KEYS=new Set(['s',' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','d','Enter']);
+
 window.addEventListener('keydown',e=>{
+  // ── FIX: Wenn ein Button focus hat, Focus entfernen ────────────────────────
+  // Sonst triggert SPACE/ENTER den Button-Click (z.B. btnPause → Pause).
+  // Das ist Browser-Standard fuer fokussierte Buttons und nicht durch
+  // preventDefault verhinderbar (der Click ist ein separates Event).
+  if(_RACE_KEYS.has(e.key)&&document.activeElement&&document.activeElement.tagName==='BUTTON'){
+    document.activeElement.blur();
+  }
+
   if(held[e.key])return;held[e.key]=true;
   if(e.key==='ArrowLeft'||e.key==='a'){pressing=true;targetWheelAngle=-65;}
   if(e.key==='ArrowRight'||e.key==='d'){pressing=true;targetWheelAngle=65;}
   if(e.key==='ArrowUp'||e.key==='w')pressing=true;
   if(e.key==='ArrowDown')brakeOn=true;
-  // 's' und Space → E-BRAKE (Handbremse für Drift), Nitro entfernt
+  // 's' und Space → E-BRAKE (Handbremse für Drift)
   if(e.key==='s'||e.key===' '){
     e.preventDefault();
+    e.stopPropagation();
     if(!ebrakeOn)console.log('[NE] E-BRAKE ON (key='+(e.key===' '?'SPACE':'s')+')');
     ebrakeOn=true;
   }
@@ -4146,6 +4158,9 @@ function showRaceModeIntro(onComplete){
 function startRaceWithCurrentMode(){
   console.log('[NE] === startRaceWithCurrentMode BEGIN ===  mode='+raceMode);
   try{
+    // Falls ein Button (z.B. RENNEN STARTEN) noch Focus hat, entfernen
+    // Sonst triggert SPACE/ENTER spaeter waehrend des Rennens diesen Button.
+    if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
     showScreen('sGame');
     console.log('[NE]   step 1: showScreen OK');
     const gc=document.getElementById('gc');
