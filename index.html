@@ -2861,17 +2861,10 @@ function update(ts){
   // ── E-BRAKE (Handbremse) — ersetzt Nitro ──
   // Aktiv via 's' oder Space ODER Mobile-Button
   // Erlaubt klassisches Drift-Setup: Gas + Handbremse gleichzeitig
-  const ebrakeActive=ebrakeOn; // immer aktiv wenn Taste gedrückt (auch im Stand)
+  const ebrakeActive=ebrakeOn; // immer aktiv wenn Taste gedrückt
   // Nitro deaktiviert (alter Code referenziert das ggf. noch)
   const nitroActive=false;
-  // Reifenrauch beim E-Brake (nur wenn Auto fährt)
-  if(ebrakeActive&&velSpd>1.0){
-    if(Math.random()>.55){
-      const rearX=p.x-Math.cos(p.angle)*8;
-      const rearY=p.y-Math.sin(p.angle)*8;
-      spawnP(G,rearX,rearY,'rgba(220,210,200,.75)',2);
-    }
-  }
+  // (Reifenrauch-Spawn ist nach velSpd-Deklaration — siehe unten)
 
   // ════════════════════════════════════════════════
   // SLIP-ANGLE PHYSIK — Drift, Gewichtsverlagerung, Lateral Forces
@@ -2890,6 +2883,12 @@ function update(ts){
   // Winkel zwischen Fahrzeug-Nase und echter Bewegungsrichtung.
   // 0 = perfekter Grip, >0.18 rad (~10°) = Drift-Zone
   const velSpd=Math.hypot(p.vx,p.vy);
+  // E-Brake Reifenrauch (jetzt NACH velSpd-Deklaration)
+  if(ebrakeActive&&velSpd>1.0&&Math.random()>.55){
+    const rearX=p.x-Math.cos(p.angle)*8;
+    const rearY=p.y-Math.sin(p.angle)*8;
+    spawnP(G,rearX,rearY,'rgba(220,210,200,.75)',2);
+  }
   const velAng=velSpd>0.12?Math.atan2(p.vy,p.vx):p.angle;
   let sa2=p.angle-velAng;
   // Normalisieren auf -π…π
