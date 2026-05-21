@@ -704,6 +704,11 @@ body.dev-tablet #nitro-wrap{right:118px;}
 <script src="src/data/tuning.js"></script>
 <script src="src/data/race-modes.js"></script>
 
+<!-- Utility-Module (Phase C) - braucht CARS aus cars.js (storage.js)
+                                und saveData aus storage.js (helpers.js) -->
+<script src="src/utils/storage.js"></script>
+<script src="src/utils/helpers.js"></script>
+
 <!-- ES Module Boot (Phase A - Stub fuer spaeteres Refactor) -->
 <script type="module" src="src/main.js"></script>
 
@@ -1057,18 +1062,7 @@ function getRaceTarget(modeId,worldId,levelIdx){
   }
 }
 
-// Zeit-Formatter: 95s → "1:35"
-function fmtTime(sec){
-  if(!isFinite(sec)||sec<0)return '–';
-  const m=Math.floor(sec/60), s=Math.floor(sec%60), ms=Math.floor((sec%1)*100);
-  return `${m}:${s.toString().padStart(2,'0')}.${ms.toString().padStart(2,'0')}`;
-}
-// Kompakter ohne ms: 95s → "1:35"
-function fmtTimeShort(sec){
-  if(!isFinite(sec)||sec<0)return '–';
-  const m=Math.floor(sec/60), s=Math.floor(sec%60);
-  return `${m}:${s.toString().padStart(2,'0')}`;
-}
+// fmtTime, fmtTimeShort → moved to src/utils/helpers.js (Phase C)
 
 // Sterne ermitteln basierend auf erreichtem Wert und Target
 function calcStarsFromTarget(achievedValue,target){
@@ -1297,58 +1291,10 @@ const WORLDS = [
 */
 
 // ════════════════════════════════════════════════
-// SAVE DATA
+// SAVE DATA → moved to src/utils/storage.js (Phase C)
+// Verfügbar: MAX_UPG, saveData (let), STAR_PRIZE, settings,
+//            save(), getStars(), setStars()
 // ════════════════════════════════════════════════
-// ── SAVE-DATEN LADEN + VALIDIERUNG ──────────────────────────────────────────────
-// Korrupte oder inkompatible Saves aus alten Versionen können Physics-Explosionen
-// verursachen: NaN/Infinity-Stats → p.speed=NaN → alles bricht. Daher strenge Validierung.
-const MAX_UPG=5; // Maximales Upgrade-Level pro Kategorie
-let saveData;
-try{
-  const raw=JSON.parse(localStorage.getItem('ne_save')||'null');
-  saveData=(raw&&typeof raw==='object')?raw:{};
-}catch(e){
-  console.warn('[NE] Korrupte Save-Daten erkannt, werden zurückgesetzt. Fehler:',e.message);
-  saveData={};
-}
-// Fehlende Felder auffüllen
-if(!saveData.stars||typeof saveData.stars!=='object')saveData.stars={};
-if(!saveData.unlocked||typeof saveData.unlocked!=='object')saveData.unlocked={city:true};
-else if(!saveData.unlocked.city)saveData.unlocked.city=true;
-if(!isFinite(saveData.money)||saveData.money<0)saveData.money=0;
-saveData.money=Math.floor(saveData.money);
-if(!saveData.upgrades||typeof saveData.upgrades!=='object')saveData.upgrades={};
-// New fields: owned/visible cars in shop, selected car, tuning
-if(!saveData.ownedCars||!Array.isArray(saveData.ownedCars))saveData.ownedCars=['bmw2002t'];
-if(!saveData.shopCars||!Array.isArray(saveData.shopCars))saveData.shopCars=CARS.filter(c=>!c.unlockBiome).map(c=>c.id);
-// Ensure bmw2002t always in shop + owned
-if(!saveData.shopCars.includes('bmw2002t'))saveData.shopCars.unshift('bmw2002t');
-if(!saveData.ownedCars.includes('bmw2002t'))saveData.ownedCars.unshift('bmw2002t');
-if(!saveData.selCar||!CARS.find(c=>c.id===saveData.selCar))saveData.selCar='bmw2002t';
-if(!saveData.tuning||typeof saveData.tuning!=='object')saveData.tuning={};
-if(!saveData.achievements||!Array.isArray(saveData.achievements))saveData.achievements=[];
-
-// Upgrade-Level validieren: Jeder Wert muss 0–5 integer sein.
-// Werte außerhalb dieses Bereichs (NaN, Infinity, zu groß, negativ)
-// führen zu Math.pow()-Explosionen in getCarStats → Physics-Crash.
-for(const carId of Object.keys(saveData.upgrades)){
-  const u=saveData.upgrades[carId];
-  if(!u||typeof u!=='object'){saveData.upgrades[carId]={engine:0,grip:0,nitro:0};continue;}
-  for(const k of['engine','grip','nitro']){
-    const v=Number(u[k]);
-    if(!isFinite(v)||v<0||v>MAX_UPG||v!==Math.floor(v)){
-      const clamped=isFinite(v)?Math.max(0,Math.min(Math.floor(v),MAX_UPG)):0;
-      console.warn(`[NE] Ungültiger Upgrade-Wert ${carId}.${k}=${u[k]} → korrigiert zu ${clamped}`);
-      u[k]=clamped;
-    }
-  }
-}
-function save(){if(adminMode)return;localStorage.setItem('ne_save',JSON.stringify(saveData));}
-function getStars(wid,lvl){return (saveData.stars[wid+'_'+lvl])||0;}
-function setStars(wid,lvl,s){saveData.stars[wid+'_'+lvl]=Math.max(getStars(wid,lvl),s);save();}
-
-// Tuning
-const STAR_PRIZE=[0,200,400,700];
 
 // ════════════════════════════════════════════════
 // SURFACES + BIOME_SURFACE → moved to src/data/worlds.js (Phase B)
@@ -1505,9 +1451,8 @@ function checkWorldUnlocks(){
 }
 
 // ════════════════════════════════════════════════
-// GAME SETTINGS
+// GAME SETTINGS → moved to src/utils/storage.js (Phase C)
 // ════════════════════════════════════════════════
-let settings={steerSens:3,vol:70,ctrl:'wheel'};
 
 // ════════════════════════════════════════════════
 // GAME STATE
@@ -2172,16 +2117,7 @@ function tickSkids(G){
 // ════════════════════════════════════════════════
 // CAR DRAWING
 // ════════════════════════════════════════════════
-// ── Hex-Normalisierung: Short-Hex (#fff) → Long-Hex (#ffffff) ──
-// Sonst crasht addColorStop bei `bodyCol+'cc'` weil #fff+cc=#fffcc (5 Zeichen, ungültig).
-// 4-Zeichen-Hex (#fff8) wird zu #ffffff88 (mit Alpha).
-function normHex(c){
-  if(typeof c!=='string'||c[0]!=='#')return c||'#888';
-  const h=c.slice(1);
-  if(h.length===3) return '#'+h[0]+h[0]+h[1]+h[1]+h[2]+h[2];                       // #fff → #ffffff
-  if(h.length===4) return '#'+h[0]+h[0]+h[1]+h[1]+h[2]+h[2]+h[3]+h[3];             // #fff8 → #ffffff88
-  return c; // 6 oder 8 chars: bereits gültig
-}
+// normHex → moved to src/utils/helpers.js (Phase C)
 
 // braking: true = Bremslichter leuchten hell rot (Bremsen oder kein Gas)
 // steerVis: optional Lenkwinkel in Radian (für Vorderräder), default 0
@@ -4694,58 +4630,9 @@ const SHOP_CATS=['all','German Performance','Rally Legends','European GT','Briti
 const SHOP_CAT_LABELS={'all':'Alle','German Performance':'🇩🇪 DE','Rally Legends':'🏁 Rally','European GT':'🇪🇺 EU GT','British Icons':'🏴󠁧󠁢󠁥󠁮󠁧󠁿 GB','American Muscle':'🇺🇸 US','JDM Classics':'🇯🇵 JDM','Swedish Classics':'🇸🇪 SE'};
 
 // ════════════════════════════════════════════════
-// UI HELPERS: Toast, Haptics, Money-Flash, Click-Sound
+// UI HELPERS → moved to src/utils/helpers.js (Phase C)
+// showToast, hapTap/Success/Error, flashMoney, uiClick
 // ════════════════════════════════════════════════
-// showToast wurde überall verwendet, war aber NIE definiert (silent bug!)
-function showToast(msg,kind){
-  // kind: 'success' | 'error' | '#hexcolor' (legacy) | undefined → default
-  const wrap=document.getElementById('toastWrap');if(!wrap)return;
-  const el=document.createElement('div');
-  let cls='toast';
-  if(kind==='success'||kind==='#2ecc71'||kind==='#27ae60')cls+=' success';
-  else if(kind==='error'||kind==='#e74c3c'||kind==='#c0392b')cls+=' error';
-  el.className=cls;
-  el.textContent=msg;
-  wrap.appendChild(el);
-  setTimeout(()=>{el.style.transition='opacity .35s,transform .35s';el.style.opacity='0';el.style.transform='translateY(-10px)';setTimeout(()=>el.remove(),400);},2600);
-}
-
-// Haptik (Mobile Vibration) — silent fail wenn nicht unterstützt
-function hapTap(){    try{if(navigator.vibrate)navigator.vibrate(8);}catch(e){} }
-function hapSuccess(){try{if(navigator.vibrate)navigator.vibrate([15,30,15]);}catch(e){} }
-function hapError(){  try{if(navigator.vibrate)navigator.vibrate([40,20,40]);}catch(e){} }
-
-// Geld-Anzeige flash-animieren (visuelles Feedback bei Kauf/Verkauf)
-function flashMoney(){
-  const fmt=saveData.money.toLocaleString('de');
-  // Alte Inline-Anzeigen (im Sidebar/Header)
-  ['garageBalance','shopBalance'].forEach(id=>{
-    const el=document.getElementById(id);if(!el)return;
-    el.classList.remove('money-flash');void el.offsetWidth;
-    el.classList.add('money-flash');
-    el.textContent='💰 '+fmt+' €';
-  });
-  // Neue Floating-Anzeigen (immer sichtbar oben rechts)
-  ['garageBalanceFloat','shopBalanceFloat'].forEach(id=>{
-    const el=document.getElementById(id);if(!el)return;
-    el.textContent=fmt+' €';
-    const parent=el.parentElement;
-    if(parent){parent.classList.remove('money-flash');void parent.offsetWidth;parent.classList.add('money-flash');}
-  });
-}
-
-// Click-Sound (kurzer UI-Beep für Buttons)
-function uiClick(){
-  try{
-    const ctx=(window._uiAudio||(window._uiAudio=new (window.AudioContext||window.webkitAudioContext)()));
-    const o=ctx.createOscillator(),g=ctx.createGain();
-    o.type='sine';o.frequency.value=820;
-    g.gain.setValueAtTime(0.06,ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.08);
-    o.connect(g);g.connect(ctx.destination);
-    o.start();o.stop(ctx.currentTime+0.08);
-  }catch(e){}
-}
 
 // Shop sort state (persistent within session)
 let shopSort='brand'; // brand | price-asc | price-desc | speed | year
