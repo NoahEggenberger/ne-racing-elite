@@ -2945,16 +2945,22 @@ function update(ts){
     driveF=-aPerF*2.0*dt;
     if(velSpd>3.5)spawnP(G,p.x,p.y,surf?.partCol||'rgba(150,140,120,.18)',0.5);
   }
-  // E-Brake Slip-Initiierung (nur wenn aktiv + bewegt + lenkt)
-  if(ebrakeActive&&velSpd>2.0){
-    // Kleine Slip-Impulse in Richtung Lenkeinschlag
+  // E-Brake Slip-Initiierung — Heck bricht SOFORT und kraeftig aus
+  if(ebrakeActive&&velSpd>1.0){
+    // Auch ohne Lenken initiiert Ebrake bereits leichten Drift in aktuelle Steer-Tendenz
     const steerSign=Math.abs(steer)>0.05?Math.sign(steer):0;
     if(steerSign!==0){
-      p.slipAngle+=steerSign*0.025*dt; // sanft, additiv
+      // Lenken+Ebrake = massiver Drift-Impuls
+      p.slipAngle+=steerSign*0.10*dt; // 4x staerker als zuvor
+    }else{
+      // Reines Ebrake ohne Lenken = sanftes Heck-Aus-Brechen in zufaellige Richtung
+      // (Sign-Persistenz: bricht in die Richtung aus die schon im Slip ist)
+      const drift=Math.sign(p.slipAngle||0.001);
+      p.slipAngle+=drift*0.04*dt;
     }
-    // Hard-Clamp (Sicherheit gegen NaN/Explosion)
+    // Hard-Clamp (Sicherheit gegen NaN/Explosion) — groesserer Spielraum fuer mehr Drift
     if(!isFinite(p.slipAngle))p.slipAngle=0;
-    p.slipAngle=Math.max(-1.2,Math.min(1.2,p.slipAngle));
+    p.slipAngle=Math.max(-1.6,Math.min(1.6,p.slipAngle));
   }
   const thrustX=Math.cos(p.angle)*driveF;
   const thrustY=Math.sin(p.angle)*driveF;
@@ -2988,8 +2994,8 @@ function update(ts){
 
   // ── 7. LATERAL CORRECTION ────────────────────────────────────────
   // Seitengrip zieht Velocity-Vektor zur Fahrzeug-Richtung.
-  // E-Brake reduziert Seitengrip nur leicht → Drift fühlbar aber kontrollierbar
-  const ebrakeGripMult=ebrakeActive?0.65:1.0;
+  // E-Brake reduziert Seitengrip MASSIV → Heck bricht weit aus
+  const ebrakeGripMult=ebrakeActive?0.18:1.0; // war 0.65, jetzt 0.18 (82% weniger lateral grip)
   const corrK=Math.min(lateralGripK*surfK*7.0*dt*tractionMult*ebrakeGripMult,0.88);
   const targetVx=Math.cos(p.angle)*velSpd;
   const targetVy=Math.sin(p.angle)*velSpd;
@@ -3814,12 +3820,12 @@ window.addEventListener('keydown',e=>{
   if(e.key==='ArrowLeft'||e.key==='a'){pressing=true;targetWheelAngle=-65;}
   if(e.key==='ArrowRight'||e.key==='d'){pressing=true;targetWheelAngle=65;}
   if(e.key==='ArrowUp'||e.key==='w')pressing=true;
-  if(e.key==='ArrowDown')brakeOn=true;
-  // 's' und Space → E-BRAKE (Handbremse für Drift)
-  if(e.key==='s'||e.key===' '){
+  if(e.key==='ArrowDown'||e.key==='s')brakeOn=true; // 's' = normale Bremse (Backup zu Arrow-Down)
+  // SPACE (Leertaste) → E-BRAKE (Handbremse für Drift)
+  if(e.key===' '){
     e.preventDefault();
     e.stopPropagation();
-    if(!ebrakeOn)console.log('[NE] E-BRAKE ON (key='+(e.key===' '?'SPACE':'s')+')');
+    if(!ebrakeOn)console.log('[NE] E-BRAKE ON (SPACE)');
     ebrakeOn=true;
   }
   if(e.key==='Escape')togglePause();
@@ -3833,8 +3839,8 @@ window.addEventListener('keyup',e=>{
     if(!held['ArrowLeft']&&!held['ArrowRight']&&!held['ArrowUp']&&!held['w'])pressing=false;
   }
   if(e.key==='ArrowUp'||e.key==='w'){if(!held['ArrowLeft']&&!held['ArrowRight'])pressing=false;}
-  if(e.key==='ArrowDown')brakeOn=false;
-  if(e.key==='s'||e.key===' ')ebrakeOn=false;
+  if(e.key==='ArrowDown'||e.key==='s')brakeOn=false;
+  if(e.key===' ')ebrakeOn=false;
 });
 
 // ════════════════════════════════════════════════
