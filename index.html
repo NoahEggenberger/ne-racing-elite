@@ -89,6 +89,9 @@ input,textarea{-webkit-user-select:text!important;user-select:text!important;tou
 /* Off-track */
 #offtrack{position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.2em;color:#e87060;text-shadow:0 0 20px rgba(232,112,96,.5);pointer-events:none;z-index:20;opacity:0;transition:opacity .2s;}
 #offtrack.show{opacity:1;}
+/* Wrong-way indicator */
+@keyframes wwPulse{0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1);}50%{opacity:.65;transform:translate(-50%,-50%) scale(1.04);}}
+#wrongway.show{opacity:1;animation:wwPulse .7s infinite;}
 /* Rescue countdown */
 #rescueCount{position:absolute;top:51%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.22em;color:#f39c12;text-shadow:0 0 18px rgba(243,156,18,.7);pointer-events:none;z-index:21;display:none;text-align:center;}
 
@@ -201,6 +204,9 @@ body.dev-tablet #nitro-wrap{right:118px;}
 .btn-fin-retry{background:linear-gradient(135deg,#a07010,#d4a017);color:#0a0a0f;border:none;}
 .btn-fin-menu{background:transparent;color:var(--white);border:1px solid var(--border);}
 .btn-fin-menu:hover{border-color:var(--gold);color:var(--gold);}
+.btn-fin-next{background:linear-gradient(135deg,#1a5c2a,#27ae60);color:#fff;border:none;}
+.btn-fin-next:hover{filter:brightness(1.15);}
+@keyframes finBannerIn{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
 
 /* ── ACCOUNT ── */
 #sAccount{background:var(--ink);background-image:radial-gradient(ellipse 80% 60% at 50% -10%,#1e1406,transparent);}
@@ -305,6 +311,29 @@ body.dev-tablet #nitro-wrap{right:118px;}
 .shop-sort{font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.1em;padding:.22rem .55rem;border-radius:3px;cursor:pointer;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);color:rgba(255,255,255,.4);transition:all .12s;}
 .shop-sort:hover{border-color:rgba(212,160,23,.3);color:rgba(255,255,255,.7);}
 .shop-sort.active{border-color:var(--gold);color:var(--gold);background:rgba(212,160,23,.08);}
+/* P8: Horizontal shop cards (2 per row) */
+.shop-card-h{background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.015));border:1px solid var(--border);border-radius:8px;padding:.5rem .55rem;cursor:pointer;transition:border-color .18s,box-shadow .18s;position:relative;overflow:hidden;display:flex;flex-direction:row;gap:.5rem;align-items:flex-start;}
+.shop-card-h:hover{border-color:rgba(212,160,23,.55);box-shadow:0 6px 16px rgba(0,0,0,.45);}
+.shop-card-h.owned{border-color:rgba(46,204,113,.5);background:linear-gradient(135deg,rgba(46,204,113,.05),rgba(46,204,113,.01));}
+.shop-card-h.active-car{border-color:var(--gold);box-shadow:0 0 18px rgba(212,160,23,.35);}
+.shop-card-h.locked{opacity:.4;cursor:default;}
+.shop-card-h.locked:hover{border-color:var(--border);box-shadow:none;}
+.shop-card-h .sc-canvas-h{flex-shrink:0;width:92px;height:58px;background:radial-gradient(ellipse at center,#1a1a26 0%,#0a0a14 100%);border-radius:4px;display:block;}
+.shop-card-h .sc-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:.15rem;}
+.shop-card-h .sc-badge{position:absolute;top:.38rem;right:.42rem;font-family:'Bebas Neue',sans-serif;font-size:.37rem;letter-spacing:.16em;padding:.1rem .34rem;border-radius:10px;line-height:1.2;z-index:2;}
+.shop-card-h .sc-badge.owned{background:rgba(46,204,113,.85);color:#fff;}
+.shop-card-h .sc-badge.active{background:rgba(212,160,23,.92);color:#fff;}
+.shop-card-h .sc-badge.locked{background:rgba(255,255,255,.12);color:rgba(255,255,255,.55);}
+.shop-card-h .sc-badge.new{background:rgba(231,76,60,.88);color:#fff;}
+/* P8: Shop detail bottom-sheet modal */
+.shop-detail-modal{position:fixed;inset:0;z-index:500;display:none;align-items:flex-end;justify-content:center;pointer-events:none;}
+.shop-detail-modal.open{display:flex;pointer-events:all;}
+.sdm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);}
+.sdm-panel{position:relative;background:#0d0d1a;border:1px solid rgba(255,255,255,.1);border-bottom:none;border-radius:14px 14px 0 0;padding:1.1rem 1.1rem 2rem;width:min(520px,100vw);max-height:88vh;overflow-y:auto;animation:sdmIn .28s cubic-bezier(.18,.9,.32,1.1);}
+@keyframes sdmIn{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sdm-handle{width:38px;height:3px;background:rgba(255,255,255,.18);border-radius:2px;margin:0 auto .9rem;}
+.sdm-close{position:absolute;top:.65rem;right:.75rem;background:none;border:none;color:rgba(255,255,255,.38);font-size:1.1rem;cursor:pointer;line-height:1;padding:.2rem .4rem;}
+.sdm-close:hover{color:#fff;}
 /* Money flash animation */
 @keyframes moneyFlash{0%{transform:scale(1);color:#2ecc71;}50%{transform:scale(1.18);color:#27ff8a;text-shadow:0 0 20px rgba(46,204,113,.9);}100%{transform:scale(1);color:#2ecc71;}}
 .money-flash{animation:moneyFlash .55s ease-out;}
@@ -314,6 +343,13 @@ body.dev-tablet #nitro-wrap{right:118px;}
 .toast.success{border-color:#2ecc71;color:#27ff8a;}
 .toast.error{border-color:#e74c3c;color:#ff6a5e;}
 @keyframes toastIn{from{transform:translateY(-20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+/* ── DRIFT COMBO ── */
+#driftMultBadge{position:absolute;top:5.4rem;left:50%;transform:translateX(-50%);display:none;font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.06em;pointer-events:none;z-index:20;text-shadow:0 2px 14px rgba(0,0,0,.7);}
+@keyframes multPulse{0%{transform:translateX(-50%) scale(2.1);opacity:.6}100%{transform:translateX(-50%) scale(1);opacity:1}}
+.mult-pulse{animation:multPulse .38s cubic-bezier(.18,.9,.32,1.3);}
+#driftComboPopup{position:absolute;top:8rem;left:50%;transform:translateX(-50%);display:none;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.18em;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.85);pointer-events:none;z-index:20;white-space:nowrap;}
+@keyframes comboPopUp{0%{transform:translateX(-50%) translateY(0);opacity:1}100%{transform:translateX(-50%) translateY(-48px);opacity:0}}
+.combo-pop-anim{animation:comboPopUp .95s ease-out forwards;}
 /* ── GARAGE ── */
 .gCamBtn{font-family:'Bebas Neue',sans-serif;font-size:.62rem;letter-spacing:.1em;padding:.3rem .65rem;border-radius:3px;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.5);color:rgba(255,255,255,.7);cursor:pointer;transition:all .12s;}
 .gCamBtn:hover{border-color:var(--gold);color:var(--gold);}
@@ -325,6 +361,20 @@ body.dev-tablet #nitro-wrap{right:118px;}
 .gOptBtn{font-family:'Bebas Neue',sans-serif;font-size:.58rem;letter-spacing:.08em;padding:.22rem .55rem;border-radius:2px;cursor:pointer;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);transition:all .12s;}
 .gOptBtn:hover{border-color:var(--gold);color:var(--gold);}
 .gOptBtn.on{border-color:var(--gold);background:rgba(212,160,23,.15);color:var(--gold);}
+/* Garage — vertikales Kategorie-Menü */
+.gCatBtn{display:flex;align-items:center;gap:.42rem;width:100%;text-align:left;font-family:'Bebas Neue',sans-serif;font-size:.68rem;letter-spacing:.12em;padding:.5rem .55rem;border-radius:4px;border:1px solid transparent;background:transparent;color:rgba(255,255,255,.45);cursor:pointer;transition:all .12s;margin-bottom:.12rem;}
+.gCatBtn:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.8);}
+.gCatBtn.active{background:rgba(212,160,23,.12);border-color:rgba(212,160,23,.35);color:var(--gold);}
+/* Garage — Mobile: horizontale Kategorieleiste oben */
+@media(max-width:680px){
+  #sGarage{flex-direction:column!important;}
+  #garageCatMenu{width:100%!important;max-width:none!important;min-width:0!important;flex-direction:row!important;overflow-x:auto!important;overflow-y:hidden!important;border-right:none!important;border-bottom:1px solid rgba(255,255,255,.07)!important;padding:.3rem .4rem!important;flex-shrink:0!important;gap:.1rem;}
+  #garageCatMenu #garageCarInfo{display:none!important;}
+  #garageCatMenu>.gCatBtn{flex-shrink:0;padding:.32rem .42rem;margin-bottom:0;font-size:.62rem;white-space:nowrap;}
+  #garageCatMenu>div:last-child{display:none!important;}
+  #garageViewer{flex:0 0 38vh!important;}
+  #garageOptionsPanel{flex:1!important;}
+}
 </style>
 </head>
 <body>
@@ -341,8 +391,8 @@ body.dev-tablet #nitro-wrap{right:118px;}
     <canvas class="car-preview-canvas" id="carPreviewCv" width="90" height="65"></canvas>
     <div class="car-info" id="carInfo"></div>
   </div>
-  <!-- Race-Mode-Badge: zeigt vorher schon welcher Modus gespielt wird (level-deterministisch) -->
-  <div id="levelModeBadge" style="font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.22em;margin:.4rem 0 .3rem;padding:.35rem 1.1rem;border-radius:18px;border:1px solid var(--gold);color:var(--gold);background:rgba(212,160,23,.10);"></div>
+  <!-- Modus-Badge: zeigt den fest zugewiesenen Modus des gewählten Levels -->
+  <div id="menuModeBadge" style="text-align:center;margin:.3rem 0 .5rem;font-family:'Bebas Neue',sans-serif;font-size:.72rem;letter-spacing:.22em;padding:.28rem 1.2rem;border-radius:20px;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.7);display:inline-block;align-self:center;pointer-events:none;"></div>
   <button class="btn-start" id="btnStart">▶ RENNEN STARTEN</button>
   <div style="display:flex;gap:.6rem;margin-top:.5rem;justify-content:center;">
     <button id="btnShop" style="font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.2em;padding:.45rem 1.4rem;border-radius:4px;border:1px solid var(--gold);background:rgba(212,160,23,.1);color:var(--gold);cursor:pointer;transition:all .15s;">🏎 SHOP</button>
@@ -413,9 +463,12 @@ body.dev-tablet #nitro-wrap{right:118px;}
     <div id="nitro-wrap" style="display:none;"><div class="ntrack"><div class="nfill" id="nBar" style="height:0%"></div></div><div class="nlbl">BOOST</div></div>
     <div id="gauge-wrap"><canvas id="gauge" width="100" height="100"></canvas></div>
     <div id="offtrack">⚠ NEBEN DER STRECKE</div>
+    <div id="wrongway" style="position:absolute;top:37%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.25em;color:#ff3300;text-shadow:0 0 30px rgba(255,51,0,.7);pointer-events:none;z-index:22;opacity:0;transition:opacity .25s;">⟵ FALSCHE RICHTUNG ⟶</div>
     <div id="rescueCount"></div>
     <div id="weatherBadge" style="position:absolute;top:70px;left:50%;transform:translateX(-50%);font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.2em;color:rgba(200,230,255,.8);pointer-events:none;z-index:20;"></div>
     <div id="driftScore" style="position:absolute;top:3rem;left:50%;transform:translateX(-50%);display:none;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--gold);pointer-events:none;z-index:20;letter-spacing:.1em;"></div>
+    <div id="driftMultBadge"></div>
+    <div id="driftComboPopup"></div>
     <!-- Race mode badge + drivetrain indicator -->
     <div id="raceModeHud" style="position:absolute;top:.5rem;left:50%;transform:translateX(-50%);display:flex;gap:.4rem;align-items:center;pointer-events:none;z-index:20;"></div>
     <!-- ZIEL-Anzeige für Time/Drift/Position-Targets -->
@@ -433,15 +486,26 @@ body.dev-tablet #nitro-wrap{right:118px;}
     <div id="actzone">
       <button class="abtn" id="abtn-brk">BREMSE</button>
       <button class="abtn" id="abtn-gas">GAS</button>
-      <button class="abtn" id="abtn-n" title="Handbremse (E-Brake) für Drift">🅿</button>
+      <button class="abtn" id="abtn-n" title="Handbremse (E-Brake) für Drift" style="font-size:.55rem;letter-spacing:.06em;line-height:1.1;">🅿<br>DRIFT</button>
     </div>
-    <div id="kbHint">↑ GAS &nbsp;·&nbsp; ↓ BREMSE &nbsp;·&nbsp; ← → LENKEN &nbsp;·&nbsp; LEERTASTE BOOST</div>
+    <div id="kbHint">↑ GAS &nbsp;·&nbsp; ↓ BREMSE &nbsp;·&nbsp; ← → LENKEN &nbsp;·&nbsp; LEERTASTE = DRIFT/E-BRAKE</div>
     <!-- Pause button -->
     <button id="btnPause" style="position:absolute;top:8px;right:8px;background:var(--panel);border:1px solid var(--border);border-radius:4px;color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.15em;padding:5px 10px;cursor:pointer;pointer-events:all;z-index:10;">II PAUSE</button>
     <!-- Level info -->
     <div id="levelInfo" style="position:absolute;bottom:155px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.3em;color:var(--gold);opacity:.6;" id="levelLabel"></div>
     </div>
+  </div>
+  <!-- P6: Finishing Banner — shown when player crosses finish, race still ongoing -->
+  <div id="finishingBanner" style="display:none;position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(0,0,0,.95),rgba(8,8,8,.78));padding:.65rem 1.2rem .85rem;flex-direction:column;align-items:center;gap:.18rem;z-index:30;animation:finBannerIn .45s cubic-bezier(.18,.9,.32,1.1);">
+    <div id="fbResult" style="font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:.12em;color:#d4a017;text-shadow:0 0 18px rgba(212,160,23,.5);"></div>
+    <div id="fbStars" style="font-size:1.05rem;margin:.04rem 0;letter-spacing:.06em;"></div>
+    <div id="fbPrize" style="font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:.12em;color:#2ecc71;"></div>
+    <div style="font-size:.4rem;letter-spacing:.22em;color:rgba(255,255,255,.35);margin-top:.22rem;text-transform:uppercase;">Warten auf andere Fahrer</div>
+    <div style="width:min(220px,55vw);height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:.2rem;overflow:hidden;">
+      <div id="finishCountBar" style="height:100%;background:#d4a017;border-radius:2px;width:100%;transition:width 1s linear;"></div>
+    </div>
+    <div id="finishCountdown" style="font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.2em;color:rgba(255,255,255,.3);margin-top:.1rem;"></div>
   </div>
 </div>
 
@@ -493,12 +557,12 @@ body.dev-tablet #nitro-wrap{right:118px;}
 <div id="toastWrap"></div>
 
 <!-- ══ SHOP ══ -->
-<div id="sShop" class="screen off" style="background:var(--ink);overflow-y:auto;padding:1.2rem;align-items:flex-start;">
+<div id="sShop" class="screen off" style="background:var(--ink);overflow-y:auto;padding:1.2rem;padding-top:4.5rem;align-items:flex-start;justify-content:flex-start;">
   <!-- Prominenter Floating-Back-Button immer oben links sichtbar -->
   <button onclick="showScreen('sMenu');buildMenuUI();hapTap();" class="back-btn-floating">← ZURÜCK ZUM MENÜ</button>
   <!-- Floating Geld-Anzeige immer oben rechts sichtbar -->
   <div class="money-floating"><span class="ml-icon">💰</span><span class="ml-label">KONTO</span><span id="shopBalanceFloat">0 €</span></div>
-  <div style="display:flex;justify-content:space-between;align-items:center;width:100%;max-width:920px;align-self:center;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;margin-top:2.6rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%;max-width:920px;align-self:center;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;margin-top:0;">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.25em;color:var(--gold);">🏎 CLASSIC CAR GARAGE</div>
     <div style="display:flex;align-items:center;gap:1rem;">
       <div id="shopBalance" style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.15em;color:#2ecc71;"></div>
@@ -509,45 +573,71 @@ body.dev-tablet #nitro-wrap{right:118px;}
     <div style="font-size:.5rem;letter-spacing:.15em;color:rgba(255,255,255,.32);">SORTIEREN NACH</div>
     <div id="shopSortRow" style="display:flex;gap:.25rem;flex-wrap:wrap;"></div>
   </div>
-  <div id="shopContent" style="width:100%;max-width:920px;align-self:center;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.65rem;"></div>
+  <div id="shopContent" style="width:100%;max-width:920px;align-self:center;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.6rem;padding-bottom:2rem;"></div>
+</div>
+
+<!-- ══ SHOP DETAIL MODAL (P8) ══ -->
+<div id="shopDetailModal" class="shop-detail-modal" onclick="if(event.target===this||event.target.classList.contains('sdm-backdrop'))closeShopDetail();">
+  <div class="sdm-backdrop"></div>
+  <div class="sdm-panel">
+    <div class="sdm-handle"></div>
+    <button class="sdm-close" onclick="closeShopDetail()">✕</button>
+    <div id="sdmContent"></div>
+  </div>
 </div>
 
 <!-- ══ GARAGE ══ -->
-<div id="sGarage" class="screen off" style="background:#050508;flex-direction:row;overflow:hidden;">
-  <!-- Floating Back-Button - immer prominent oben links -->
+<div id="sGarage" class="screen off" style="background:#050508;flex-direction:row;overflow:hidden;align-items:stretch;">
+  <!-- Floating Back-Button -->
   <button onclick="showScreen('sMenu');buildMenuUI();hapTap();" class="back-btn-floating">← ZURÜCK ZUM MENÜ</button>
-  <!-- Floating Geld-Anzeige immer oben rechts -->
+  <!-- Floating Geld-Anzeige -->
   <div class="money-floating"><span class="ml-icon">💰</span><span class="ml-label">KONTO</span><span id="garageBalanceFloat">0 €</span></div>
-  <!-- 3D Canvas Area -->
-  <div style="flex:1.6;position:relative;min-width:0;display:flex;flex-direction:column;">
-    <canvas id="garageCanvas" style="width:100%;flex:1;display:block;"></canvas>
-    <div style="position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;">
-      <button class="gCamBtn" onclick="setCameraView('3/4');hapTap();">3/4</button>
-      <button class="gCamBtn" onclick="setCameraView('Front');hapTap();">Front</button>
-      <button class="gCamBtn" onclick="setCameraView('Seite');hapTap();">Seite</button>
-      <button class="gCamBtn" onclick="setCameraView('Top');hapTap();">Top</button>
-      <button class="gCamBtn" id="gAutoRotBtn" onclick="toggleGarageAutoRotate();hapTap();" title="Auto-Drehen ein/aus">🔄 AUTO</button>
-    </div>
-    <div style="position:absolute;top:.8rem;left:50%;transform:translateX(-50%);font-size:.45rem;color:rgba(255,255,255,.25);letter-spacing:.2em;pointer-events:none;">ZIEHEN ZUM DREHEN · SCROLL ZUM ZOOMEN</div>
-    <div id="garageLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#050508;flex-direction:column;gap:.8rem;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.3em;color:var(--gold);">GARAGE WIRD GELADEN…</div>
-      <div style="width:80px;height:2px;background:rgba(212,160,23,.2);border-radius:2px;overflow:hidden;">
-        <div style="width:40%;height:100%;background:var(--gold);border-radius:2px;animation:pulse 1s ease-in-out infinite;"></div>
-      </div>
+
+  <!-- LEFT: Vertikales Kategorie-Menü (~190px) -->
+  <div id="garageCatMenu" style="width:190px;min-width:140px;background:rgba(0,0,0,.88);backdrop-filter:blur(12px);border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;overflow-y:auto;padding:.5rem .4rem;flex-shrink:0;">
+    <div id="garageCarInfo" style="padding:.25rem .1rem .5rem;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:.4rem;"></div>
+    <button class="gCatBtn active" data-cat="LACK"       onclick="switchGarageCat('LACK')">🎨 <span>Lack</span></button>
+    <button class="gCatBtn"        data-cat="MOTOR"      onclick="switchGarageCat('MOTOR')">🔧 <span>Motor</span></button>
+    <button class="gCatBtn"        data-cat="GETRIEBE"   onclick="switchGarageCat('GETRIEBE')">⚙️ <span>Getriebe</span></button>
+    <button class="gCatBtn"        data-cat="REIFEN"     onclick="switchGarageCat('REIFEN')">🛞 <span>Reifen</span></button>
+    <button class="gCatBtn"        data-cat="KAROSSERIE" onclick="switchGarageCat('KAROSSERIE')">🏎️ <span>Karosserie</span></button>
+    <button class="gCatBtn"        data-cat="AUSPUFF"    onclick="switchGarageCat('AUSPUFF')">💨 <span>Auspuff</span></button>
+    <button class="gCatBtn"        data-cat="FENSTER"    onclick="switchGarageCat('FENSTER')">🪟 <span>Fenster</span></button>
+    <button class="gCatBtn"        data-cat="STATS"      onclick="switchGarageCat('STATS')">📊 <span>Stats</span></button>
+    <div style="margin-top:auto;padding-top:.5rem;border-top:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;gap:.3rem;">
+      <button onclick="showScreen('sShop');buildShopUI();hapTap();" style="font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.12em;padding:.42rem;border-radius:3px;border:1px solid var(--gold);background:rgba(212,160,23,.1);color:var(--gold);cursor:pointer;">🏎 SHOP</button>
     </div>
   </div>
-  <!-- Sidebar -->
-  <div id="garageSidebar" style="width:320px;min-width:260px;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);border-left:1px solid rgba(255,255,255,.07);overflow-y:auto;display:flex;flex-direction:column;">
-    <div id="garageCarInfo" style="padding:.9rem .9rem .5rem;border-bottom:1px solid rgba(255,255,255,.07);"></div>
-    <div style="display:flex;border-bottom:1px solid rgba(255,255,255,.07);">
-      <button class="gTab active" data-gtab="TUNING"  onclick="switchGarageTab('TUNING')" >TUNING</button>
-      <button class="gTab"        data-gtab="LACK"    onclick="switchGarageTab('LACK')"   >LACK</button>
-      <button class="gTab"        data-gtab="STATS"   onclick="switchGarageTab('STATS')"  >STATS</button>
+
+  <!-- RIGHT: 3D-Viewer (60%) + Options-Panel (40%) -->
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
+    <!-- Oben 60%: 3D-Viewer -->
+    <div id="garageViewer" style="flex:3;position:relative;min-height:0;">
+      <canvas id="garageCanvas" style="width:100%;height:100%;display:block;"></canvas>
+      <div style="position:absolute;bottom:.8rem;left:50%;transform:translateX(-50%);display:flex;gap:.3rem;flex-wrap:wrap;justify-content:center;">
+        <button class="gCamBtn" onclick="setCameraView('3/4');hapTap();">3/4</button>
+        <button class="gCamBtn" onclick="setCameraView('Front');hapTap();">Front</button>
+        <button class="gCamBtn" onclick="setCameraView('Seite');hapTap();">Seite</button>
+        <button class="gCamBtn" onclick="setCameraView('Top');hapTap();">Top</button>
+        <button class="gCamBtn" id="gAutoRotBtn" onclick="toggleGarageAutoRotate();hapTap();" title="Auto-Drehen ein/aus">🔄 AUTO</button>
+      </div>
+      <div style="position:absolute;top:.8rem;left:50%;transform:translateX(-50%);font-size:.45rem;color:rgba(255,255,255,.25);letter-spacing:.2em;pointer-events:none;">ZIEHEN ZUM DREHEN · SCROLL ZUM ZOOMEN</div>
+      <div id="garageLoading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#050508;flex-direction:column;gap:0;">
+        <!-- 2D-Preview: eigener Canvas, KEIN Kontext-Konflikt mit #garageCanvas -->
+        <canvas id="garage2DPreview" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
+        <div id="garageLoadSpinner" style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:.8rem;background:rgba(5,5,8,.75);padding:1.2rem 2rem;border-radius:8px;backdrop-filter:blur(4px);">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.3em;color:var(--gold);">3D WIRD GELADEN…</div>
+          <div style="width:80px;height:2px;background:rgba(212,160,23,.2);border-radius:2px;overflow:hidden;">
+            <div style="width:40%;height:100%;background:var(--gold);border-radius:2px;animation:pulse 1s ease-in-out infinite;"></div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div id="garageTabContent" style="flex:1;padding:.7rem;overflow-y:auto;"></div>
-    <div style="padding:.7rem;border-top:1px solid rgba(255,255,255,.07);display:flex;gap:.5rem;">
-      <button onclick="showScreen('sShop');buildShopUI();" style="flex:1;font-family:'Bebas Neue',sans-serif;font-size:.7rem;letter-spacing:.15em;padding:.45rem;border-radius:3px;border:1px solid var(--gold);background:rgba(212,160,23,.1);color:var(--gold);cursor:pointer;">🏎 SHOP</button>
-      <button onclick="showScreen('sMenu');buildMenuUI();" style="flex:1;font-family:'Bebas Neue',sans-serif;font-size:.7rem;letter-spacing:.15em;padding:.45rem;border-radius:3px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);cursor:pointer;">← MENÜ</button>
+    <!-- Unten 40%: Options-Panel -->
+    <div id="garageOptionsPanel" style="flex:2;border-top:1px solid rgba(255,255,255,.07);background:rgba(0,0,0,.75);backdrop-filter:blur(8px);overflow-y:auto;padding:.6rem .9rem;">
+      <!-- Car Switcher: horizontaler scrollbarer Streifen der eigenen Autos -->
+      <div id="garageSwitcher" style="display:none;gap:.35rem;overflow-x:auto;padding-bottom:.5rem;margin-bottom:.55rem;border-bottom:1px solid rgba(255,255,255,.07);scrollbar-width:thin;scrollbar-color:rgba(212,160,23,.25) transparent;"></div>
+      <div id="garageTabContent"></div>
     </div>
   </div>
 </div>
@@ -572,6 +662,8 @@ body.dev-tablet #nitro-wrap{right:118px;}
   <div class="fin-title" id="finTitle">SIEG!</div>
   <div class="fin-carname" id="finCar"></div>
   <div class="stars-row" id="finStars">⭐⭐⭐</div>
+  <div id="finPrize" style="font-family:'Bebas Neue',sans-serif;font-size:1.05rem;color:#27ae60;letter-spacing:.18em;margin:.12rem 0;"></div>
+  <div id="finStarBonus" style="font-family:'Bebas Neue',sans-serif;font-size:.78rem;color:#d4a017;letter-spacing:.16em;margin-bottom:.1rem;display:none;">⭐ STERNE-BONUS: +0 €</div>
   <div class="fin-stats">
     <div class="fstat"><div class="fstat-v" id="finTime">0:00</div><div class="fstat-l">Zeit</div></div>
     <div class="fstat"><div class="fstat-v" id="finPos">1.</div><div class="fstat-l">Platzierung</div></div>
@@ -579,6 +671,8 @@ body.dev-tablet #nitro-wrap{right:118px;}
   </div>
   <div class="fin-btns">
     <button class="btn-fin btn-fin-retry" id="btnRetry">↺ NOCHMAL</button>
+    <button class="btn-fin btn-fin-next" id="btnFinNext">WEITER →</button>
+    <button class="btn-fin btn-fin-menu" id="btnFinGarage">⚙ GARAGE</button>
     <button class="btn-fin btn-fin-menu" id="btnFinMenu">← MENÜ</button>
   </div>
 </div>
@@ -709,6 +803,9 @@ body.dev-tablet #nitro-wrap{right:118px;}
 <script src="src/utils/storage.js"></script>
 <script src="src/utils/helpers.js"></script>
 
+<!-- 3D Car Renderer — Three.js Offscreen (A.5) -->
+<script src="src/render/car-renderer.js"></script>
+
 <!-- ES Module Boot (Phase A - Stub fuer spaeteres Refactor) -->
 <script type="module" src="src/main.js"></script>
 
@@ -718,15 +815,69 @@ body.dev-tablet #nitro-wrap{right:118px;}
 const _touch=navigator.maxTouchPoints>0;
 const DEVICE=!_touch?'desktop':screen.width>=768?'tablet':'phone';
 document.body.classList.add('dev-'+DEVICE);
+
+// ── Three.js Async Boot — lädt THREE + GLTFLoader + OrbitControls im Hintergrund ──
+// _threeReady wird gesetzt sobald THREE + GLTFLoader da sind (OrbitControls ist optional).
+// Ohne Internet/CDN: Konsole zeigt Fehler, Spiel läuft mit 2D-Fallback.
+(function loadThreeJS(){
+  function _loadScript(url,cb,onErr){
+    const s=document.createElement('script');s.src=url;
+    s.onload=cb;
+    s.onerror=()=>{
+      console.error('[NE] ❌ CDN-Script nicht geladen:',url);
+      if(onErr)onErr();
+    };
+    document.head.appendChild(s);
+  }
+
+  // file:// Warnung: GLB-Modelle brauchen einen lokalen HTTP-Server
+  if(location.protocol==='file:'){
+    console.warn(
+      '[NE] ⚠️  Seite über file:// geöffnet — GLB-Modelle werden NICHT geladen.\n'+
+      'Lokalen HTTP-Server starten:\n'+
+      '  → VS Code: "Live Server" Extension installieren → rechts unten "Go Live" klicken\n'+
+      '  → Python:  python -m http.server 8000  (dann http://localhost:8000 öffnen)\n'+
+      '  → Node.js: npx serve .  (dann http://localhost:3000 öffnen)\n'+
+      '  → Direkt:  index.html mit VS Code Live Server öffnen'
+    );
+    // Banner im UI anzeigen
+    window.addEventListener('DOMContentLoaded',()=>{
+      const b=document.createElement('div');
+      b.id='fileProtocolBanner';
+      b.style.cssText='position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#7d1a0a;color:#fff;'+
+        'font-family:"Barlow Condensed",sans-serif;font-size:.75rem;padding:.4rem 1rem;text-align:center;'+
+        'letter-spacing:.05em;pointer-events:none;';
+      b.innerHTML='⚠ <b>file://</b> Modus — 3D-Automodelle nicht verfügbar. '+
+        'Bitte <b>VS Code Live Server</b> oder <b>python -m http.server</b> verwenden.';
+      document.body.appendChild(b);
+    });
+  }
+
+  const BASE='https://cdn.jsdelivr.net/npm/three@0.134.0';
+  _loadScript(BASE+'/build/three.min.js',()=>{
+    // GLTFLoader: kritisch → setzt _threeReady
+    _loadScript(BASE+'/examples/js/loaders/GLTFLoader.js',()=>{
+      window._threeReady=true;
+      if(typeof CarRenderer3D!=='undefined') CarRenderer3D.init();
+      console.log('[NE] ✓ Three.js r134 + GLTFLoader ready');
+    },()=>{
+      console.error('[NE] ❌ GLTFLoader konnte nicht geladen werden — 3D-Modelle nicht verfügbar');
+    });
+    // OrbitControls: parallel, nicht blockierend für _threeReady
+    _loadScript(BASE+'/examples/js/controls/OrbitControls.js',()=>{
+      window._orbitReady=true;
+      console.log('[NE] ✓ OrbitControls ready');
+    });
+  },()=>{
+    console.error('[NE] ❌ Three.js core konnte nicht geladen werden. Kein Internet / CDN blockiert?');
+  });
+})();
 // ════════════════════════════════════════════════
-// CARS
+// CARS — 46 Autos mit GLB-Modellen (A.4)
+// Definiert in src/data/cars.js (geladen per <script> Tag oben)
+// Globale Konstanten: CARS, CAR_DRIVETRAIN, CAR_SHAPES, getCarShape()
 // ════════════════════════════════════════════════
-// ════════════════════════════════════════════════
-// CARS, CAR_DRIVETRAIN, CAR_SHAPES → moved to src/data/cars.js (Phase B)
-// Loaded via classic <script> tag VOR diesem inline-Block.
-// Verfügbar als globale Konstanten: CARS, CAR_DRIVETRAIN, CAR_SHAPES, getCarShape()
-// ════════════════════════════════════════════════
-/* CARS-INLINE-DEFINITION ENTFERNT — siehe src/data/cars.js
+/* ALTE INLINE-DEFINITION (52 Autos, kein GLB) — vollständig entfernt in A.6
 const CARS = [
   // ── GERMAN PERFORMANCE ───────────────────────────────────────────────────────
   {id:'bmw2002t',   brand:'BMW',    name:'2002 Turbo',         year:'1973',cat:'German Performance',flag:'🇩🇪',price:22000, unlockBiome:null,
@@ -1030,14 +1181,15 @@ function getRaceTarget(modeId,worldId,levelIdx){
         unit:'s'
       };
     case 'drift_challenge':
-      // Drift-Punkte skalieren mit Level (3 Runden Zeit zum Sammeln)
-      const baseDrift=1500+levelIdx*150;
+      // P4: 2 Minuten Drift-Score. Neue Formel ca. 4× mehr Punkte als alte.
+      // Bronze: einfach erreichbar, Gold: erfordert durchgehende High-Angle-Kombo
+      const baseDrift=6000+levelIdx*600;
       return {
         type:'score',
-        label:'DRIFT-ZIEL (3 Runden)',
-        gold:Math.round(baseDrift*1.7),     // ⭐⭐⭐
-        silver:Math.round(baseDrift),        // ⭐⭐
-        bronze:Math.round(baseDrift*0.50),   // ⭐
+        label:'DRIFT-ZIEL (2 Min.)',
+        gold:Math.round(baseDrift*1.65),    // ⭐⭐⭐ — durchgehend Vollgas-Drift
+        silver:Math.round(baseDrift),        // ⭐⭐  — gute, aber nicht perfekte Session
+        bronze:Math.round(baseDrift*0.45),   // ⭐   — auch für Anfänger erreichbar
         unit:'P'
       };
     case 'classic_race':
@@ -1419,16 +1571,18 @@ const BIOME_PRIZE_MULT={
   baja:1.4,hakone:1.2,safari:1.35,swedish:1.25,finland:1.3,
   atlas:1.3,pyrenees:1.2,outback:1.35,iom:1.5,nurburgring:1.4,
 };
-function calcRacePrize(pos,worldId,stars,prevStars,driftDist,cleanLap){
+function calcRacePrize(pos,worldId,stars,prevStars,driftDist,cleanLap,levelIdx){
   const BASE=[3000,1800,1100,700,400,250];
   const basePrize=BASE[Math.min(pos-1,BASE.length-1)];
   const bm=BIOME_PRIZE_MULT[worldId]||1.0;
+  // B.5: Level-Multiplikator — Level 1 = 1.0×, Level 20 = 2.14×
+  const lm=1.0+Math.min(levelIdx||0,19)*0.06;
   let mult=1.0;
   if(stars>prevStars)mult*=1.4;
   if(cleanLap)mult*=1.1;
   if(driftDist>300)mult*=1.1;
   if(driftDist>800)mult*=1.25;
-  return Math.round(basePrize*bm*mult);
+  return Math.round(basePrize*bm*lm*mult);
 }
 
 function isWorldUnlocked(wid){return !!saveData.unlocked[wid];}
@@ -2006,49 +2160,120 @@ function carMaxSpeedUnits(car,nitro,onTrack){
 // ════════════════════════════════════════════════
 const OP_SKILL_BASE=0.50;
 
-function mkOp(car,startProg,pts,segs){
+function mkOp(car,startProg,pts,segs,skillBase){
   const idx=Math.min(Math.round(startProg),pts.length-1);
   const ni=Math.min(idx+4,pts.length-1);
+  const sx=pts[idx].x,sy=pts[idx].y;
+  const sk=(skillBase||OP_SKILL_BASE)+(Math.random()*.12-.06);
   return{
-    x:pts[idx].x,y:pts[idx].y,
+    x:sx,y:sy,
     angle:Math.atan2(pts[ni].y-pts[idx].y,pts[ni].x-pts[idx].x),
     speed:0,prog:startProg,lap:1,lapValid:false,
     car,
-    skill:OP_SKILL_BASE+(Math.random()*.08),
-    lineOff:(Math.random()-.5)*22,
-    lapNotified:1, // which laps we've already notified
+    skill:sk,
+    // P7: Linienvarianz ±24px (reduziert von ±32) — bleibt sicher im Streckenbett
+    lineOff:(Math.random()-.5)*48,
+    // Look-ahead-Faktor: 0.85–1.25 — Diversität ohne Blindflug
+    lookFactor:0.85+Math.random()*0.40,
+    // Kurvenbrems-Faktor: moderat bis defensiv
+    cornerK:0.22+Math.random()*0.16,
+    // Fahrfehler: selten und klein — nur subtile Linienvarianz
+    errRate:Math.max(0,0.002+(1-sk)*0.004),
+    errMag:0.035+Math.random()*0.025,
+    errPhase:Math.random()*1000|0,
+    lapNotified:1,
+    // P7 fix: stuckX/stuckY korrekt (wird in initGame nach offset überschrieben)
+    stuckTimer:0,stuckX:sx,stuckY:sy,
   };
 }
 
-function stepOp(op,G,dt){
-  // Use stored op.prog for look-ahead (prevents flip to wrong direction after collisions)
-  const look=Math.max(8,Math.floor(op.speed*1.0));
-  const ti=Math.round(op.prog+look)%G.segs.length;
-  const seg=G.segs[Math.min(Math.floor(op.prog),G.segs.length-1)];
-  const tgt=G.pts[ti];
-  const tx2=tgt.x+seg.nx*op.lineOff,ty2=tgt.y+seg.ny*op.lineOff;
-  const da=Math.atan2(ty2-op.y,tx2-op.x)-op.angle;
-  const dan=Math.atan2(Math.sin(da),Math.cos(da));
-  op.angle+=dan*.07*dt;
+// P7: Rubber-banding — AI passt Geschwindigkeit subtil an Spielerabstand an
+function _rbFactor(op,G){
+  if(!G.player||!G.segs)return 1.0;
+  const n=G.segs.length;
+  const pProg=(G.player.prog+(G.player.lap-1)*n);
+  const oProg=(op.prog+(op.lap-1)*n);
+  const diff=oProg-pProg; // positiv = AI vorne
+  if(Math.abs(diff)<25)return 1.0; // Totzone: kein Eingriff
+  return diff>0
+    ?Math.max(0.88,1.0-Math.min(diff-25,180)/1800)   // vorne: bis −12% Geschwindigkeit
+    :Math.min(1.10,1.0+Math.min(25-diff,180)/1800);  // hinten: bis +10% Geschwindigkeit
+}
 
-  // Zone detection — Hint: op.prog → Fenster-Suche (kein falscher Segment-Match)
+function stepOp(op,G,dt){
+  // P7: Zone detection ZUERST — steuert Linienwahl, steerBoost und Beschleunigung
   const qd=queryTrack(op.x,op.y,G.segs,op.prog);
   const wd=G.wallDist;
   const opOnTrack=qd.dist<wd;
   const opOnGrass=!opOnTrack&&qd.dist<wd*2;
 
+  // Look-ahead: individuell pro Gegner (lookFactor 0.85–1.25), mindestens 20 Seg.
+  const look=Math.max(20,Math.round(op.speed*dt*3.5*(op.lookFactor||1.0)));
+  const ti=Math.round(op.prog+look)%G.segs.length;
+  const seg=G.segs[Math.min(Math.floor(op.prog),G.segs.length-1)];
+  const tgtSeg=G.segs[ti];
+  const tgt=G.pts[ti];
+  // P7: Kein lineOff wenn off-track → AI zielt auf Streckenmitte zurück
+  const lOff=opOnTrack?op.lineOff:0;
+  const tx2=tgt.x+(tgtSeg||seg).nx*lOff,ty2=tgt.y+(tgtSeg||seg).ny*lOff;
+  const da=Math.atan2(ty2-op.y,tx2-op.x)-op.angle;
+  const dan=Math.atan2(Math.sin(da),Math.cos(da));
+  const maxS0=carMaxSpeedUnits(op.car,false,true)*op.skill;
+  // P7: steerBoost×2 off-track → schnellere Rückkehr zur Strecke
+  const steerBoost=opOnTrack?1.0:2.0;
+  const steerRate=(0.06+0.03*(1-Math.min(op.speed/Math.max(maxS0,0.1),1)))*steerBoost;
+  op.angle+=dan*steerRate*dt;
+
+  // Subtile Fahrfehler: nur wenn gut im Streckenbett (qd.dist < 55% wallDist).
+  // Verhindert dass Fehler am Rand das Auto ins Gras schubsen.
+  if(op.errRate&&opOnTrack&&qd.dist<wd*0.55&&Math.random()<op.errRate*dt){
+    op.angle+=(Math.random()-.5)*op.errMag*dt;
+  }
+
+  // Corner-Braking: individueller cornerK (0.22–0.38)
+  // P7: CORNER_LOOK geschwindigkeitsskaliert → Hochgeschwindigkeit schaut weiter voraus
+  const CORNER_LOOK=Math.max(15,Math.round(op.speed*1.8));
+  const tc=Math.round(op.prog+CORNER_LOOK)%G.segs.length;
+  const tgtC=G.pts[tc];
+  const futureAng=Math.atan2(tgtC.y-op.y,tgtC.x-op.x);
+  const cornerDelta=Math.abs(Math.atan2(Math.sin(futureAng-op.angle),Math.cos(futureAng-op.angle)));
+  const cornerFactor=Math.min(cornerDelta/(Math.PI*.5),1.0);
+  const cornerK=op.cornerK||0.32;
+
   const aPerF=carAccelPerFrame(op.car);
-  // maxS must NOT be multiplied by dt — it's a speed cap, not per-frame delta
   const maxS=carMaxSpeedUnits(op.car,false,opOnTrack)*op.skill;
-  const effMaxS=opOnGrass?maxS*0.42:maxS;
+  // P7: Rubber-banding via _rbFactor (±10–12% Geschwindigkeit, Totzone ±25 Seg)
+  const effMaxS=(opOnGrass?maxS*0.42:maxS*(1.0-cornerFactor*cornerK))*_rbFactor(op,G);
   const prevOpSpeed=op.speed;
   op.speed=Math.min(op.speed+aPerF*op.skill*dt,effMaxS);
-  // Bremslicht-Flag: Gegner bremst wenn Geschwindigkeit sinkt (sichtbar für render)
+  if(op.speed>effMaxS)op.speed=Math.max(effMaxS,op.speed-aPerF*4*dt);
   op.braking=(op.speed<prevOpSpeed&&op.speed>0.5);
 
-  op.x+=Math.cos(op.angle)*op.speed;
-  op.y+=Math.sin(op.angle)*op.speed;
+  // *dt: frameratunabhängige Bewegung — ohne *dt dreht KI bei dt>1 doppelt so schnell
+  // wie sie sich vorwärts bewegt → Kreisbewegung bei niedrigerer Framerate.
+  op.x+=Math.cos(op.angle)*op.speed*dt;
+  op.y+=Math.sin(op.angle)*op.speed*dt;
   pushBackToTrack(op,G.segs,G.wallDist);
+
+  // Stuck-Watchdog — nur wenn Rennen läuft (nicht im Countdown), alle ~1.5s
+  if(G.started)op.stuckTimer+=dt;
+  if(G.started&&op.stuckTimer>=90){
+    const moved=Math.hypot(op.x-op.stuckX,op.y-op.stuckY);
+    op.stuckX=op.x;op.stuckY=op.y;
+    op.stuckTimer=0;
+    if(moved<30){
+      // Feststeckend! → 5 Segmente voraus zurücksetzen, auf persönliche Linie (lineOff)
+      const ri=(Math.round(op.prog)+5)%G.segs.length;
+      const rseg=G.segs[ri];
+      // Jeder Gegner springt auf seine eigene Linie, nicht alle auf dieselbe Mitte
+      const safeOff=Math.max(-G.wallDist*.35,Math.min(G.wallDist*.35,op.lineOff||0));
+      op.x=rseg.ax+rseg.dx*.5+rseg.nx*safeOff;
+      op.y=rseg.ay+rseg.dy*.5+rseg.ny*safeOff;
+      op.angle=Math.atan2(rseg.dy,rseg.dx);
+      op.speed=0;
+      op.stuckX=op.x;op.stuckY=op.y;
+    }
+  }
 
   // Checkpoint-Validierung: Gegner muss mindestens 300px von der Startlinie entfernt sein,
   // bevor ein Rundenübergang zählt (Euclidean-Distanz — unabhängig von queryTrack-Genauigkeit).
@@ -2067,9 +2292,10 @@ function stepOp(op,G,dt){
     if(op.lap>G.player.totalLaps&&!G.finished)G.opFinished=true;
     op.prog=nq.prog;
   } else {
-    // Accept only if new prog is plausibly forward (ignore large backward jumps)
+    // Nur vorwärts oder sehr kleine Korrekturen rückwärts akzeptieren.
+    // Max 5% rückwärts (≈12 Seg bei 240) — verhindert falsches Segment-Locking.
     const diff=nq.prog-prevProg;
-    if(diff>-G.segs.length*.4)op.prog=nq.prog;
+    if(diff>-G.segs.length*.05)op.prog=nq.prog;
   }
 }
 
@@ -2564,7 +2790,50 @@ function drawGauge(cv,kmh,maxKmh){
 // ════════════════════════════════════════════════
 // INIT GAME
 // ════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// A.7 — KI OPPONENT SELECTION
+// Wählt `count` Gegner-Autos aus dem 46-Auto-Pool.
+// Kriterien: Geschwindigkeitsnähe zum Spieler + Level-Seed (wiederholbar)
+//            + Kategorienvielfalt (keine 3 gleichen Kategorien).
+// ════════════════════════════════════════════════
+function pickOpponentCars(playerCar,worldId,levelIdx,count){
+  count=count||3;
+  const pool=CARS.filter(c=>c.id!==playerCar.id);
+  if(!pool.length)return[];
+
+  // Deterministischer Seed für konsistente Gegner pro Level/Auto-Kombination
+  let rngState=(worldId.charCodeAt(0)*2654435761^levelIdx*1664525^playerCar.maxKmh*31)>>>0;
+  const rng=()=>{ rngState=(rngState*1664525+1013904223)>>>0; return rngState/4294967296; };
+
+  // Geschwindigkeitsnähe bewerten (±100 km/h bevorzugt), Noise hinzufügen
+  const playerKmh=playerCar.maxKmh;
+  const scored=pool.map(c=>{
+    const speedDiff=Math.abs(c.maxKmh-playerKmh);
+    return{car:c, score:speedDiff*0.6+rng()*80};
+  });
+  scored.sort((a,b)=>a.score-b.score);
+
+  // Kategorie-diverse Auswahl
+  const picked=[];
+  const usedCats=new Set();
+  for(const{car:c}of scored){
+    if(picked.length>=count)break;
+    if(!usedCats.has(c.cat)||picked.length>=count-1){
+      picked.push(c);usedCats.add(c.cat);
+    }
+  }
+  // Auffüllen falls zu wenig verschiedene Kategorien
+  for(const{car:c}of scored){
+    if(picked.length>=count)break;
+    if(!picked.find(p=>p.id===c.id))picked.push(c);
+  }
+  return picked.slice(0,count);
+}
+
 function initGame(){
+  // Falsche-Richtung-Indikator verstecken
+  const wwEl=document.getElementById('wrongway');
+  if(wwEl)wwEl.classList.remove('show');
   const cv=document.getElementById('gc');
   cv.width=window.innerWidth;cv.height=window.innerHeight;
   const isMP=!!mpRaceParams;
@@ -2593,17 +2862,24 @@ function initGame(){
     (raceMode==='sprint')                        ?1:
     (raceMode==='free_drive')                   ?999:
     isSprint                                     ?1:3; // 3 Runden für time_trial, drift, classic, elimination
+  // noAI: Modi ohne KI-Gegner ('drift' ist Alias für 'drift_challenge')
   const noAI=raceMode==='time_trial'||raceMode==='free_drive'||raceMode==='drift'||raceMode==='drift_challenge';
   const ops=isMP?[]:noAI?[]:(()=>{
-    const opCars=[CARS[0],CARS[1],CARS[3],CARS[2]].filter(c=>c.id!==car.id).slice(0,4);
+    // B.1: Skill steigt mit Level — 0.32 (Level 1) → 0.88 (Level 20)
+    const skillBase=0.32+(levelIdxUsed/19)*0.56;
+    // B.5: Gegneranzahl steigt mit Level — 3 (Lvl 0-4) · 4 (Lvl 5-9) · 5 (Lvl 10+)
+    const opCount=levelIdxUsed>=10?5:levelIdxUsed>=5?4:3;
+    const opCars=pickOpponentCars(car,world.id,levelIdxUsed,opCount);
     const ROW_GAP=10,SIDE=28;
-    const gridProgs=[3,3,Math.max(0,3-ROW_GAP),Math.max(0,3-ROW_GAP)];
-    const gridSides=[1,-1,1,-1];
+    // Startpositionen: 3 Reihen (Reihe 0/1 neben Spieler, Reihe 2 dahinter, Reihe 3 ganz hinten)
+    const gridProgs=[3,3,Math.max(0,3-ROW_GAP),Math.max(0,3-ROW_GAP),Math.max(0,3-ROW_GAP*2)];
+    const gridSides=[1,-1,1,-1,0];
     return opCars.map((c,i)=>{
-      const startP=gridProgs[i];
+      const startP=gridProgs[i]??Math.max(0,3-ROW_GAP);
       const seg=segs[Math.min(Math.round(startP),segs.length-1)];
-      const o=mkOp(c,startP,pts,segs);
-      o.x+=seg.nx*gridSides[i]*SIDE;o.y+=seg.ny*gridSides[i]*SIDE;
+      const o=mkOp(c,startP,pts,segs,skillBase);
+      o.x+=seg.nx*(gridSides[i]??0)*SIDE;o.y+=seg.ny*(gridSides[i]??0)*SIDE;
+      o.stuckX=o.x;o.stuckY=o.y; // P7: nach lateral-Offset synchronisieren
       return o;
     });
   })();
@@ -2617,9 +2893,12 @@ function initGame(){
     monaco:'rain',highland:'fog',targa:'clear',pikes:'snow',bonneville:'clear',
     baja:'sandstorm',hakone:'fog',safari:'clear',swedish:'snow',finland:'rain',
     atlas:'sandstorm',pyrenees:'rain',outback:'sandstorm',iom:'fog',nurburgring:'rain'};
-  const wSeed=world.id.charCodeAt(0)*7+selLevel*13;
+  const wSeed=world.id.charCodeAt(0)*7+levelIdxUsed*13;
   const wRng=Math.abs(Math.sin(wSeed)*9999)%1;
-  const weather=(wRng<(WEATHER_CHANCE[world.id]||0))?WEATHER_TYPE[world.id]:'clear';
+  // B.5: Wetter-Wahrscheinlichkeit steigt mit Level (Level 0 = 1.0×, Level 19 = 1.57×, max 85%)
+  const weatherLvlMult=1.0+levelIdxUsed*0.03;
+  const weatherChance=Math.min((WEATHER_CHANCE[world.id]||0)*weatherLvlMult,0.85);
+  const weather=(wRng<weatherChance)?WEATHER_TYPE[world.id]:'clear';
 
   // World-specific wall distance
   const WORLD_WALL={
@@ -2673,13 +2952,28 @@ function initGame(){
     // Race Target: konkretes Ziel (Zeit/Punkte/Position) + Schwellen für 1/2/3 Sterne
     target:isMP?null:getRaceTarget(raceMode,world.id,selLevel),
     driftScore:0,
+    driftComboTime:0,    // B.3: Sekunden in aktuellem Drift
+    driftMultiplier:1,   // B.3: Aktueller Combo-Multiplikator (1–4)
+    driftComboScore:0,   // B.3: Punkte aus diesem Combo-Abschnitt
+    // P4: Drift-Challenge 2-Minuten-Timer
+    driftTimeLimit:raceMode==='drift_challenge'?120:0,
+    driftTimeRem:raceMode==='drift_challenge'?120:0,
+    // B.2: Elimination-Timer (40s pro Runde, Letzter fliegt raus)
+    elimTimer:raceMode==='elimination'?40:null,
+    elimRound:0,
+    // P6: Finishing state — player crossed finish line, race continues for AI
+    finishing:false,     // true = player done, waiting for AI / countdown
+    finResult:null,      // locked result at the moment player crossed the line
+    finishEnd:0,         // G.t timestamp when the 15-second wait ends
   };
   if(isMP)mpPlayers={};
   wheelAngle=0;targetWheelAngle=0;nitroOn=false;brakeOn=false;ebrakeOn=false;pressing=false;gasHeld=false;steerL=false;steerR=false;brakeHeld=false;
   document.getElementById('wsvg').style.transform='rotate(0deg)';
   document.getElementById('offtrack').classList.remove('show');
   const trackName=world.tracks[isMP?0:selLevel]||'';
-  const modeLabel=raceMode==='time_trial'?'⏱ ZEITFAHREN':raceMode==='drift'?'💨 DRIFT':raceMode==='free_drive'?'🗺 FREIES FAHREN':raceMode==='elimination'?'💀 ELIMINATION':raceMode==='checkpoint'?'📍 CHECKPOINT':'';
+  // B.2: Mode-Label aus RACE_MODE_DEF (einheitliche Quelle)
+  const _modeDef=RACE_MODE_DEF[raceMode];
+  const modeLabel=_modeDef&&raceMode!=='classic_race'?(_modeDef.icon+' '+_modeDef.name):'';
   document.getElementById('levelLabel').textContent=(modeLabel?modeLabel+' · ':'')+(!modeLabel&&isSprint?'⚡ SPRINT · ':'')+trackName;
   // HUD lap indicator suffix — hide for unlimited modes
   const lapSuffix=document.querySelector('#hLap+span');
@@ -2689,6 +2983,9 @@ function initGame(){
   const wb=document.getElementById('weatherBadge');
   if(wb)wb.textContent=WEATHER_BADGE[weather]||'';
   initTyreSound();
+
+  // Rennen verwendet 2D-Arcade-Rendering (drawCar) — kein 3D-Preload nötig.
+  // 3D-Modelle werden nur in der Garage verwendet (loadCarGLB / initGarageScene).
 }
 
 // ════════════════════════════════════════════════
@@ -2791,12 +3088,15 @@ function update(ts){
   const slipMag=Math.abs(sa2);
   // surf already declared above (line ~2295)
   const driftThresh=cs.driftK!==undefined?Math.max(0.05,(car.drift||0.18)*0.8):0.18;
-  const effectiveDriftK=cs.driftK!==undefined?cs.driftK:carDrift;
-  const GRIP_THRESHOLD=surf?.driftThresh||0.18; // surface-dependent
+  // surf.driftK: Multiplikator für Drift-Charakter pro Untergrund (gravel=1.45, ice=2.10, asphalt=0.80)
+  // Macht Schotterpisten und Schnee-Biome spürbar rutschiger als Asphalt
+  const effectiveDriftK=(cs.driftK!==undefined?cs.driftK:carDrift)*(surf?.driftK||1.0);
+  const GRIP_THRESHOLD=surf?.driftThresh||0.18; // surface-dependent: gravel=0.11, ice=0.06
   const wasDrifting=p.isDrifting;
   p.isDrifting=slipMag>GRIP_THRESHOLD&&velSpd>1.0;
   // Seitlicher Grip-Koeffizient: bei Drift sinkt Rückkopplung stark
   // → Drift bleibt erhalten, Auto dreht weiter aus
+  // Berechnung nutzt surf.gripK (Traction) UND surf.driftK (Slide-Persistenz) über effectiveDriftK
   const lateralGripK=p.isDrifting
     ?(0.28+effectiveDriftK*0.55)*wGrip*surf.gripK
     :(0.92+effectiveDriftK*0.08)*wGrip*surf.gripK;
@@ -2836,58 +3136,64 @@ function update(ts){
     driveF=-aPerF*2.0*dt;
     if(velSpd>3.5)spawnP(G,p.x,p.y,surf?.partCol||'rgba(150,140,120,.18)',0.5);
   }
-  // E-Brake Slip-Initiierung — Heck bricht SOFORT und kraeftig aus
-  if(ebrakeActive&&velSpd>1.0){
-    // Auch ohne Lenken initiiert Ebrake bereits leichten Drift in aktuelle Steer-Tendenz
+  // E-Brake Drift-Initiierung — Heck-Slip direkt in Velocity einbauen
+  // Ohne diesen Impuls bräuchte der Fahrer viele Frames, um Drift zu initiieren.
+  if(ebrakeActive&&velSpd>1.0&&onTrack){
     const steerSign=Math.abs(steer)>0.05?Math.sign(steer):0;
     if(steerSign!==0){
-      // Lenken+Ebrake = massiver Drift-Impuls
-      p.slipAngle+=steerSign*0.10*dt; // 4x staerker als zuvor
-    }else{
-      // Reines Ebrake ohne Lenken = sanftes Heck-Aus-Brechen in zufaellige Richtung
-      // (Sign-Persistenz: bricht in die Richtung aus die schon im Slip ist)
-      const drift=Math.sign(p.slipAngle||0.001);
-      p.slipAngle+=drift*0.04*dt;
+      // Lateralen Impuls senkrecht zur Fahrtrichtung geben → Heck bricht aus
+      // (senkrechter Vektor zur Fahrzeugrichtung: links=(-sin,cos), rechts=(sin,-cos))
+      const kickStrength=Math.min(velSpd*0.022,0.28)*dt;
+      p.vx+=( Math.sin(p.angle))*steerSign*kickStrength;
+      p.vy+=(-Math.cos(p.angle))*steerSign*kickStrength;
     }
-    // Hard-Clamp (Sicherheit gegen NaN/Explosion) — groesserer Spielraum fuer mehr Drift
-    if(!isFinite(p.slipAngle))p.slipAngle=0;
-    p.slipAngle=Math.max(-1.6,Math.min(1.6,p.slipAngle));
   }
   const thrustX=Math.cos(p.angle)*driveF;
   const thrustY=Math.sin(p.angle)*driveF;
 
   // ── 6. DRIVETRAIN-PHYSIK ─────────────────────────────────────────
-  // RWD: Heck bricht unter Last aus (Übersteuern)
-  // FWD: Front schiebt unter Last über (Untersteuern)
-  // AWD: Neutral, beste Traktion
-  let driveSlipBias=0;
+  // RWD: Heck bricht unter Last aus → Velocity-Kick senkrecht zur Fahrtrichtung
+  // FWD: Front schiebt → Velocity-Kick gegen Lenkrichtung (Untersteuern)
+  // AWD: Neutral, beste Traktion (tractionMult-Bonus)
+  // WICHTIG: p.slipAngle wird jedes Frame aus Velocity neu berechnet → kann nicht
+  // für Physik-Feedback genutzt werden. Stattdessen: direkte Velocity-Manipulation.
   let tractionMult=1.0;
+  const steerSgn=Math.abs(steer)>0.05?Math.sign(steer):0;
   if(drv==='rwd'){
-    // Unter Vollgas: Heck bekommt mehr Slip → Drift-Tendenz
-    if(gasActive&&!effectiveBrake&&onTrack){
-      const powerSlip=Math.abs(steer)*(velSpd/Math.max(maxS*0.3,0.5))*0.014*dt;
-      driveSlipBias=steer*powerSlip*(1-slipMag*1.5); // schwächer wenn schon drifting
+    // Power-Übersteuern: Heck bricht aus wenn Gas+Lenkung+Tempo → wie kleines E-Brake
+    if(gasActive&&!effectiveBrake&&onTrack&&steerSgn!==0&&velSpd>2.0){
+      const speedRatio=Math.min(velSpd/Math.max(maxS*0.3,0.5),1.0);
+      const rwdKick=Math.abs(steer)*speedRatio*0.006*dt*(p.isDrifting?0.3:1.0);
+      // Kick in Lenkrichtung senkrecht zur Fahrtrichtung → Heck schiebt aus
+      p.vx+=Math.sin(p.angle)*steerSgn*rwdKick;
+      p.vy-=Math.cos(p.angle)*steerSgn*rwdKick;
     }
   } else if(drv==='fwd'){
-    // Unter Gas: Front schiebt → steer reduziert effektiv, Auto geht geradeaus
-    if(gasActive&&!effectiveBrake&&onTrack){
-      const underSteer=Math.abs(steer)*(velSpd/Math.max(maxS*0.4,0.5))*0.012*dt;
-      driveSlipBias=-steer*underSteer; // Gegenrichtung = Untersteuern
+    // Untersteuern: Front schiebt unter Gas durch → Gegen-Kick (weniger Kurventreue)
+    if(gasActive&&!effectiveBrake&&onTrack&&steerSgn!==0&&velSpd>2.0){
+      const speedRatio=Math.min(velSpd/Math.max(maxS*0.4,0.5),1.0);
+      const fwdPush=Math.abs(steer)*speedRatio*0.005*dt;
+      // Kick gegen Lenkrichtung → Auto fährt geradeaus statt zu drehen
+      p.vx-=Math.sin(p.angle)*steerSgn*fwdPush;
+      p.vy+=Math.cos(p.angle)*steerSgn*fwdPush;
     }
-    // FWD: stabiler unter Bremsen (kein Übersteuern)
-    tractionMult=effectiveBrake?1.12:0.95;
+    // FWD: leicht mehr Lateral-Grip unter Bremsen (stabiler), weniger unter Gas
+    tractionMult=effectiveBrake?1.12:0.94;
   } else if(drv==='awd'){
-    // AWD: Beste Traktion, neutrales Handling
+    // AWD: bestes Traktionsvermögen, kein Übersteuern unter Last
     tractionMult=1.15;
   }
-  // Slip-Bias anwenden (wirkt wie ein kurzer Lenkimpuls in Gegenrichtung)
-  if(onTrack&&velSpd>1.0)p.slipAngle+=driveSlipBias;
 
   // ── 7. LATERAL CORRECTION ────────────────────────────────────────
   // Seitengrip zieht Velocity-Vektor zur Fahrzeug-Richtung.
-  // E-Brake reduziert Seitengrip MASSIV → Heck bricht weit aus
-  const ebrakeGripMult=ebrakeActive?0.18:1.0; // war 0.65, jetzt 0.18 (82% weniger lateral grip)
-  const corrK=Math.min(lateralGripK*surfK*7.0*dt*tractionMult*ebrakeGripMult,0.88);
+  // WICHTIG: lateralGripK*7.0 überschreitet den 0.88-Cap auf allen Oberflächen —
+  // deshalb: surf.gripK NACH dem Cap anwenden (wie ebrakeGripMult), damit Biome spürbar sind.
+  // sqrt(surf.gripK): sanfte Kurve — gravel=79%, sand=69%, snow=72%, ice=47%, saltflat=96%
+  const surfGripPostCap=onTrack?Math.sqrt(surf.gripK||1.0):1.0;
+  const corrKBase=Math.min(lateralGripK*surfK*7.0*dt*tractionMult,0.88)*surfGripPostCap;
+  // E-Brake: 18% Restgrip → Heck bricht aus. Auf Gras: etwas mehr (sonst zu rutschig)
+  const ebrakeGripMult=ebrakeActive?(onGrass?0.38:0.18):1.0;
+  const corrK=corrKBase*ebrakeGripMult;
   const targetVx=Math.cos(p.angle)*velSpd;
   const targetVy=Math.sin(p.angle)*velSpd;
   p.vx+=(targetVx-p.vx)*corrK+thrustX;
@@ -2950,13 +3256,105 @@ function update(ts){
     p._wasSkidding=false;
   }
 
-  // Drift mode: score accumulation and timer
-  if((raceMode==='drift'||raceMode==='drift_challenge')&&G.started&&!G.finished){
-    if(!G.driftScore)G.driftScore=0;
-    if(p.isDrifting)G.driftScore+=Math.abs(p.slipAngle)*p.speed*dt*0.5;
+  // P4: Drift mode — verbesserte Formel + 2-Minuten-Timer für drift_challenge
+  // Multiplikatorstufen: ×1 (0–3 s) · ×2 (3–8 s) · ×3 (8–15 s) · ×4 (15 s+)
+  if((raceMode==='drift'||raceMode==='drift_challenge')&&G.started&&!G.finished&&!G.finishing){
+    // P4: Countdown-Timer (nur drift_challenge)
+    if(raceMode==='drift_challenge'&&G.driftTimeLimit>0){
+      G.driftTimeRem=Math.max(0,G.driftTimeRem-dt/60);
+      if(G.driftTimeRem<=0){
+        onPlayerFinished();
+      }
+    }
+
+    if(p.isDrifting){
+      G.driftComboTime+=dt/60;
+      const prevMult=G.driftMultiplier;
+      G.driftMultiplier=G.driftComboTime>=15?4:G.driftComboTime>=8?3:G.driftComboTime>=3?2:1;
+      // P4: verbesserte Formel — Winkel nichtlinear (^0.75) + Speed-Anteil
+      // Größere Winkel werden überproportional belohnt; Speed sorgt für mehr Punkte
+      const absSlip=Math.min(Math.abs(p.slipAngle),1.55);
+      const angleContrib=Math.pow(absSlip/1.55,0.75)*0.7;  // 70%
+      const speedContrib=Math.min(p.speed/8,1.0)*0.3;       // 30%
+      const earned=(angleContrib+speedContrib)*p.speed*dt*2.0*G.driftMultiplier;
+      G.driftScore+=earned;
+      G.driftComboScore+=earned;
+      // Neue Multiplikatorstufe → Pulse-Effekt
+      if(G.driftMultiplier>prevMult){
+        const mb=document.getElementById('driftMultBadge');
+        if(mb){mb.classList.remove('mult-pulse');void mb.offsetWidth;mb.classList.add('mult-pulse');}
+      }
+    } else if(G.driftComboTime>0){
+      // Combo abgebrochen → Popup wenn sinnvoller Score
+      if(G.driftComboTime>0.8&&G.driftComboScore>5){
+        const el=document.getElementById('driftComboPopup');
+        if(el){
+          const multTxt=G.driftMultiplier>1?` ×${G.driftMultiplier}`:'';
+          el.textContent=`+${Math.round(G.driftComboScore).toLocaleString('de')} P${multTxt}`;
+          el.style.display='block';
+          el.classList.remove('combo-pop-anim');void el.offsetWidth;
+          el.classList.add('combo-pop-anim');
+          setTimeout(()=>{el.style.display='none';el.classList.remove('combo-pop-anim');},1100);
+        }
+      }
+      G.driftComboTime=0;G.driftMultiplier=1;G.driftComboScore=0;
+    }
+
+    // P4: HUD — Score + Timer-Anzeige (drift_challenge) + Multiplikator
     const ds=document.getElementById('driftScore');
-    if(ds)ds.textContent=`🌀 ${Math.round(G.driftScore)}`;
-    // Drift-Challenge endet jetzt nach 3 Runden (statt 2-Min-Timer)
+    if(ds){
+      const sc=Math.round(G.driftScore);
+      let inner=`🌀 ${sc.toLocaleString('de')} P`;
+      if(raceMode==='drift_challenge'&&G.driftTimeLimit>0){
+        const rem=Math.ceil(G.driftTimeRem);
+        const tCol=rem<=10?'#e74c3c':rem<=20?'#f39c12':'rgba(255,255,255,.6)';
+        inner+=` <span style="font-size:.65em;color:${tCol};margin-left:.3em;">⏱${rem}s</span>`;
+      }
+      ds.innerHTML=inner;
+      ds.style.display='block';
+    }
+    const mb=document.getElementById('driftMultBadge');
+    if(mb){
+      if(G.driftMultiplier>1&&p.isDrifting){
+        const multCols=['','','#f39c12','#e74c3c','#9b59b6'];
+        mb.style.color=multCols[G.driftMultiplier]||'#fff';
+        mb.textContent=`×${G.driftMultiplier}`;
+        mb.style.display='block';
+      }else{mb.style.display='none';}
+    }
+  }
+
+  // B.2: Elimination-Timer — alle 40s wird der Letzte eliminiert
+  if(raceMode==='elimination'&&G.started&&!G.finished&&G.elimTimer!==null&&G.ops.length>0){
+    G.elimTimer-=dt/60; // dt=1 @ 60fps → 1s = 60 frames
+    // Countdown im HUD anzeigen (targetCurrent überschreiben)
+    const tcEl=document.getElementById('targetCurrent');
+    if(tcEl){
+      const sec=Math.ceil(Math.max(0,G.elimTimer));
+      const pulse=sec<=5?'color:#e74c3c':'';
+      tcEl.innerHTML=`<span style="${pulse}">💀 Eliminierung in ${sec}s</span>`;
+    }
+    if(G.elimTimer<=0){
+      G.elimTimer=40; // Timer zurücksetzen
+      G.elimRound++;
+      // Rangfolge ermitteln (Spieler + Gegner) — sortiert nach Runde+Fortschritt
+      const all=[{isPlayer:true,lap:p.lap,prog:p.prog},...G.ops.map(o=>({isPlayer:false,lap:o.lap,prog:o.prog,ref:o}))];
+      all.sort((a,b)=>b.lap-a.lap||(b.prog%G.segs.length)-(a.prog%G.segs.length));
+      const last=all[all.length-1];
+      if(last.isPlayer){
+        // Spieler ist Letzter → verliert (DNF, no finResult computed)
+        showToast('💀 Du wurdest eliminiert!','#9b59b6');
+        endRace();
+      } else {
+        // Letzter Gegner fliegt raus
+        G.ops=G.ops.filter(o=>o!==last.ref);
+        showToast(`💀 ${last.ref.car.brand} ${last.ref.car.name} eliminiert!`,'#9b59b6');
+        if(G.ops.length===0){
+          // Alle Gegner weg → Spieler gewinnt
+          onPlayerFinished();
+        }
+      }
+    }
   }
 
   // Boundary wall push-back
@@ -3012,6 +3410,21 @@ function update(ts){
     if(rcEl)rcEl.style.display='none';
   }
 
+  // ── FALSCHE-RICHTUNG-ERKENNUNG ────────────────────────────────────────────────
+  // Prüft ob Spieler gegen die Fahrtrichtung fährt (Antischummeln + Lapsync-Schutz)
+  if(onTrack&&velSpd>1.5&&G.started&&!G.finished){
+    const wsi=Math.min(Math.round(q.prog),G.segs.length-1);
+    const ws=G.segs[wsi];
+    // Segment-Vorwärtsrichtung (normiert): ws.dx/ws.len
+    const dotWW=(p.vx*(ws.dx/ws.len)+p.vy*(ws.dy/ws.len))/velSpd;
+    // dotWW < -0.35 = Fahrtrichtung >110° entgegen der Strecke
+    p._wrongWay=(dotWW<-0.35);
+  } else {
+    p._wrongWay=false;
+  }
+  const wwEl=document.getElementById('wrongway');
+  if(wwEl)wwEl.classList.toggle('show',!!p._wrongWay);
+
   // ── RUNDENLOGIK mit Checkpoint-Validierung ──────────────────────────────────────
   // Problem: Spieler spawnt kurz VOR der Ziellinie (prog≈3). queryTrack kann aufgrund
   // physischer Nähe von Seg 229 (Streckenende) und Seg 3 (Streckenstart) kurzfristig
@@ -3021,17 +3434,33 @@ function update(ts){
   const nq=queryTrack(p.x,p.y,G.segs,p.prog);
   // Checkpoint: >300px Luftlinie von der Startlinie weg → Runde kann gezählt werden
   if(!p.lapValid&&G.finPt&&Math.hypot(p.x-G.finPt.x,p.y-G.finPt.y)>300)p.lapValid=true;
-  // Rundenübergang: von prog≥92% auf prog<8%, NUR wenn Checkpoint erreicht
-  const crossed=!G.finished&&p.lapValid&&p.lastProg>G.segs.length*.92&&nq.prog<G.segs.length*.08;
+  // Rundenübergang: von prog≥92% auf prog<8%, NUR wenn Checkpoint erreicht UND kein Gegenverkehr
+  // P6: !G.finishing verhindert doppeltes Zählen nach dem Zieleinlauf
+  const crossed=!G.finished&&!G.finishing&&p.lapValid&&!p._wrongWay&&p.lastProg>G.segs.length*.92&&nq.prog<G.segs.length*.08;
   if(crossed){
     p.lapValid=false; // Reset für nächste Runde
-    if(p.lap<p.totalLaps){p.lap=Math.min(p.lap+1,p.totalLaps);}
-    else{endRace(true);return;}
+    if(raceMode==='drift_challenge'){
+      // P4: Drift-Challenge läuft zeitbasiert (2 Min-Timer) — Runden werden nur hochgezählt
+      p.lap++;
+    } else if(p.lap<p.totalLaps){
+      p.lap=Math.min(p.lap+1,p.totalLaps);
+    } else {
+      onPlayerFinished(); // P6: enter finishing state
+    }
   }
   p.lastProg=nq.prog;p.prog=nq.prog;
 
-  // Opponent finished — only trigger once, after player had a chance
-  if(G.opFinished&&!G.finished){endRace(false);return;}
+  // P6: Finishing phase — race continues for AI, countdown until endRace()
+  if(G.finishing&&!G.finished){
+    const allDone=G.ops.every(op=>op.lap>G.player.totalLaps);
+    const timedOut=G.t>=G.finishEnd;
+    if(allDone||timedOut){endRace();return;}
+    // Update countdown bar & text
+    const rem=Math.max(0,(G.finishEnd-G.t)/1000);
+    const cd=document.getElementById('finishCountdown');if(cd)cd.textContent=Math.ceil(rem)+'s';
+    const cb=document.getElementById('finishCountBar');if(cb)cb.style.width=(rem/15*100).toFixed(1)+'%';
+  }
+  // P6: removed G.opFinished early termination — AI finishing alone no longer ends the race
 
   // AI
   for(const op of G.ops)stepOp(op,G,dt);
@@ -3203,16 +3632,19 @@ function render(){
     ctx.globalAlpha=1;
   });
 
-  // Opponents — JEDEN einzeln tracken (häufigster Crash-Verdacht)
+  // Opponents — 2D Arcade-Rendering (drawCar)
   if(G.ops)for(let opi=0;opi<G.ops.length;opi++){
     const op=G.ops[opi];
-    _step('op'+opi,()=>drawCar(ctx,op.x,op.y,op.car,op.angle,1,false,false,op.braking||false));
+    _step('op'+opi,()=>{
+      drawCar(ctx,op.x,op.y,op.car,op.angle,1,false,false,op.braking||false);
+    });
   }
-  // Player — Front-Räder lenken sichtbar mit (wheelAngle in deg → rad, ±0.5)
+  // Player — 2D Arcade-Rendering (drawCar)
+  // Front-Räder lenken sichtbar mit (wheelAngle in deg → rad, ±0.5)
   // Body-Roll bei Drift: Slip-Angle gedämpft als visuelle Neigung
   _step('player',()=>{
-    const steerVis=(wheelAngle/72)*0.55; // ±65° wheelAngle → ±0.5 rad Lenkeinschlag
-    const rollVis=(G.player.slipAngle||0)*0.15; // subtle drift roll
+    const steerVis=(wheelAngle/72)*0.55;
+    const rollVis=(G.player.slipAngle||0)*0.15;
     drawCar(ctx,G.player.x,G.player.y,G.car,G.player.angle,1.18,true,nitroOn&&G.player.nitro>0,G.player.isBraking||false,steerVis,rollVis);
   });
 
@@ -3331,80 +3763,136 @@ function startCountdown(){
 }
 
 // ════════════════════════════════════════════════
-// END RACE
+// P6: PLAYER CROSSED FINISH LINE
+// Computes result immediately, enters "finishing" state (race loop continues for AI).
 // ════════════════════════════════════════════════
-function endRace(playerFinished){
-  if(G.finished)return;
-  G.finished=true;running=false;cancelAnimationFrame(animId);
-  const rcEl=document.getElementById('rescueCount');if(rcEl)rcEl.style.display='none';
-  stopEngineSound();
+function onPlayerFinished(){
+  if(!G||G.finishing||G.finished)return;
   const p=G.player;
+
+  // Lock position at THIS exact moment (AI haven't advanced further yet)
   const all=[{l:p.lap,pr:p.prog,me:true},...G.ops.map(o=>({l:o.lap,pr:o.prog,me:false}))];
-  // MP: include network players in standings
-  if(G.isMP)for(const mp of Object.values(mpPlayers))if(mp.lap!==undefined)all.push({l:mp.lap,pr:mp.prog||0,me:false});
+  if(G.isMP)for(const mp of Object.values(mpPlayers||{}))if(mp.lap!==undefined)all.push({l:mp.lap,pr:mp.prog||0,me:false});
   all.sort((a,b)=>b.l-a.l||(b.pr%G.segs.length)-(a.pr%G.segs.length));
   const pos=all.findIndex(x=>x.me)+1;
 
   let stars=0,newPrize=0,targetMet='none';
   if(!G.isMP){
-    // ── Stars basierend auf RACE TARGET vergeben (statt nur Position) ──
-    if(G.target&&playerFinished){
-      let achieved;
-      if(G.target.type==='time'){
-        achieved=G.raceMs/1000; // Sekunden
-      }else if(G.target.type==='score'){
-        achieved=Math.round(G.driftScore||0);
-      }else{ // position
-        achieved=pos;
-      }
+    if(G.target){
+      const achieved=G.target.type==='time'?G.raceMs/1000:G.target.type==='score'?Math.round(G.driftScore||0):pos;
       stars=calcStarsFromTarget(achieved,G.target);
       targetMet=stars>=3?'gold':stars===2?'silver':stars===1?'bronze':'missed';
-    }else if(playerFinished){
-      // Fallback (kein Target): klassisches Positions-System
+    }else{
       stars=pos===1?3:pos<=3?2:1;
+      targetMet=['missed','bronze','silver','gold'][stars]||'missed';
     }
     const prevStars=getStars(G.world.id,selLevel);
-    setStars(G.world.id,selLevel,Math.max(prevStars,stars)); // höchste Sterne behalten
+    setStars(G.world.id,selLevel,Math.max(prevStars,stars));
     checkWorldUnlocks();
-    const driftD=G.player?.driftDist||0;
-    const cleanL=G.player?.cleanLap!==false;
-    newPrize=calcRacePrize(pos,G.world?.id||'city',stars,prevStars,driftD,cleanL);
+    newPrize=calcRacePrize(pos,G.world?.id||'city',stars,prevStars,p?.driftDist||0,p?.cleanLap!==false,selLevel);
     saveData.money+=newPrize;
     if(!saveData.totalEarned)saveData.totalEarned=0;
     saveData.totalEarned+=newPrize;
+    // P5: Star tier bonus — one-time reward per NEW tier achieved on this level
+    let starBonus=0;
+    if(stars>prevStars){
+      const bm=BIOME_PRIZE_MULT[G.world.id]||1.0;
+      const lm=1.0+Math.min(selLevel,19)*0.06;
+      for(let t=prevStars+1;t<=stars;t++)starBonus+=Math.round((STAR_PRIZE[t]||0)*bm*lm);
+      if(starBonus>0){saveData.money+=starBonus;saveData.totalEarned+=starBonus;}
+    }
     save();
     checkCarUnlocks(G.world?.id||'city',selLevel);
+    _triggerAchievements(pos,stars);
+    // Store starBonus in finResult for display
+    G.finResult={pos,stars,newPrize,starBonus,targetMet,raceMs:G.raceMs};
   }
-  G.lastTargetMet=targetMet;
-  G.lastPrize=newPrize;G.lastPos=pos;G.lastStars=stars;
+  if(!G.finResult)G.finResult={pos,stars,newPrize:0,starBonus:0,targetMet,raceMs:G.raceMs};
+  G.finishing=true;
+  G.finishEnd=G.t+15000; // 15 seconds for AI to finish
 
   playFinishJingle(pos);
 
-  // Achievements prüfen
-  if(!G.isMP)_triggerAchievements(pos,stars);
+  // Show finishing banner (slide up from bottom)
+  const banner=document.getElementById('finishingBanner');
+  if(banner){
+    const posLabels=['🥇 1. PLATZ!','🥈 2. PLATZ!','🥉 3. PLATZ!','4. PLATZ','5. PLATZ','6. PLATZ'];
+    document.getElementById('fbResult').textContent=posLabels[pos-1]||pos+'. PLATZ';
+    document.getElementById('fbStars').textContent=['☆☆☆','⭐☆☆','⭐⭐☆','⭐⭐⭐'][stars]||'☆☆☆';
+    const fb=G.finResult;
+    const totalBannerPrize=(fb.newPrize||0)+(fb.starBonus||0);
+    document.getElementById('fbPrize').textContent=totalBannerPrize>0?'+'+totalBannerPrize.toLocaleString('de')+' €'+(fb.starBonus>0?' (inkl. ⭐ Bonus)':''):'';
+    document.getElementById('finishCountBar').style.width='100%';
+    banner.style.display='flex';
+  }
+}
 
-  // Worst-Position für "Comeback"-Achievement tracken
-  if(G.player.worstPos===undefined)G.player.worstPos=pos;
+// ════════════════════════════════════════════════
+// END RACE
+// P6: Called when finishing countdown ends or timeout. Uses G.finResult.
+// P2: Always shows sFin directly (no sTuning screen).
+// ════════════════════════════════════════════════
+function endRace(){
+  if(!G||G.finished)return;
+  G.finished=true;G.finishing=false;
+  running=false;cancelAnimationFrame(animId);
+  const rcEl=document.getElementById('rescueCount');if(rcEl)rcEl.style.display='none';
+  stopEngineSound();
+  // Hide finishing banner
+  const banner=document.getElementById('finishingBanner');
+  if(banner)banner.style.display='none';
+
+  const p=G.player;
+  let pos,stars,newPrize,targetMet,raceMs;
+
+  let starBonus=0;
+  if(G.finResult){
+    // P6: Player finished normally — use pre-computed result
+    ({pos,stars,newPrize,starBonus,targetMet,raceMs}=G.finResult);
+  } else {
+    // Player did not cross the finish line (DNF/timeout)
+    raceMs=G.raceMs;
+    const all=[{l:p.lap,pr:p.prog,me:true},...G.ops.map(o=>({l:o.lap,pr:o.prog,me:false}))];
+    if(G.isMP)for(const mp of Object.values(mpPlayers||{}))if(mp.lap!==undefined)all.push({l:mp.lap,pr:mp.prog||0,me:false});
+    all.sort((a,b)=>b.l-a.l||(b.pr%G.segs.length)-(a.pr%G.segs.length));
+    pos=all.findIndex(x=>x.me)+1;
+    stars=0;newPrize=0;targetMet='none';
+    if(!G.isMP){
+      // Small participation prize for DNF (no stars saved)
+      const prevStars=getStars(G.world.id,selLevel);
+      newPrize=Math.round(calcRacePrize(pos,G.world?.id||'city',0,prevStars,0,false,selLevel)*0.3);
+      if(newPrize>0){saveData.money+=newPrize;if(!saveData.totalEarned)saveData.totalEarned=0;saveData.totalEarned+=newPrize;save();}
+    }
+    playFinishJingle(pos);
+  }
+
+  G.lastPrize=newPrize;G.lastPos=pos;G.lastStars=stars;G.lastTargetMet=targetMet;
 
   // Fill finish screen
-  const ms=G.raceMs,s=ms/1000,m=Math.floor(s/60);
+  const ms=raceMs||0,s=ms/1000,m=Math.floor(s/60);
   document.getElementById('finTime').textContent=`${m}:${(s%60).toFixed(2).padStart(5,'0')}`;
-  document.getElementById('finTop').textContent=Math.round(p.topKmh);
+  document.getElementById('finTop').textContent=Math.round(p.topKmh||0);
   document.getElementById('finPos').textContent=pos+'.';
   document.getElementById('finCar').textContent=`${G.car.brand} ${G.car.name} ${G.car.year}`;
-  // Titel: jetzt basierend auf Target-Erfüllung statt nur Position
+
   const titleEl=document.getElementById('finTitle');
-  if(targetMet==='gold')      titleEl.textContent='🏆 GOLD! Ziel klar übertroffen';
-  else if(targetMet==='silver')titleEl.textContent='🥈 SILBER — Ziel erreicht';
-  else if(targetMet==='bronze')titleEl.textContent='🥉 BRONZE — knapp am Ziel';
-  else if(targetMet==='missed')titleEl.textContent='ZIEL VERFEHLT — versuche es erneut';
-  else                         titleEl.textContent=pos===1?'SIEG! 🏆':pos<=3?'PODIUM!':playerFinished?'FINISH':'DISQUALIFIZIERT';
+  if(targetMet==='gold')       titleEl.textContent='🏆 GOLD! Ziel klar übertroffen';
+  else if(targetMet==='silver') titleEl.textContent='🥈 SILBER — Ziel erreicht';
+  else if(targetMet==='bronze') titleEl.textContent='🥉 BRONZE — knapp am Ziel';
+  else if(targetMet==='missed') titleEl.textContent='ZIEL VERFEHLT — versuche es erneut';
+  else                          titleEl.textContent=G.finResult?(pos===1?'SIEG! 🏆':pos<=3?'PODIUM!':'ZIEL!'):'NICHT GEWERTET';
   document.getElementById('finBadge').textContent=['🥇','🥈','🥉','4.','5.'][pos-1]||pos+'.';
   document.getElementById('finStars').textContent=['☆☆☆','⭐☆☆','⭐⭐☆','⭐⭐⭐'][stars]||'☆☆☆';
+  const prizeEl=document.getElementById('finPrize');
+  if(prizeEl)prizeEl.textContent=newPrize>0?'+'+newPrize.toLocaleString('de')+' €':'';
+  // P5: Star bonus display
+  const sbEl=document.getElementById('finStarBonus');
+  if(sbEl){
+    if(starBonus>0){sbEl.textContent='⭐ STERNE-BONUS: +'+starBonus.toLocaleString('de')+' €';sbEl.style.display='block';}
+    else{sbEl.style.display='none';}
+  }
 
-  // MP: skip tuning, go straight to finish screen
-  if(G.isMP){showScreen('sFin');return;}
-  buildTuningUI();showScreen('sTuning');
+  showScreen('sFin'); // P2: always go to sFin, never sTuning
 }
 
 // ════════════════════════════════════════════════
@@ -3616,7 +4104,7 @@ function buildMenuUI(){
     d.addEventListener('click',()=>{if(!unlocked)return;selLevel=li;buildMenuUI();});
     grid.appendChild(d);
   });
-  // Car preview
+  // Car preview — 2D Arcade-Sprite (3D nur in der Garage)
   const car=CARS.find(c=>c.id===(saveData.selCar||'bmw2002t'))||CARS[0];
   const cv=document.getElementById('carPreviewCv');
   const cx2=cv.getContext('2d');cx2.clearRect(0,0,cv.width,cv.height);
@@ -3631,16 +4119,16 @@ function buildMenuUI(){
     </div>
     <div style="font-size:.55rem;color:rgba(255,255,255,.3);margin-top:.3rem;">${car.desc}</div>`;
   buildWheel(car);
-  // Race-Mode-Badge updaten: zeigt vor Klick auf START schon welcher Modus dran ist
-  const lmb=document.getElementById('levelModeBadge');
-  if(lmb){
-    const modeId=getLevelMode(world.id,selLevel);
-    const def=RACE_MODE_DEF[modeId]||RACE_MODE_DEF.classic_race;
-    lmb.textContent=def.icon+' '+def.name;
-    lmb.style.color=def.color;
-    lmb.style.borderColor=def.color;
-    lmb.style.background=def.color+'18'; // 18 = ~10% alpha hex
-    lmb.title=def.desc;
+  // Modus-Badge für gewähltes Level
+  const mb=document.getElementById('menuModeBadge');
+  if(mb){
+    const mId=getLevelMode(world.id,selLevel);
+    const mDef=RACE_MODE_DEF[mId];
+    if(mDef){
+      mb.textContent=`${mDef.icon} ${mDef.name}`;
+      mb.style.borderColor=mDef.color;mb.style.color=mDef.color;
+      mb.style.background=mDef.color+'1a';
+    }
   }
 }
 
@@ -3965,28 +4453,14 @@ pedalBtn('abtn-brk',()=>brakeHeld=true,()=>brakeHeld=false);
 })();
 
 // ════════════════════════════════════════════════
-// RACE MODES
+// RACE MODES  (B.2)
 // ════════════════════════════════════════════════
-let raceMode='circuit';
-const RACE_MODES=[
-  {id:'circuit',     icon:'🏁', name:'Rundkurs',    desc:'3 Runden gegen KI', laps:3},
-  {id:'time_trial',  icon:'⏱', name:'Zeitfahren',  desc:'Beste Rundenzeit, solo'},
-  {id:'sprint',      icon:'⚡', name:'Sprint',       desc:'1 Runde, maximale KI'},
-  {id:'drift',       icon:'💨', name:'Drift-Battle', desc:'2 Min · Drift-Punkte'},
-  {id:'elimination', icon:'💀', name:'Elimination',  desc:'Letzter fliegt raus'},
-  {id:'checkpoint',  icon:'📍', name:'Checkpoint',   desc:'Punkte in der Zeit'},
-  {id:'free_drive',  icon:'🗺', name:'Freies Fahren',desc:'Kein Ziel, nur fahren'},
-];
+// Modus wird ausschließlich durch getLevelMode() bestimmt — kein Spieler-Override.
+// Einzige Quelle der Wahrheit: BIOME_MODE_PATTERN in src/data/race-modes.js
+let raceMode='classic_race';    // aktiver Modus beim Rennenstart (gesetzt von getLevelMode)
 
-function buildModeSelect(){
-  const grid=document.getElementById('modeGrid');
-  if(!grid)return;
-  grid.innerHTML=RACE_MODES.map(m=>`<div onclick="startWithMode('${m.id}')" style="background:rgba(255,255,255,.04);border:1px solid ${raceMode===m.id?'var(--gold)':'rgba(255,255,255,.1)'};border-radius:6px;padding:.8rem;cursor:pointer;text-align:center;transition:border-color .15s;">
-    <div style="font-size:1.8rem;margin-bottom:.3rem;">${m.icon}</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.15em;color:var(--gold);">${m.name}</div>
-    <div style="font-size:.5rem;color:rgba(255,255,255,.4);margin-top:.2rem;">${m.desc}</div>
-  </div>`).join('');
-}
+// Legacy-Shim (wird noch von MP-Lobby gerufen)
+function startWithMode(modeId){ raceMode=modeId; startRaceWithCurrentMode(); }
 
 // ════════════════════════════════════════════════
 // RACE MODE INTRO — bulletproof + skip-on-click + watchdog
@@ -4053,6 +4527,8 @@ function showRaceModeIntro(onComplete){
 
 function startRaceWithCurrentMode(){
   console.log('[NE] === startRaceWithCurrentMode BEGIN ===  mode='+raceMode);
+  // P6: hide finishing banner from previous race
+  const _fb=document.getElementById('finishingBanner');if(_fb)_fb.style.display='none';
   try{
     // Falls ein Button (z.B. RENNEN STARTEN) noch Focus hat, entfernen
     // Sonst triggert SPACE/ENTER spaeter waehrend des Rennens diesen Button.
@@ -4062,8 +4538,12 @@ function startRaceWithCurrentMode(){
     const gc=document.getElementById('gc');
     if(gc){gc.width=window.innerWidth;gc.height=window.innerHeight;}
     console.log('[NE]   step 2: canvas resize OK');
+    const isDriftMode=raceMode==='drift'||raceMode==='drift_challenge';
     const ds=document.getElementById('driftScore');
-    if(ds)ds.style.display=(raceMode==='drift'||raceMode==='drift_challenge')?'block':'none';
+    if(ds)ds.style.display=isDriftMode?'block':'none';
+    // B.3: Badge + Popup nur im Drift-Modus sichtbar, zu Beginn immer verborgen
+    const dmb=document.getElementById('driftMultBadge');if(dmb)dmb.style.display='none';
+    const dcp=document.getElementById('driftComboPopup');if(dcp)dcp.style.display='none';
     const mhud=document.getElementById('raceModeHud');
     if(mhud){
       const def=RACE_MODE_DEF[raceMode]||RACE_MODE_DEF.classic_race;
@@ -4090,16 +4570,13 @@ function startRaceWithCurrentMode(){
   }
 }
 
-function startWithMode(modeId){ raceMode=modeId; startRaceWithCurrentMode(); } // Legacy shim
-
 // ════════════════════════════════════════════════
 // START / FINISH BUTTONS
 // ════════════════════════════════════════════════
 document.getElementById('btnStart').addEventListener('click',()=>{
-  // Mode is determined by level, NOT player choice
   const world=WORLDS[selWorld];
   raceMode=getLevelMode(world?.id||'city',selLevel);
-  console.log('[NE] btnStart click → level mode:',raceMode,'world:',world?.id,'level:',selLevel);
+  console.log('[NE] btnStart click → mode:',raceMode,'world:',world?.id,'level:',selLevel);
   // CRITICAL: sGame screen muss VOR dem Intro sichtbar gemacht werden,
   // sonst ist das Intro-Overlay (DOM-Kind von #sGame) wegen .screen.off
   // {display:none !important} unsichtbar → User sieht 2.4s frozen menu.
@@ -4111,7 +4588,6 @@ document.getElementById('btnStart').addEventListener('click',()=>{
 document.getElementById('btnRetry').addEventListener('click',()=>{
   if(mpRaceParams){startMPRace();}
   else{
-    // Re-derive mode from level in case player came from menu
     const world=WORLDS[selWorld];
     raceMode=getLevelMode(world?.id||'city',selLevel);
     startRaceWithCurrentMode();
@@ -4329,6 +4805,20 @@ document.getElementById('btnWaitLeave').addEventListener('click',()=>{
 document.getElementById('btnFinMenu').addEventListener('click',()=>{
   if(mpRaceParams){Net.cleanup();mpRaceParams=null;showScreen('sMode');}
   else{buildMenuUI();showScreen('sMenu');}
+});
+// P2: WEITER → advances to next level (or stays on same if last), goes to menu
+document.getElementById('btnFinNext').addEventListener('click',()=>{
+  if(mpRaceParams){Net.cleanup();mpRaceParams=null;showScreen('sMode');return;}
+  // Auto-advance: try next level
+  const world=WORLDS[selWorld];
+  if(world&&selLevel<(world.tracks||[]).length-1)selLevel++;
+  buildMenuUI();showScreen('sMenu');
+});
+// P2: GARAGE → go to garage screen
+document.getElementById('btnFinGarage').addEventListener('click',()=>{
+  if(mpRaceParams){Net.cleanup();mpRaceParams=null;}
+  showScreen('sGarage');
+  setTimeout(()=>updateGarageCar(saveData.selCar||'bmw2002t'),50);
 });
 
 // ── Account boot listeners ──
@@ -4672,53 +5162,79 @@ function buildShopUI(){
   const filtered=CARS.filter(c=>shopFilter==='all'||c.cat===shopFilter)
                      .sort(SHOP_SORTS[shopSort].fn);
 
+  // Showroom-Style Karten: horizontal (Bild links, Info rechts) für klare Übersicht
+  const statBar=(v,mx,col)=>`<div style="background:rgba(255,255,255,.08);border-radius:2px;height:4px;flex:1;"><div style="background:${col};width:${Math.min(100,Math.round(v/mx*100))}%;height:4px;border-radius:2px;"></div></div>`;
+
   content.innerHTML=filtered.map((car,idx)=>{
     const owned=isCarOwned(car.id);
     const inShop=isCarInShop(car.id);
     const selected=isCarSelected(car.id);
     const locked=!inShop;
     const canBuy=inShop&&!owned&&saveData.money>=car.price;
-    const cls='shop-card'+(selected?' active-car':owned?' owned':locked?' locked':'');
 
-    // Badge oben rechts
-    const badge=selected?'<div class="sc-badge active">✓ AKTIV</div>'
-      :owned?'<div class="sc-badge owned">IM BESITZ</div>'
-      :locked?`<div class="sc-badge locked">🔒 ${car.unlockBiome||'?'}</div>`
-      :car.price>=100000?'<div class="sc-badge new">PREMIUM</div>'
-      :'';
+    // Status-Farbe für den Kartenrand
+    const borderCol=selected?'var(--gold)':owned?'rgba(46,204,113,.5)':locked?'rgba(255,255,255,.06)':'rgba(255,255,255,.1)';
+    const bgCol=selected?'rgba(212,160,23,.07)':owned?'rgba(46,204,113,.05)':'rgba(255,255,255,.025)';
 
-    const statBar=(v,mx,col)=>`<div style="background:rgba(255,255,255,.08);border-radius:2px;height:3px;width:100%;"><div style="background:${col};width:${Math.min(100,Math.round(v/mx*100))}%;height:3px;border-radius:2px;"></div></div>`;
+    const statusChip=selected
+      ?`<span style="background:rgba(212,160,23,.2);color:var(--gold);border:1px solid var(--gold);font-family:'Bebas Neue',sans-serif;font-size:.42rem;letter-spacing:.15em;padding:.08rem .4rem;border-radius:10px;">✓ AKTIV</span>`
+      :owned?`<span style="background:rgba(46,204,113,.15);color:#2ecc71;border:1px solid rgba(46,204,113,.4);font-family:'Bebas Neue',sans-serif;font-size:.42rem;letter-spacing:.15em;padding:.08rem .4rem;border-radius:10px;">IM BESITZ</span>`
+      :locked?`<span style="background:rgba(255,255,255,.05);color:rgba(255,255,255,.3);font-family:'Bebas Neue',sans-serif;font-size:.42rem;letter-spacing:.12em;padding:.08rem .4rem;border-radius:10px;">🔒 GESPERRT</span>`
+      :car.price>=100000?`<span style="background:rgba(212,160,23,.15);color:var(--gold);border:1px solid rgba(212,160,23,.3);font-family:'Bebas Neue',sans-serif;font-size:.42rem;letter-spacing:.15em;padding:.08rem .4rem;border-radius:10px;">★ PREMIUM</span>`
+      :`<span style="background:rgba(255,255,255,.06);color:rgba(255,255,255,.4);font-family:'Bebas Neue',sans-serif;font-size:.42rem;letter-spacing:.12em;padding:.08rem .4rem;border-radius:10px;">VERFÜGBAR</span>`;
+
+    const drv=(car.drv)||'rwd';
+    const drvC={rwd:'#e74c3c',fwd:'#3498db',awd:'#2ecc71'};
+    const drvLabel={rwd:'RWD',fwd:'FWD',awd:'AWD'};
+    const drvChip=`<span style="font-family:'Bebas Neue',sans-serif;font-size:.4rem;letter-spacing:.1em;padding:.06rem .3rem;border-radius:8px;border:1px solid ${drvC[drv]}44;color:${drvC[drv]};background:${drvC[drv]}11;">${drvLabel[drv]}</span>`;
 
     const btn=locked
-      ?`<div style="font-size:.5rem;color:rgba(255,255,255,.32);text-align:center;padding:.3rem;font-style:italic;">Im Biom "${car.unlockBiome||'?'}" freischalten</div>`
+      ?`<div style="font-size:.46rem;color:rgba(255,255,255,.25);text-align:center;padding:.35rem .5rem;background:rgba(255,255,255,.03);border-radius:4px;border:1px dashed rgba(255,255,255,.08);">🔒 Biom «${car.unlockBiome||'?'}» abschliessen</div>`
       :owned
-        ?`<button onclick="selectCar('${car.id}');hapSuccess();" style="width:100%;font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.12em;padding:.4rem;border-radius:4px;cursor:pointer;border:1px solid ${selected?'var(--gold)':'#2ecc71'};background:${selected?'rgba(212,160,23,.18)':'rgba(46,204,113,.12)'};color:${selected?'var(--gold)':'#2ecc71'};font-weight:bold;">${selected?'✓ FAHREN':'AUSWÄHLEN'}</button>`
-        :`<button onclick="${canBuy?`buyCarConfirm('${car.id}')`:`hapError();showToast('Zu wenig Geld — fehlen '+(${car.price}-${saveData.money}).toLocaleString('de')+'€','error')`}" style="width:100%;font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.1em;padding:.4rem;border-radius:4px;cursor:${canBuy?'pointer':'not-allowed'};border:1px solid ${canBuy?'var(--gold)':'rgba(255,255,255,.12)'};background:${canBuy?'rgba(212,160,23,.15)':'rgba(255,255,255,.03)'};color:${canBuy?'var(--gold)':'rgba(255,255,255,.32)'};font-weight:bold;">💰 ${car.price.toLocaleString('de')} €</button>`;
+        ?`<button onclick="event.stopPropagation();selectCar('${car.id}');buildShopUI();hapSuccess();" style="width:100%;font-family:'Bebas Neue',sans-serif;font-size:.68rem;letter-spacing:.14em;padding:.4rem .6rem;border-radius:5px;cursor:pointer;border:1px solid ${selected?'var(--gold)':'#2ecc71'};background:${selected?'rgba(212,160,23,.18)':'rgba(46,204,113,.12)'};color:${selected?'var(--gold)':'#2ecc71'};">${selected?'✓ AUSGEWÄHLT':'AUSWÄHLEN'}</button>`
+        :`<button onclick="event.stopPropagation();${canBuy?`buyCarConfirm('${car.id}')`:``}" ${!canBuy?'disabled':''} style="width:100%;font-family:'Bebas Neue',sans-serif;font-size:.68rem;letter-spacing:.14em;padding:.4rem .6rem;border-radius:5px;cursor:${canBuy?'pointer':'not-allowed'};border:1px solid ${canBuy?'var(--gold)':'rgba(255,255,255,.1)'};background:${canBuy?'rgba(212,160,23,.15)':'rgba(255,255,255,.03)'};color:${canBuy?'var(--gold)':'rgba(255,255,255,.25)'};">💰 ${car.price.toLocaleString('de')} €${canBuy?'':` <span style="font-size:.48rem;letter-spacing:0;display:block;opacity:.75">−${(car.price-saveData.money).toLocaleString('de')} €</span>`}</button>`;
 
-    return `<div class="${cls}" data-car="${car.id}">
-      ${badge}
-      <canvas class="sc-canvas" id="sc-cv-${idx}" width="170" height="80"></canvas>
-      <div style="font-size:.42rem;letter-spacing:.15em;color:rgba(255,255,255,.32);">${car.flag||''} ${car.year} · ${car.cat}</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:.85rem;color:var(--white);line-height:1.05;">${car.brand}</div>
-      <div style="font-size:.78rem;color:var(--gold);font-weight:600;line-height:1.1;">${car.name}</div>
-      <div style="display:grid;grid-template-columns:auto 1fr;gap:.18rem .4rem;font-size:.42rem;letter-spacing:.08em;color:rgba(255,255,255,.5);align-items:center;margin-top:.18rem;">
-        <span>VMAX</span>${statBar(car.maxKmh,400,'#e74c3c')}
-        <span>BESCH.</span>${statBar(10-car.accel100,10,'#f39c12')}
-        <span>GRIP</span>${statBar(car.grip*500,100,'#3498db')}
+    return `<div style="display:flex;background:${bgCol};border:1px solid ${borderCol};border-radius:8px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s;position:relative;"
+        onclick="openShopDetail('${car.id}');hapTap();"
+        onmouseenter="this.style.transform='translateY(-2px)';this.style.borderColor='${selected?'var(--gold)':owned?'#2ecc71':'rgba(255,255,255,.22)'}'"
+        onmouseleave="this.style.transform='';this.style.borderColor='${borderCol}'"
+        data-car="${car.id}">
+      <!-- Auto-Canvas links -->
+      <div style="width:140px;min-width:140px;position:relative;background:radial-gradient(circle at 50% 60%,rgba(212,160,23,.08),rgba(0,0,0,.3));display:flex;align-items:center;justify-content:center;border-right:1px solid rgba(255,255,255,.07);">
+        <canvas id="sc-cv-${idx}" width="140" height="90" style="display:block;"></canvas>
+        ${locked?'<div style="position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🔒</div>':''}
       </div>
-      <div style="font-size:.45rem;color:rgba(255,255,255,.38);margin:.15rem 0;text-align:center;">${car.maxKmh} km/h · 0-100 in ${car.accel100}s</div>
-      ${btn}
+      <!-- Info rechts -->
+      <div style="flex:1;padding:.55rem .65rem;display:flex;flex-direction:column;gap:.2rem;min-width:0;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.2rem;">
+          ${statusChip}${drvChip}
+        </div>
+        <div style="font-size:.38rem;letter-spacing:.12em;color:rgba(255,255,255,.28);">${car.flag||''} ${car.year}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:#fff;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${car.brand}</div>
+        <div style="font-size:.72rem;color:var(--gold);font-weight:600;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${car.name}</div>
+        <div style="display:grid;grid-template-columns:3rem 1fr 2.5rem;gap:.12rem .3rem;font-size:.38rem;letter-spacing:.06em;color:rgba(255,255,255,.4);align-items:center;margin:.1rem 0 .15rem;">
+          <span>VMAX</span>${statBar(car.maxKmh,400,'#e74c3c')}<span style="color:rgba(255,255,255,.55);text-align:right;">${car.maxKmh}</span>
+          <span>BESCH.</span>${statBar(10-car.accel100,10,'#f39c12')}<span style="color:rgba(255,255,255,.55);text-align:right;">${car.accel100}s</span>
+          <span>GRIP</span>${statBar(car.grip*500,100,'#3498db')}<span style="color:rgba(255,255,255,.55);text-align:right;">${Math.round(car.grip*100)}</span>
+        </div>
+        ${btn}
+      </div>
     </div>`;
   }).join('');
 
-  // Mini-Canvas-Auto in jede Karte zeichnen (drawCar von oben verwendet)
+  // Auto-Vorschau in den Karten zeichnen
   setTimeout(()=>{
     filtered.forEach((car,idx)=>{
       const cv=document.getElementById('sc-cv-'+idx);if(!cv)return;
       const ctx=cv.getContext('2d');
       ctx.clearRect(0,0,cv.width,cv.height);
-      try{drawCar(ctx,cv.width/2,cv.height/2,car,Math.PI*1.5,1.7,false,false,false);}
-      catch(e){console.warn('Shop-card preview failed for '+car.id,e);}
+      try{
+        // Hintergrund-Glow
+        const grd=ctx.createRadialGradient(70,50,0,70,50,55);
+        grd.addColorStop(0,'rgba(212,160,23,.08)');grd.addColorStop(1,'transparent');
+        ctx.fillStyle=grd;ctx.fillRect(0,0,140,90);
+        drawCar(ctx,70,48,car,Math.PI*1.5,2.0,false,false,false);
+      }catch(e){}
     });
   },0);
 }
@@ -4731,6 +5247,98 @@ function buyCarConfirm(carId){
   hapSuccess();
   flashMoney();
   showToast(`✓ ${car.brand} ${car.name} gekauft!`,'success');
+  closeShopDetail();
+  buildShopUI();
+}
+
+// ─── P8: Shop Detail Modal ────────────────────────────────────────────────────
+function openShopDetail(carId){
+  const car=CARS.find(c=>c.id===carId);if(!car)return;
+  const modal=document.getElementById('shopDetailModal');if(!modal)return;
+  const owned=isCarOwned(car.id);
+  const inShop=isCarInShop(car.id);
+  const selected=isCarSelected(car.id);
+  const locked=!inShop;
+  const canBuy=!locked&&!owned&&saveData.money>=car.price;
+  const upg=saveData.upgrades[car.id]||{engine:0,grip:0,nitro:0};
+
+  const statB=(v,mx,col)=>`<div style="background:rgba(255,255,255,.1);border-radius:2px;height:4px;flex:1;overflow:hidden;"><div style="background:${col};width:${Math.min(100,Math.round(v/mx*100))}%;height:100%;border-radius:2px;"></div></div>`;
+  const upgDots=(v)=>Array.from({length:5},(_,i)=>`<div style="width:11px;height:5px;border-radius:1px;background:${i<v?'var(--gold)':'rgba(255,255,255,.12)'};"></div>`).join('');
+
+  const btnHtml=locked
+    ?`<div style="text-align:center;padding:.7rem .5rem;color:rgba(255,255,255,.38);font-size:.52rem;letter-spacing:.1em;border:1px solid rgba(255,255,255,.08);border-radius:6px;background:rgba(255,255,255,.02);">🔒 Biom <b style="color:rgba(255,255,255,.6);">"${car.unlockBiome||'?'}"</b> abschließen zum Freischalten</div>`
+    :owned
+      ?selected
+        ?`<div style="text-align:center;padding:.65rem;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.2em;color:var(--gold);border:1px solid rgba(212,160,23,.35);border-radius:6px;background:rgba(212,160,23,.08);">✓ AKTIVES FAHRZEUG</div>`
+        :`<button onclick="selectCar('${car.id}');buildShopUI();closeShopDetail();hapSuccess();showToast('${car.brand} ${car.name} ausgewählt','success');" style="width:100%;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.2em;padding:.65rem;border-radius:6px;cursor:pointer;border:1px solid #2ecc71;background:rgba(46,204,113,.15);color:#2ecc71;">✓ AUSWÄHLEN</button>`
+      :canBuy
+        ?`<button onclick="buyCarConfirm('${car.id}');" style="width:100%;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.2em;padding:.65rem;border-radius:6px;cursor:pointer;border:1px solid var(--gold);background:rgba(212,160,23,.18);color:var(--gold);">💰 KAUFEN — ${car.price.toLocaleString('de')} €</button>`
+        :`<div style="text-align:center;padding:.65rem;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:.15em;color:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.08);border-radius:6px;background:rgba(255,255,255,.02);">💰 ${car.price.toLocaleString('de')} € <span style="display:block;font-size:.5rem;letter-spacing:.08em;margin-top:.25rem;color:rgba(255,100,100,.55);">Fehlen: ${(car.price-saveData.money).toLocaleString('de')} €</span></div>`;
+
+  document.getElementById('sdmContent').innerHTML=`
+    <div style="display:flex;align-items:flex-start;gap:.6rem;margin-bottom:.75rem;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:.4rem;letter-spacing:.14em;color:rgba(255,255,255,.28);">${car.flag||''} ${car.year} · ${(car.cat||'').toUpperCase()}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:var(--white);line-height:1.05;">${car.brand}</div>
+        <div style="font-size:1.05rem;color:var(--gold);font-weight:600;line-height:1.15;">${car.name}</div>
+      </div>
+    </div>
+    <canvas id="sdmCanvas" width="400" height="200" style="width:100%;height:auto;background:radial-gradient(ellipse at 50% 65%,#1a1a2e,#08080f);border-radius:8px;display:block;margin-bottom:.9rem;"></canvas>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.55rem .9rem;margin-bottom:.85rem;">
+      <div>
+        <div style="font-size:.36rem;letter-spacing:.14em;color:rgba(255,255,255,.3);margin-bottom:.22rem;">HÖCHSTGESCHWINDIGKEIT</div>
+        <div style="display:flex;align-items:center;gap:.4rem;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:.92rem;color:#e74c3c;">${car.maxKmh}</span>
+          <span style="font-size:.42rem;color:rgba(255,255,255,.38);">km/h</span>
+          ${statB(car.maxKmh,400,'#e74c3c')}
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.36rem;letter-spacing:.14em;color:rgba(255,255,255,.3);margin-bottom:.22rem;">BESCHLEUNIGUNG</div>
+        <div style="display:flex;align-items:center;gap:.4rem;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:.92rem;color:#f39c12;">${car.accel100}</span>
+          <span style="font-size:.42rem;color:rgba(255,255,255,.38);">s (0–100)</span>
+          ${statB(10-car.accel100,10,'#f39c12')}
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.36rem;letter-spacing:.14em;color:rgba(255,255,255,.3);margin-bottom:.22rem;">GRIP</div>
+        <div style="display:flex;align-items:center;gap:.4rem;">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:.92rem;color:#3498db;">${Math.round(car.grip*100)}</span>
+          <span style="font-size:.42rem;color:rgba(255,255,255,.38);">/100</span>
+          ${statB(car.grip*500,100,'#3498db')}
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.36rem;letter-spacing:.14em;color:rgba(255,255,255,.3);margin-bottom:.22rem;">GEWICHT</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.92rem;color:rgba(255,255,255,.7);">${car.mass||'–'} <span style="font-size:.48rem;">kg</span></div>
+      </div>
+    </div>
+    ${owned?`<div style="border-top:1px solid rgba(255,255,255,.07);padding-top:.65rem;margin-bottom:.72rem;">
+      <div style="font-size:.38rem;letter-spacing:.18em;color:rgba(255,255,255,.28);margin-bottom:.48rem;">TUNING-STAND</div>
+      <div style="display:grid;grid-template-columns:auto auto 1fr;gap:.3rem .55rem;align-items:center;font-size:.48rem;color:rgba(255,255,255,.48);">
+        <span>🔧 MOTOR</span><span style="color:var(--gold);min-width:2rem;text-align:right;font-family:'Bebas Neue',sans-serif;">LV ${upg.engine||0}</span><div style="display:flex;gap:2px;">${upgDots(upg.engine||0)}</div>
+        <span>🏎 GRIP</span><span style="color:var(--gold);min-width:2rem;text-align:right;font-family:'Bebas Neue',sans-serif;">LV ${upg.grip||0}</span><div style="display:flex;gap:2px;">${upgDots(upg.grip||0)}</div>
+        <span>💨 NITRO</span><span style="color:var(--gold);min-width:2rem;text-align:right;font-family:'Bebas Neue',sans-serif;">LV ${upg.nitro||0}</span><div style="display:flex;gap:2px;">${upgDots(upg.nitro||0)}</div>
+      </div>
+    </div>`:''}
+    ${btnHtml}
+  `;
+
+  modal.classList.add('open');
+
+  // Render preview in large canvas
+  setTimeout(()=>{
+    const cv=document.getElementById('sdmCanvas');if(!cv)return;
+    const ctx=cv.getContext('2d');
+    ctx.clearRect(0,0,cv.width,cv.height);
+    try{ drawCar(ctx,cv.width/2,cv.height/2+8,car,Math.PI*1.5,3.0,false,false,false); }catch(e){}
+  },0);
+}
+
+function closeShopDetail(){
+  const modal=document.getElementById('shopDetailModal');
+  if(modal)modal.classList.remove('open');
 }
 
 // Shop button event
@@ -4742,32 +5350,419 @@ document.getElementById('btnGarage')?.addEventListener('click',()=>{openGarage()
 // ════════════════════════════════════════════════
 let garageThreeLoaded=false,garageScene=null,garageCam=null,garageRenderer=null,garageControls=null,garageMesh=null,garageAnimId=null;
 let garageSelCar=null;
-let garageActiveTab='TUNING';
+let garageActiveTab='LACK';
+
+// 2D-Preview: Zeigt Auto im #garage2DPreview-Canvas (INNERHALB #garageLoading).
+// KRITISCH: Zeichnet NICHT auf #garageCanvas → kein 2D-Kontext-Konflikt mit WebGL!
+// Der Spinner wird versteckt, die Canvas-Preview bleibt sichtbar bis 3D lädt.
+function showGarage2DFallback(carId){
+  const canvas=document.getElementById('garage2DPreview'); // <-- NEU: separater Canvas
+  const spinnerEl=document.getElementById('garageLoadSpinner');
+  const loadingEl=document.getElementById('garageLoading');
+  if(!canvas)return;
+  // #garageLoading (Overlay) einblenden — enthält den 2D-Preview-Canvas
+  // (könnte von vorheriger 3D-Session noch display:none sein)
+  if(loadingEl)loadingEl.style.display='flex';
+  // Spinner ausblenden — Auto-Preview ist ausreichend
+  if(spinnerEl)spinnerEl.style.display='none';
+
+  const car=CARS.find(c=>c.id===carId)||CARS[0];
+  const t=getTuning(carId)||{};
+  // Dimensionen vom übergeordneten #garageLoading-Overlay holen
+  const parent=canvas.parentElement;
+  const W=parent?parent.offsetWidth||700:700;
+  const H=parent?parent.offsetHeight||500:500;
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+
+  function draw2DGarage(){
+    ctx.clearRect(0,0,W,H);
+    const bodyColor=t.bodyHue!=null?`hsl(${t.bodyHue},${t.bodySat||70}%,${t.bodyLit||45}%)`:car.body;
+    const floorY=H*.60;
+
+    // ══════════════════════════════════════════════
+    // 1. WAND — sehr dunkel, fast schwarz
+    // ══════════════════════════════════════════════
+    const bgGrad=ctx.createLinearGradient(0,0,0,floorY);
+    bgGrad.addColorStop(0,'#0a0a0c');bgGrad.addColorStop(1,'#0f0f12');
+    ctx.fillStyle=bgGrad;ctx.fillRect(0,0,W,floorY);
+    // Mauerwerk-Fugen
+    ctx.strokeStyle='rgba(0,0,0,.55)';ctx.lineWidth=1.5;
+    const bH=Math.round(H*.082);
+    for(let y=bH;y<floorY;y+=bH){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=1;
+    for(let row=0;row<Math.ceil(floorY/bH);row++){
+      const off=(row%2)*W*.3;
+      for(let x=off;x<W;x+=W*.6){
+        ctx.beginPath();ctx.moveTo(x,row*bH);ctx.lineTo(x,Math.min((row+1)*bH,floorY));ctx.stroke();
+      }
+    }
+    // Schmutzflecken an der Wand
+    ctx.fillStyle='rgba(0,0,0,.2)';
+    ctx.fillRect(0,0,W*.08,floorY);ctx.fillRect(W*.92,0,W*.08,floorY);
+
+    // ══════════════════════════════════════════════
+    // 2. WANDMONTIERTE LEITUNGEN + KABEL
+    // ══════════════════════════════════════════════
+    ctx.strokeStyle='rgba(40,45,50,.9)';ctx.lineWidth=4;
+    ctx.beginPath();ctx.moveTo(0,H*.1);ctx.lineTo(W,H*.1);ctx.stroke();
+    ctx.lineWidth=2.5;ctx.strokeStyle='rgba(35,40,45,.9)';
+    ctx.beginPath();ctx.moveTo(0,H*.13);ctx.lineTo(W*.5,H*.13);ctx.stroke();
+    ctx.lineWidth=2;ctx.strokeStyle='rgba(50,40,35,.8)';
+    ctx.beginPath();ctx.moveTo(W*.5,H*.13);ctx.lineTo(W*.5,floorY*.6);ctx.stroke();
+    // Anschlussboxen
+    ctx.fillStyle='#1a1c20';
+    ctx.fillRect(W*.24,H*.09,W*.04,H*.025);
+    ctx.fillRect(W*.71,H*.09,W*.04,H*.025);
+
+    // ══════════════════════════════════════════════
+    // 3. WERKZEUGWAGEN LINKS (großer roter Snap-On-Stil)
+    // ══════════════════════════════════════════════
+    {
+      const tw=W*.1,th=H*.38,tx=W*.02,ty=floorY-th;
+      // Korpus dunkelrot
+      ctx.fillStyle='#1a0a08';ctx.fillRect(tx,ty,tw,th);
+      ctx.fillStyle='#220c0a';ctx.fillRect(tx+1,ty+1,tw-2,th-2);
+      // Obere Ablagefläche
+      ctx.fillStyle='#2a1008';ctx.fillRect(tx-2,ty-H*.025,tw+4,H*.025);
+      ctx.fillStyle='#331410';ctx.fillRect(tx-1,ty-H*.024,tw+2,4);
+      // Schubladen (7 Stück)
+      const dH=(th-H*.025)/7.5;
+      for(let d=0;d<7;d++){
+        const dy=ty+H*.005+d*(dH+2);
+        ctx.fillStyle=d%2===0?'#1e0c0a':'#180a08';
+        ctx.fillRect(tx+3,dy,tw-6,dH);
+        // Griff (Chrom)
+        ctx.fillStyle='#3a3540';
+        ctx.fillRect(tx+tw*.25,dy+dH*.35,tw*.5,dH*.28);
+        ctx.fillStyle='rgba(255,255,255,.08)';
+        ctx.fillRect(tx+tw*.25,dy+dH*.35,tw*.5,dH*.1);
+      }
+      // Räder
+      ctx.fillStyle='#0d0d0f';
+      [tx+tw*.2,tx+tw*.8].forEach(rx=>{
+        ctx.beginPath();ctx.arc(rx,floorY+3,5,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
+        ctx.beginPath();ctx.arc(rx,floorY+3,5,0,Math.PI*2);ctx.stroke();
+      });
+      // Highlight-Kante links
+      ctx.strokeStyle='rgba(255,80,50,.12)';ctx.lineWidth=1;
+      ctx.strokeRect(tx,ty,tw,th);
+    }
+
+    // ══════════════════════════════════════════════
+    // 4. LOCHBLECH-WAND (Pegboard) mit Werkzeug LINKS-MITTE
+    // ══════════════════════════════════════════════
+    {
+      const px=W*.14,py=H*.12,pw=W*.15,ph=floorY*.65;
+      // Pegboard (dunkelgrau gelocht)
+      ctx.fillStyle='#131318';ctx.fillRect(px,py,pw,ph);
+      // Lochmuster
+      ctx.fillStyle='rgba(0,0,0,.5)';
+      for(let lx=px+8;lx<px+pw-4;lx+=10){
+        for(let ly=py+8;ly<py+ph-4;ly+=10){
+          ctx.beginPath();ctx.arc(lx,ly,1.5,0,Math.PI*2);ctx.fill();
+        }
+      }
+      // Werkzeuge am Pegboard (Silhouetten)
+      ctx.fillStyle='rgba(80,82,90,.75)';
+      // Schraubenschlüssel (mehrere)
+      for(let i=0;i<3;i++){
+        const wx=px+pw*.18+i*(pw*.28),wy=py+ph*.12;
+        ctx.save();ctx.translate(wx,wy);ctx.rotate(Math.PI*.08+i*Math.PI*.05);
+        ctx.fillRect(-3,0,6,ph*.25); // Griff
+        ctx.beginPath();ctx.arc(0,0,8,0,Math.PI*2);ctx.fill(); // Kopf
+        ctx.beginPath();ctx.arc(0,ph*.25,5,0,Math.PI*2);ctx.fill();
+        ctx.restore();
+      }
+      // Hammer
+      ctx.save();ctx.translate(px+pw*.8,py+ph*.15);ctx.rotate(Math.PI*.1);
+      ctx.fillStyle='rgba(65,68,78,.8)';
+      ctx.fillRect(-4,0,8,ph*.22);
+      ctx.fillStyle='rgba(85,88,98,.8)';
+      ctx.fillRect(-10,-10,20,12);
+      ctx.restore();
+      // Schraubenzieher
+      for(let i=0;i<2;i++){
+        ctx.save();ctx.translate(px+pw*.55+i*pw*.2,py+ph*.05);
+        ctx.fillStyle='rgba(90,50,30,.8)';ctx.fillRect(-2,0,4,ph*.3);
+        ctx.fillStyle='rgba(70,75,85,.8)';ctx.fillRect(-2,ph*.3,4,ph*.08);
+        ctx.restore();
+      }
+      // Rahmen
+      ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
+      ctx.strokeRect(px,py,pw,ph);
+    }
+
+    // ══════════════════════════════════════════════
+    // 5. WERKBANK RECHTS-MITTE (hinter Auto, im Hintergrund)
+    // ══════════════════════════════════════════════
+    {
+      const bx=W*.66,by=floorY-H*.28,bw=W*.18,bh=H*.28;
+      // Beine
+      ctx.fillStyle='#151518';
+      ctx.fillRect(bx+4,by+H*.05,bw*.06,bh-H*.05);
+      ctx.fillRect(bx+bw-bw*.06-4,by+H*.05,bw*.06,bh-H*.05);
+      // Platte
+      ctx.fillStyle='#1c1c20';ctx.fillRect(bx,by,bw,H*.04);
+      ctx.fillStyle='#222228';ctx.fillRect(bx,by,bw,H*.015);
+      // Ablage unten
+      ctx.fillStyle='#181820';ctx.fillRect(bx+4,by+bh*.55,bw-8,H*.02);
+      // Werkzeug auf Werkbank (Teile, Schrauben etc.)
+      ctx.fillStyle='rgba(80,82,92,.6)';
+      ctx.fillRect(bx+bw*.05,by+H*.005,bw*.2,H*.015); // Teil 1
+      ctx.fillRect(bx+bw*.35,by+H*.003,bw*.12,H*.02);  // Teil 2
+      // Lampe über der Werkbank
+      ctx.fillStyle='#1a1a1e';
+      ctx.fillRect(bx+bw*.4,by-H*.15,bw*.06,H*.15); // Arm
+      ctx.fillRect(bx+bw*.25,by-H*.165,bw*.3,H*.02); // Kopf
+      ctx.fillStyle='rgba(255,240,180,.12)'; // Lichtkegel
+      ctx.beginPath();
+      ctx.moveTo(bx+bw*.4,by-H*.145);
+      ctx.lineTo(bx+bw*.1,by+H*.005);
+      ctx.lineTo(bx+bw*.7,by+H*.005);
+      ctx.closePath();ctx.fill();
+    }
+
+    // ══════════════════════════════════════════════
+    // 6. REIFENSTAPEL RECHTS
+    // ══════════════════════════════════════════════
+    {
+      const cx=W*.87,r=W*.042;
+      for(let i=3;i>=0;i--){
+        const ty=floorY-8-i*(r*.6);
+        ctx.fillStyle='#0d0d10';
+        ctx.beginPath();ctx.ellipse(cx,ty,r,r*.36,0,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#161618';
+        ctx.beginPath();ctx.ellipse(cx,ty,r*.55,r*.2,0,0,Math.PI*2);ctx.fill();
+        // Reifenprofil-Andeutung
+        ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
+        ctx.beginPath();ctx.ellipse(cx,ty,r*.85,r*.31,0,0,Math.PI*2);ctx.stroke();
+        ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.ellipse(cx,ty,r,r*.36,0,0,Math.PI*2);ctx.stroke();
+      }
+    }
+
+    // ══════════════════════════════════════════════
+    // 7. KOMPRESSOR RECHTS-AUSSEN
+    // ══════════════════════════════════════════════
+    {
+      const cx=W*.93,cy=floorY-H*.22,cw=W*.065,ch=H*.22;
+      // Behälter (zylindrisch, Draufsicht = Rechteck)
+      ctx.fillStyle='#141820';ctx.fillRect(cx,cy,cw,ch);
+      ctx.fillStyle='#1c2230';ctx.fillRect(cx+2,cy+2,cw-4,ch-4);
+      // Druckanzeige
+      ctx.beginPath();ctx.arc(cx+cw*.5,cy+ch*.25,cw*.22,0,Math.PI*2);
+      ctx.fillStyle='#0d0e14';ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;ctx.stroke();
+      // Räder
+      ctx.fillStyle='#0a0a0c';
+      [cx+cw*.2,cx+cw*.8].forEach(rx=>{
+        ctx.beginPath();ctx.arc(rx,floorY+4,4,0,Math.PI*2);ctx.fill();
+      });
+      // Druckluftschlauch
+      ctx.strokeStyle='rgba(20,35,55,.9)';ctx.lineWidth=4;ctx.lineCap='round';
+      ctx.beginPath();
+      ctx.moveTo(cx+cw*.5,cy+ch*.55);
+      ctx.bezierCurveTo(cx+cw*1.5,cy+ch*.4,cx+cw*2,cy+ch*.7,cx+cw*1.8,floorY-4);
+      ctx.stroke();
+      ctx.strokeStyle='rgba(255,255,255,.03)';ctx.lineWidth=1;
+      ctx.strokeRect(cx,cy,cw,ch);
+    }
+
+    // ══════════════════════════════════════════════
+    // 8. BETONBODEN — sehr dunkel
+    // ══════════════════════════════════════════════
+    const floorGrad=ctx.createLinearGradient(0,floorY,0,H);
+    floorGrad.addColorStop(0,'#1e1e22');floorGrad.addColorStop(.5,'#161618');floorGrad.addColorStop(1,'#0e0e10');
+    ctx.fillStyle=floorGrad;ctx.fillRect(0,floorY,W,H-floorY);
+    // Perspektivische Bodenfugen
+    ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=1.5;
+    for(let i=-7;i<=7;i++){
+      const bx=W*.5+i*(W*.088);
+      ctx.beginPath();ctx.moveTo(W*.5+(bx-W*.5)*.03,floorY);ctx.lineTo(bx,H);ctx.stroke();
+    }
+    for(let r=1;r<=4;r++){
+      const y2=floorY+(H-floorY)*(r/4);
+      ctx.beginPath();ctx.moveTo(0,y2);ctx.lineTo(W,y2);ctx.stroke();
+    }
+    // Ölflecken auf dem Boden
+    ctx.save();
+    [[W*.38,floorY+H*.07,W*.055,0.4],[W*.6,floorY+H*.12,W*.035,0.3]].forEach(([ox,oy,or2,oa])=>{
+      const oGrad=ctx.createRadialGradient(ox,oy,0,ox,oy,or2);
+      oGrad.addColorStop(0,`rgba(5,8,14,${oa})`);oGrad.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=oGrad;ctx.scale(1,0.35);ctx.beginPath();ctx.arc(ox,oy/0.35,or2,0,Math.PI*2);ctx.fill();ctx.setTransform(1,0,0,1,0,0);
+    });
+    ctx.restore();
+
+    // ══════════════════════════════════════════════
+    // 9. DECKEN-NEONRÖHREN (schwächer, industriell)
+    // ══════════════════════════════════════════════
+    for(const lx of [W*.35,W*.65]){
+      ctx.fillStyle='#202025';
+      ctx.fillRect(lx-W*.075,H*.025,W*.15,H*.02);
+      // Röhre
+      ctx.fillStyle='rgba(190,210,255,.7)';
+      ctx.fillRect(lx-W*.07,H*.027,W*.14,H*.007);
+      // Lichtkegel (sehr dezent)
+      const cone=ctx.createLinearGradient(lx,H*.045,lx,floorY*.9);
+      cone.addColorStop(0,'rgba(190,210,255,.05)');cone.addColorStop(1,'rgba(190,210,255,0)');
+      ctx.fillStyle=cone;
+      ctx.beginPath();ctx.moveTo(lx-W*.01,H*.045);ctx.lineTo(lx-W*.14,floorY*.9);ctx.lineTo(lx+W*.14,floorY*.9);ctx.lineTo(lx+W*.01,H*.045);ctx.closePath();ctx.fill();
+    }
+
+    // ══════════════════════════════════════════════
+    // 10. HEBEBÜHNE
+    // ══════════════════════════════════════════════
+    const liftW=W*.36,liftH2=H*.02,liftX=W*.5-liftW*.5,liftTop=floorY-1;
+    ctx.fillStyle='#1c1c22';ctx.fillRect(liftX,liftTop-liftH2,liftW,liftH2);
+    ctx.fillStyle='#353540';ctx.fillRect(liftX,liftTop-liftH2,liftW,2);
+    const sw=Math.round(W*.019);
+    for(let sx=liftX;sx<liftX+liftW;sx+=sw*2){
+      ctx.fillStyle='rgba(200,165,0,.45)';ctx.fillRect(sx,liftTop-liftH2+2,Math.min(sw,liftX+liftW-sx),liftH2-2);
+      ctx.fillStyle='rgba(10,10,12,.6)';ctx.fillRect(sx+sw,liftTop-liftH2+2,Math.min(sw,liftX+liftW-(sx+sw)),liftH2-2);
+    }
+    // Hebebühnen-Säulen (senkrecht)
+    ctx.fillStyle='#202028';
+    ctx.fillRect(liftX+liftW*.13,liftTop,liftW*.07,H*.06);
+    ctx.fillRect(liftX+liftW*.8,liftTop,liftW*.07,H*.06);
+    // Hydraulik-Kolben (Andeutung)
+    ctx.fillStyle='#2a2a32';
+    ctx.fillRect(liftX+liftW*.18,liftTop+H*.02,liftW*.03,H*.03);
+    ctx.fillRect(liftX+liftW*.79,liftTop+H*.02,liftW*.03,H*.03);
+
+    // ══════════════════════════════════════════════
+    // 11. AUTO (von oben)
+    // ══════════════════════════════════════════════
+    ctx.save();
+    ctx.translate(W*.5,liftTop-liftH2-5);
+    const sc=Math.min(W,H)/210;
+    ctx.scale(sc,sc*0.84);
+    drawCar(ctx,0,0,{...car,body:bodyColor},Math.PI*1.5,5,false,false,false);
+    ctx.restore();
+    // Reflexion auf Plattform
+    ctx.save();
+    ctx.translate(W*.5,liftTop-liftH2-5);
+    ctx.scale(1,-0.09);ctx.globalAlpha=0.08;
+    const sc2=Math.min(W,H)/210;
+    ctx.scale(sc2,sc2*0.84);
+    drawCar(ctx,0,0,{...car,body:bodyColor},Math.PI*1.5,5,false,false,false);
+    ctx.restore();
+
+    // Auto-Name (sehr dezent)
+    ctx.save();
+    ctx.font=`900 ${Math.round(W*.038)}px 'Bebas Neue',sans-serif`;
+    ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,.03)';
+    ctx.fillText((car.brand+' '+car.name).toUpperCase(),W*.5,floorY-H*.045);
+    ctx.restore();
+  }
+
+  draw2DGarage();
+  // draw2DGarage als Referenz speichern — für Farb/Tab-Wechsel im 2D-Modus
+  canvas._redraw=draw2DGarage;
+}
+
+// ════════════════════════════════════════════════
+// CAR SWITCHER — Horizontale Leiste eigener Autos
+// ════════════════════════════════════════════════
+
+function buildGarageCarSwitcher(){
+  const el=document.getElementById('garageSwitcher');if(!el)return;
+  const owned=saveData.ownedCars||['bmw2002t'];
+  // Nur anzeigen wenn mehrere Autos vorhanden
+  if(owned.length<=1){el.style.display='none';return;}
+  el.style.display='flex';
+  el.innerHTML=owned.map(id=>{
+    const car=CARS.find(c=>c.id===id)||CARS[0];
+    const t=getTuning(id)||{};
+    const isSel=id===garageSelCar;
+    return `<button onclick="switchGarageSelCar('${id}')" title="${car.brand} ${car.name}"
+      style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:.22rem;padding:.28rem .35rem;border-radius:5px;cursor:pointer;border:1.5px solid ${isSel?'var(--gold)':'rgba(255,255,255,.08)'};background:${isSel?'rgba(212,160,23,.1)':'rgba(255,255,255,.03)'};transition:all .12s;min-width:68px;max-width:80px;">
+      <canvas id="gsc_${id}" width="64" height="34" style="display:block;border-radius:3px;background:#0a0a14;"></canvas>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:.48rem;letter-spacing:.1em;color:${isSel?'var(--gold)':'rgba(255,255,255,.4)'};text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${car.name}</div>
+    </button>`;
+  }).join('');
+  // Mini-Canvases nach DOM-Insert zeichnen
+  requestAnimationFrame(()=>{
+    owned.forEach(id=>{
+      const car=CARS.find(c=>c.id===id)||CARS[0];
+      const t=getTuning(id)||{};
+      const bodyColor=t.bodyHue!=null?`hsl(${t.bodyHue},${t.bodySat||70}%,${t.bodyLit||45}%)`:car.body;
+      const cv=document.getElementById('gsc_'+id);if(!cv)return;
+      const ctx2=cv.getContext('2d');
+      // Mini-Garage-Hintergrund (Beton)
+      ctx2.fillStyle='#1e1e22';ctx2.fillRect(0,0,64,34);
+      // Boden (untere Hälfte heller grau)
+      ctx2.fillStyle='#2c2c30';ctx2.fillRect(0,22,64,12);
+      // Mini-Hebebühne
+      ctx2.fillStyle='#303038';ctx2.fillRect(10,20,44,3);
+      ctx2.fillStyle='rgba(220,185,0,.5)';
+      for(let sx=10;sx<54;sx+=6){ctx2.fillRect(sx,20,3,3);}
+      // Auto von oben
+      ctx2.save();ctx2.translate(32,18);ctx2.scale(1.15,1.15);
+      drawCar(ctx2,0,0,{...car,body:bodyColor},Math.PI*1.5,1.3,false,false,false);
+      ctx2.restore();
+    });
+  });
+}
+
+// Aktives Auto im Garage-Viewer und Spielstand wechseln
+function switchGarageSelCar(carId){
+  if(!isCarOwned(carId)){showToast('Auto nicht besessen','error');return;}
+  garageSelCar=carId;
+  saveData.selCar=carId;
+  save();
+  hapTap();
+  buildGarageCarInfo();
+  buildGarageCarSwitcher(); // Highlight aktualisieren
+  buildGarageTabContent();
+  updateGarageCar(carId);
+  showToast('🏎️  '+( CARS.find(c=>c.id===carId)?.name||carId),'success');
+}
 
 function openGarage(){
   garageSelCar=saveData.selCar||'bmw2002t';
+  garageActiveTab='LACK'; // immer auf Lack zurücksetzen
+  // ── Alte 3D-Szene immer zerstören → initGarageScene läuft jedes Mal neu ──
+  // (Ohne Reset würde die gecachte Szene alle Änderungen an initGarageScene ignorieren)
+  if(garageAnimId){cancelAnimationFrame(garageAnimId);garageAnimId=null;}
+  if(garageMesh&&garageScene){garageScene.remove(garageMesh);garageMesh=null;}
+  if(garageRenderer){garageRenderer.dispose();garageRenderer=null;}
+  if(garageControls){garageControls.dispose();garageControls=null;}
+  garageScene=null;garageCam=null;
   showScreen('sGarage');
+  // Kategorie-Buttons zurücksetzen
+  document.querySelectorAll('.gCatBtn').forEach(b=>b.classList.toggle('active',b.dataset.cat==='LACK'));
   buildGarageCarInfo();
+  buildGarageCarSwitcher(); // Car Switcher aufbauen
   buildGarageTabContent();
   // Floating-Anzeige initial setzen
   const balF=document.getElementById('garageBalanceFloat');
   if(balF)balF.textContent=saveData.money.toLocaleString('de')+' €';
-  if(!garageThreeLoaded){
-    function loadS(url,cb){const s=document.createElement('script');s.src=url;s.onload=cb;s.onerror=()=>console.warn('Failed to load',url);document.head.appendChild(s);}
-    // Three.js r134 — last version with legacy examples/js/ (non-module) files
-    loadS('https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js',()=>{
-      loadS('https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js',()=>{
-        // GLTFLoader für echte 3D-Modelle (.glb-Dateien)
-        loadS('https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/loaders/GLTFLoader.js',()=>{
-          garageThreeLoaded=true;
-          initGarageScene();
-          updateGarageCar(garageSelCar);
-        });
-      });
-    });
-  } else {
-    document.getElementById('garageLoading').style.display='none';
+  // Wenn Three.js bereits geladen: direkt 3D zeigen, kein 2D-Preview nötig.
+  // Sonst: 2D-Preview im #garage2DPreview-Canvas (NICHT #garageCanvas) zeigen.
+  // #garageCanvas bleibt immer unberührt von 2D → WebGL kann problemlos drauf rendern.
+  function _upgrade3D(){
+    garageThreeLoaded=true;
+    // Spinner kurz zeigen (initGarageScene versteckt #garageLoading selbst)
+    const spinner=document.getElementById('garageLoadSpinner');
+    if(spinner)spinner.style.display='flex';
+    initGarageScene(); // erstellt WebGL-Kontext auf #garageCanvas, versteckt #garageLoading
     updateGarageCar(garageSelCar);
+  }
+  if(window._threeReady){
+    // Three.js bereits geladen → sofort 3D, kein 2D-Preview
+    _upgrade3D();
+  } else {
+    // Three.js lädt noch → 2D-Preview als Platzhalter
+    showGarage2DFallback(garageSelCar);
+    let _garageAttempts=0;
+    function _tryUpgradeTo3D(){
+      if(window._threeReady){_upgrade3D();}
+      else if(_garageAttempts++<40){setTimeout(_tryUpgradeTo3D,200);}
+      else{console.warn('[NE] Three.js nicht verfügbar — 2D-Garage bleibt aktiv');}
+    }
+    _tryUpgradeTo3D();
   }
 }
 
@@ -4786,40 +5781,87 @@ function openGarage(){
 //
 // Per-Kategorie-Fallbacks (vor prozedural): wenn kein spezifisches Modell,
 // versucht der Loader CAR_GLB_CATEGORY_URLS[car.cat] als zweite Wahl.
+// Echte GLB-Modelle — liegen in assets/models/cars/{id}/{id}.glb
+const _GLB_BASE='assets/models/cars/';
+const _glbPath=id=>`${_GLB_BASE}${id}/${id}.glb`;
 const CAR_GLB_URLS={
-  // Hier eigene Modelle eintragen, z.B.:
-  // 'bmw2002t': 'assets/cars/bmw2002t.glb',
-  // 'p911': 'assets/cars/porsche_911.glb',
+  'bmw2002t':   _glbPath('bmw2002t'),
+  'bmw3csl':    _glbPath('bmw3csl'),
+  'bmwm3e30':   _glbPath('bmwm3e30'),
+  'bmw_m1':     _glbPath('bmw_m1'),
+  'bmw_635csi': _glbPath('bmw_635csi'),
+  'vw_golf_gti':_glbPath('vw_golf_gti'),
+  'p911_rs':    _glbPath('p911_rs'),
+  'p930':       _glbPath('p930'),
+  'p935':       _glbPath('p935'),
+  'p959':       _glbPath('p959'),
+  'audi_s1':    _glbPath('audi_s1'),
+  'mercedes_sl':_glbPath('mercedes_sl'),
+  'lancia_stratos':_glbPath('lancia_stratos'),
+  'lancia_037': _glbPath('lancia_037'),
+  'lancia_delta':_glbPath('lancia_delta'),
+  'lancia_fulvia':_glbPath('lancia_fulvia'),
+  'ford_rs200': _glbPath('ford_rs200'),
+  'escort_coss':_glbPath('escort_coss'),
+  'ferrari_288gto':_glbPath('ferrari_288gto'),
+  'ferrari_f40':_glbPath('ferrari_f40'),
+  'lambo_countach':_glbPath('lambo_countach'),
+  'lambo_diablo':_glbPath('lambo_diablo'),
+  'de_tomaso':  _glbPath('de_tomaso'),
+  'alfa_155':   _glbPath('alfa_155'),
+  'alpine_a110':_glbPath('alpine_a110'),
+  'aston_db5':  _glbPath('aston_db5'),
+  'camaro_z28': _glbPath('camaro_z28'),
+  'charger_dom':_glbPath('charger_dom'),
+  'charger_rt': _glbPath('charger_rt'),
+  'corvette_c2':_glbPath('corvette_c2'),
+  'mustang_gt350':_glbPath('mustang_gt350'),
+  'shelby_cobra':_glbPath('shelby_cobra'),
+  'honda_nsx':  _glbPath('honda_nsx'),
+  'toyota_2000gt':_glbPath('toyota_2000gt'),
+  'supra_a70':  _glbPath('supra_a70'),
+  'rx7_fc':     _glbPath('rx7_fc'),
+  'nissan_240z':_glbPath('nissan_240z'),
+  'skyline_r32':_glbPath('skyline_r32'),
+  'mazda_787b': _glbPath('mazda_787b'),
+  'celica_imsa':_glbPath('celica_imsa'),
+  'peugeot_205t16':_glbPath('peugeot_205t16'),
+  'r5_turbo':   _glbPath('r5_turbo'),
+  'subaru_impreza':_glbPath('subaru_impreza'),
+  'mini_cooper':_glbPath('mini_cooper'),
+  'jaguar_etype':_glbPath('jaguar_etype'),
+  'lotus_esprit':_glbPath('lotus_esprit'),
+  'saab_99t':   _glbPath('saab_99t'),
+  'volvo_240t': _glbPath('volvo_240t'),
 };
-const CAR_GLB_CATEGORY_URLS={
-  // Kategorie-Templates: 1 GLB für alle Autos einer Kategorie (Fallback)
-  // 'Classic Sports': 'assets/cars/_template_classic_sports.glb',
-  // 'Supercars': 'assets/cars/_template_supercar.glb',
-};
+const CAR_GLB_CATEGORY_URLS={};
 
 // Cache für bereits geladene GLBs (vermeidet Re-Download)
 const _glbCache={};
 
 function loadCarGLB(car,onLoad,onFail){
-  if(typeof THREE==='undefined'||!THREE.GLTFLoader){onFail&&onFail('No GLTFLoader');return;}
-  const url=CAR_GLB_URLS[car.id]||CAR_GLB_CATEGORY_URLS[car.cat]||null;
-  if(!url){onFail&&onFail('No URL');return;}
-  // Cache-Hit: direkt aus Speicher
+  if(typeof THREE==='undefined'||!THREE.GLTFLoader){
+    console.warn('[GLB] Three.js / GLTFLoader noch nicht bereit');
+    onFail&&onFail('No GLTFLoader');return;
+  }
+  // A.4: modelPath kommt aus cars.js (car.modelPath)
+  const url=car.modelPath||CAR_GLB_URLS[car.id]||null;
+  if(!url){onFail&&onFail('No modelPath for '+car.id);return;}
+
+  // Cache-Hit
   if(_glbCache[url]){
-    // Deep clone der Szene (Materials werden geteilt — Vorsicht beim Färben)
     onLoad(_glbCache[url].clone(true));
     return;
   }
-  // Laden
   const loader=new THREE.GLTFLoader();
   loader.load(url,
     (gltf)=>{
       _glbCache[url]=gltf.scene;
       onLoad(gltf.scene.clone(true));
     },
-    null, // onProgress
+    null,
     (err)=>{
-      console.warn('[GLB] Failed to load '+url+':',err);
+      console.error('[GLB] ❌ Fehler beim Laden von "'+url+'":', err&&err.message||err);
       onFail&&onFail(err);
     }
   );
@@ -4846,89 +5888,264 @@ function tintGLBModel(model,bodyHexColor){
 
 function initGarageScene(){
   if(!window.THREE)return;
-  const THREE=window.THREE;
+  const T=window.THREE;
   const canvas=document.getElementById('garageCanvas');
-  garageRenderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
+  const W=canvas.offsetWidth||800,H=canvas.offsetHeight||600;
+  garageRenderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});
   garageRenderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-  garageRenderer.setSize(canvas.offsetWidth||800,canvas.offsetHeight||600);
+  garageRenderer.setSize(W,H);
   garageRenderer.shadowMap.enabled=true;
-  garageRenderer.shadowMap.type=THREE.PCFSoftShadowMap;
-  garageRenderer.toneMapping=THREE.ACESFilmicToneMapping;
-  garageRenderer.toneMappingExposure=1.15;
+  garageRenderer.shadowMap.type=T.PCFSoftShadowMap;
+  garageRenderer.toneMapping=T.ACESFilmicToneMapping;
+  garageRenderer.toneMappingExposure=0.95;
 
-  garageScene=new THREE.Scene();
-  garageScene.background=new THREE.Color(0x070710);
-  garageScene.fog=new THREE.Fog(0x070710,25,70);
+  garageScene=new T.Scene();
+  garageScene.background=new T.Color(0x100c08);
+  garageScene.fog=new T.Fog(0x0c0905,16,38);
 
-  garageCam=new THREE.PerspectiveCamera(45,(canvas.offsetWidth||800)/(canvas.offsetHeight||600),0.1,100);
-  garageCam.position.set(5,3,8);
+  garageCam=new T.PerspectiveCamera(52,W/H,0.1,100);
+  garageCam.position.set(0,3.2,9);
 
-  const OC=THREE.OrbitControls||window.OrbitControls;
+  const OC=T.OrbitControls||window.OrbitControls;
   if(OC){
     garageControls=new OC(garageCam,canvas);
-    garageControls.enableDamping=true;garageControls.dampingFactor=0.05;
-    garageControls.minDistance=3;garageControls.maxDistance=20;
+    garageControls.enableDamping=true;garageControls.dampingFactor=0.06;
+    garageControls.minDistance=3;garageControls.maxDistance=16;
     garageControls.maxPolarAngle=Math.PI/1.9;
-    garageControls.target.set(0,.72,0);
-    // Auto-Rotate für Premium-Showroom-Feeling (User kann jederzeit per Drag übernehmen)
+    garageControls.target.set(0,1,0);
     garageControls.autoRotate=true;
-    garageControls.autoRotateSpeed=0.6; // langsam: ca. 18s pro Umdrehung
+    garageControls.autoRotateSpeed=0.4;
   }
 
-  // ── PREMIUM Lighting Setup ──
-  garageScene.add(new THREE.AmbientLight(0x2a2a3e,1.6));
-  // Haupt-Spotlight von oben (Showroom-Optik)
-  const spot=new THREE.SpotLight(0xfff0d8,180,35,Math.PI/5,0.45,2);
-  spot.position.set(0,12,3);spot.castShadow=true;
+  // ── HELPER: schnelles Mesh ──
+  function mk(geo,mat,x,y,z,rx,ry){
+    const m=new T.Mesh(geo,mat);
+    m.position.set(x||0,y||0,z||0);
+    if(rx)m.rotation.x=rx;if(ry)m.rotation.y=ry;
+    m.castShadow=true;m.receiveShadow=true;
+    garageScene.add(m);return m;
+  }
+
+  // ── TEXTUREN (Canvas-basiert) ──
+  // Backstein-Wand
+  const bC=document.createElement('canvas');bC.width=512;bC.height=256;
+  const bc=bC.getContext('2d');
+  bc.fillStyle='#4a1e0e';bc.fillRect(0,0,512,256);
+  const bw=64,bh=26;
+  for(let row=0;row<12;row++){for(let col=0;col<9;col++){
+    const ox=row%2?bw/2:0;
+    const r=90+Math.random()*50,g=28+Math.random()*22,b=10+Math.random()*14;
+    bc.fillStyle=`rgb(${r},${g},${b})`;
+    bc.fillRect(col*bw+ox+1,row*bh+1,bw-2,bh-2);
+  }}
+  bc.strokeStyle='rgba(0,0,0,.55)';bc.lineWidth=1.5;
+  for(let row=0;row<12;row++){for(let col=0;col<9;col++){
+    const ox=row%2?bw/2:0;
+    bc.strokeRect(col*bw+ox+1,row*bh+1,bw-2,bh-2);
+  }}
+  const brickTex=new T.CanvasTexture(bC);
+  brickTex.wrapS=brickTex.wrapT=T.RepeatWrapping;brickTex.repeat.set(3.5,2.5);
+  // Betonboden
+  const flC=document.createElement('canvas');flC.width=flC.height=512;
+  const flc=flC.getContext('2d');
+  flc.fillStyle='#1e1c18';flc.fillRect(0,0,512,512);
+  flc.strokeStyle='rgba(0,0,0,.6)';flc.lineWidth=2;
+  for(let i=0;i<=512;i+=128){flc.beginPath();flc.moveTo(i,0);flc.lineTo(i,512);flc.stroke();flc.beginPath();flc.moveTo(0,i);flc.lineTo(512,i);flc.stroke();}
+  for(let i=0;i<5;i++){const grd=flc.createRadialGradient(80+i*90,80+i*60,0,80+i*90,80+i*60,60+i*20);grd.addColorStop(0,'rgba(0,0,0,.4)');grd.addColorStop(1,'rgba(0,0,0,0)');flc.fillStyle=grd;flc.fillRect(0,0,512,512);}
+  for(let i=0;i<700;i++){flc.fillStyle='rgba(255,255,255,.01)';flc.fillRect(Math.random()*512,Math.random()*512,1,1);}
+  const flTex=new T.CanvasTexture(flC);flTex.wrapS=flTex.wrapT=T.RepeatWrapping;flTex.repeat.set(8,8);
+  // Warnsstreifen
+  const stC=document.createElement('canvas');stC.width=256;stC.height=16;
+  const stc=stC.getContext('2d');
+  for(let i=0;i<256;i+=32){stc.fillStyle='#e8b800';stc.fillRect(i,0,16,16);stc.fillStyle='#1a1a1a';stc.fillRect(i+16,0,16,16);}
+  const stTex=new T.CanvasTexture(stC);stTex.wrapS=T.RepeatWrapping;stTex.repeat.set(4,1);
+
+  // ── MATERIALIEN ──
+  const brickMat =new T.MeshStandardMaterial({map:brickTex,roughness:0.93,metalness:0.01});
+  const floorMat =new T.MeshStandardMaterial({map:flTex,roughness:0.88,metalness:0.04,color:0x1c1a16});
+  const ceilMat  =new T.MeshStandardMaterial({color:0x1a1510,roughness:0.9,metalness:0.1});
+  const beamMat  =new T.MeshStandardMaterial({color:0x28221a,roughness:0.75,metalness:0.55});
+  const metalMat =new T.MeshStandardMaterial({color:0x404048,roughness:0.55,metalness:0.82});
+  const darkMetal=new T.MeshStandardMaterial({color:0x1e1e1e,roughness:0.7,metalness:0.7});
+  const redMat   =new T.MeshStandardMaterial({color:0xcc1818,roughness:0.38,metalness:0.3});
+  const woodMat  =new T.MeshStandardMaterial({color:0x3c2810,roughness:0.92,metalness:0});
+  const yellowMat=new T.MeshStandardMaterial({color:0xe8b800,roughness:0.5,metalness:0.2});
+  const greenMat =new T.MeshStandardMaterial({color:0x1f5c1f,roughness:0.5,metalness:0.45});
+  const blueMat  =new T.MeshStandardMaterial({color:0x1a3a8a,roughness:0.5,metalness:0.45});
+  const liftMat  =new T.MeshStandardMaterial({color:0x303038,metalness:0.68,roughness:0.52});
+  const stripeMat=new T.MeshStandardMaterial({map:stTex,roughness:0.8,metalness:0.1});
+  const tubeLightMat=new T.MeshStandardMaterial({color:0xf0f8ff,emissive:0xd8edff,emissiveIntensity:3,roughness:0.2,metalness:0});
+
+  // ══ BELEUCHTUNG ══
+  garageScene.add(new T.AmbientLight(0x6a5040,1.4));
+  // Fluoreszent-Licht (4 Röhren)
+  [[-4,-3],[4,-3],[-4,2],[4,2]].forEach(([x,z])=>{
+    const pl=new T.PointLight(0xcce8ff,28,14,2);pl.position.set(x,7.6,z);garageScene.add(pl);
+  });
+  // Haupt-Spot auf das Auto
+  const spot=new T.SpotLight(0xfff2e0,90,22,Math.PI/5.5,0.38,1.6);
+  spot.position.set(0,8,1);spot.castShadow=true;
   spot.shadow.mapSize.width=spot.shadow.mapSize.height=2048;
-  spot.shadow.bias=-0.0008;
-  garageScene.add(spot,spot.target);
-  // Akzent-Licht blau (links)
-  const spotB=new THREE.SpotLight(0x4080ff,90,28,Math.PI/4.5,0.55,2);
-  spotB.position.set(-8,7,-4);garageScene.add(spotB);
-  // Akzent-Licht warm-rot (rechts)
-  const spotC=new THREE.SpotLight(0xff4020,75,28,Math.PI/4.5,0.55,2);
-  spotC.position.set(8,7,-4);garageScene.add(spotC);
-  // Rim Light hinten (Highlight-Kante an Karosserie)
-  const rim=new THREE.SpotLight(0xffd070,60,22,Math.PI/5,0.6,2);
-  rim.position.set(0,5,-9);rim.target.position.set(0,1,0);
-  garageScene.add(rim,rim.target);
-  // Fill-Licht von vorne
-  const fill=new THREE.DirectionalLight(0xaaccff,0.65);fill.position.set(0,4,8);garageScene.add(fill);
+  spot.shadow.bias=-0.001;
+  spot.target.position.set(0,0,0);garageScene.add(spot,spot.target);
+  // Warmes Seitenlicht (links)
+  const sideL=new T.DirectionalLight(0xffe0a0,0.5);sideL.position.set(-8,4,3);garageScene.add(sideL);
+  // Schwaches Gegenlicht
+  const back=new T.DirectionalLight(0x304060,0.25);back.position.set(0,2,-8);garageScene.add(back);
 
-  // ── PREMIUM Boden: Showroom-Polish-Pattern ──
-  const fCanvas=document.createElement('canvas');fCanvas.width=fCanvas.height=1024;
-  const fc=fCanvas.getContext('2d');
-  // Dunkler Hintergrund
-  fc.fillStyle='#0a0a14';fc.fillRect(0,0,1024,1024);
-  // Diagonale Streifen-Subtle
-  fc.strokeStyle='rgba(255,255,255,0.025)';fc.lineWidth=1.5;
-  for(let i=-1024;i<2048;i+=80){fc.beginPath();fc.moveTo(i,0);fc.lineTo(i+1024,1024);fc.stroke();}
-  // Helleres Zentrum-Glow
-  const grad=fc.createRadialGradient(512,512,80,512,512,500);
-  grad.addColorStop(0,'rgba(212,160,23,0.18)');grad.addColorStop(.6,'rgba(60,40,20,0.05)');grad.addColorStop(1,'rgba(0,0,0,0)');
-  fc.fillStyle=grad;fc.fillRect(0,0,1024,1024);
-  const fTex=new THREE.CanvasTexture(fCanvas);
-  fTex.wrapS=fTex.wrapT=THREE.ClampToEdgeWrapping;
-  const floor=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.MeshStandardMaterial({map:fTex,roughness:0.18,metalness:0.7}));
-  floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;garageScene.add(floor);
+  // ══ BODEN ══
+  mk(new T.PlaneGeometry(40,40),floorMat,0,0,0,-Math.PI/2);
 
-  // ── ROTATING TURNTABLE (kreisförmiger Sockel unter dem Auto) ──
-  const turntableGeom=new THREE.CylinderGeometry(2.6,2.7,0.08,64);
-  const turntableMat=new THREE.MeshStandardMaterial({color:0x1a1a26,metalness:0.92,roughness:0.18,emissive:0x0a0814,emissiveIntensity:0.4});
-  const turntable=new THREE.Mesh(turntableGeom,turntableMat);
-  turntable.position.y=-0.04;turntable.receiveShadow=true;garageScene.add(turntable);
-  // Goldenen Rand am Sockel
-  const ringGeom=new THREE.TorusGeometry(2.65,0.04,12,128);
-  const ringMat=new THREE.MeshStandardMaterial({color:0xd4a017,metalness:0.95,roughness:0.12,emissive:0x4a3008,emissiveIntensity:0.6});
-  const ring=new THREE.Mesh(ringGeom,ringMat);
-  ring.rotation.x=Math.PI/2;ring.position.y=0.01;garageScene.add(ring);
-  // Subtle Boden-Glow (radiales Light unten)
-  const glowGeom=new THREE.CircleGeometry(3.2,64);
-  const glowMat=new THREE.MeshBasicMaterial({color:0xd4a017,transparent:true,opacity:0.07,blending:THREE.AdditiveBlending,depthWrite:false});
-  const glow=new THREE.Mesh(glowGeom,glowMat);
-  glow.rotation.x=-Math.PI/2;glow.position.y=0.005;garageScene.add(glow);
+  // ══ WÄNDE (Backstein) ══
+  // Rückwand
+  mk(new T.BoxGeometry(20,9,0.25),brickMat,0,4.5,-8.1);
+  // Linke Wand
+  mk(new T.BoxGeometry(0.25,9,18),brickMat,-9,4.5,0);
+  // Rechte Wand
+  mk(new T.BoxGeometry(0.25,9,18),brickMat,9,4.5,0);
 
+  // ══ DECKE ══
+  mk(new T.PlaneGeometry(20,20),ceilMat,0,8.8,0,Math.PI/2);
+  // Stahlträger (quer)
+  [-5,-1,3,7].forEach(z=>mk(new T.BoxGeometry(18.5,0.35,0.28),beamMat,0,8.2,z));
+  // Längsträger
+  [-7,0,7].forEach(x=>mk(new T.BoxGeometry(0.22,0.3,18),beamMat,x,8.05,0));
+
+  // ══ NEONRÖHREN (Geometrie + Licht) ══
+  const fixMat=new T.MeshStandardMaterial({color:0x555555,roughness:0.6,metalness:0.7});
+  [[-4,-3],[4,-3],[-4,2],[4,2]].forEach(([x,z])=>{
+    mk(new T.BoxGeometry(0.14,0.06,2.1),fixMat,x,8.35,z);       // Halterung
+    mk(new T.BoxGeometry(0.04,0.04,1.95),tubeLightMat,x,8.3,z); // leuchtende Röhre
+  });
+
+  // ══ HEBEBÜHNE ══
+  mk(new T.BoxGeometry(5.2,0.08,2.8),liftMat,0,0.04,0);
+  mk(new T.BoxGeometry(5.2,0.082,0.14),stripeMat,0,0.04,1.4);   // vorn Streifen
+  mk(new T.BoxGeometry(5.2,0.082,0.14),stripeMat,0,0.04,-1.4);  // hinten
+  mk(new T.BoxGeometry(5.2,0.07,0.06),metalMat,0,0.08,1.44);    // Stahlkante
+  mk(new T.BoxGeometry(5.2,0.07,0.06),metalMat,0,0.08,-1.44);
+  // Hydrauliksäulen
+  [-1.8,1.8].forEach(x=>mk(new T.CylinderGeometry(0.09,0.11,0.85,12),metalMat,x,-0.42,0));
+
+  // ══ ROTER WERKZEUGWAGEN (links) ══
+  const cbX=-7,cbZ=-4.5;
+  mk(new T.BoxGeometry(1.45,1.65,0.68),redMat,cbX,0.825,cbZ);             // Korpus
+  mk(new T.BoxGeometry(1.48,0.06,0.72),metalMat,cbX,1.65,cbZ);            // Abdeckplatte
+  for(let i=0;i<7;i++){                                                     // Schubladen
+    mk(new T.BoxGeometry(1.34,0.195,0.02),new T.MeshStandardMaterial({color:0xdd1a1a,roughness:0.35,metalness:0.35}),cbX,0.14+i*0.225,cbZ-0.32);
+    mk(new T.BoxGeometry(0.55,0.034,0.04),new T.MeshStandardMaterial({color:0xc8c8c8,roughness:0.2,metalness:0.9}),cbX,0.14+i*0.225,cbZ-0.345);
+  }
+  // Räder
+  [[-0.55,0.55],[-0.55,-0.55],[0.55,0.55],[0.55,-0.55]].forEach(([ox,oz])=>{
+    mk(new T.CylinderGeometry(0.065,0.065,0.07,10),darkMetal,cbX+ox,-0.035,cbZ+oz*0.42,0,0,Math.PI/2);
+  });
+  // Werkzeuge auf der Abdeckplatte (Silhouetten)
+  mk(new T.BoxGeometry(0.06,0.32,0.04),metalMat,cbX-0.4,1.82,cbZ-0.1);
+  mk(new T.BoxGeometry(0.06,0.28,0.04),metalMat,cbX-0.25,1.80,cbZ-0.1);
+  mk(new T.BoxGeometry(0.55,0.06,0.08),metalMat,cbX+0.15,1.68,cbZ-0.1);
+
+  // ══ WERKBANK (links hinten) ══
+  const wbX=-7,wbZ=-7.2;
+  mk(new T.BoxGeometry(3.8,0.1,0.95),woodMat,wbX,1.05,wbZ);              // Tischplatte
+  mk(new T.BoxGeometry(3.8,0.06,0.9),new T.MeshStandardMaterial({color:0x2e2410,roughness:0.9}),wbX,0.34,wbZ); // Unterschale
+  [[-1.75,0.4],[-1.75,-0.4],[1.75,0.4],[1.75,-0.4]].forEach(([ox,oz])=>{
+    mk(new T.BoxGeometry(0.08,1.05,0.08),metalMat,wbX+ox,0.525,wbZ+oz);
+  });
+  // Teile auf der Werkbank
+  mk(new T.BoxGeometry(0.28,0.18,0.18),new T.MeshStandardMaterial({color:0x3a5a8a,roughness:0.6}),wbX-1.1,1.15,wbZ-0.1);
+  mk(new T.BoxGeometry(0.22,0.24,0.16),new T.MeshStandardMaterial({color:0x8a3a22,roughness:0.6}),wbX-0.5,1.17,wbZ-0.1);
+  mk(new T.BoxGeometry(0.35,0.12,0.2),new T.MeshStandardMaterial({color:0x4a6a2a,roughness:0.6}),wbX+0.3,1.11,wbZ-0.1);
+  mk(new T.CylinderGeometry(0.06,0.05,0.22,10),new T.MeshStandardMaterial({color:0x888888,roughness:0.4,metalness:0.8}),wbX+1.2,1.17,wbZ-0.1);
+  // Wandlampe über Werkbank
+  mk(new T.BoxGeometry(0.08,0.06,0.45),metalMat,wbX,1.5,wbZ-0.44);
+  mk(new T.CylinderGeometry(0.1,0.12,0.08,16),new T.MeshStandardMaterial({color:0xf0f0c0,emissive:0xffff80,emissiveIntensity:1.5}),wbX,1.46,wbZ-0.65);
+  const wbLight=new T.PointLight(0xffee88,8,3,2);wbLight.position.set(wbX,1.4,wbZ-0.65);garageScene.add(wbLight);
+
+  // ══ LOCHBLECH-WAND über Werkbank ══
+  const pegMat=new T.MeshStandardMaterial({color:0x2a2a2a,roughness:0.7,metalness:0.6});
+  mk(new T.BoxGeometry(3.6,1.8,0.04),pegMat,wbX,2.2,wbZ-0.46);
+  // Hakensilhouetten (Schraubenschlüssel, Hämmer usw.)
+  [[-1.4,0.3],[-0.8,0.5],[-0.2,0.2],[0.5,0.4],[1.1,0.1],[1.5,0.5]].forEach(([ox,oy])=>{
+    mk(new T.BoxGeometry(0.06,0.35,0.04),metalMat,wbX+ox,2.2+oy,wbZ-0.44);
+  });
+  mk(new T.BoxGeometry(0.5,0.08,0.04),metalMat,wbX-1.1,2.55,wbZ-0.44);   // großer Schlüssel
+  mk(new T.BoxGeometry(0.08,0.45,0.04),new T.MeshStandardMaterial({color:0x8a2a0a,roughness:0.5}),wbX+0.2,2.45,wbZ-0.44); // Hammer
+
+  // ══ METALL-REGAL (rechts hinten) ══
+  const shX=7.5,shZ=-5.5;
+  const shMat=new T.MeshStandardMaterial({color:0x505058,roughness:0.6,metalness:0.75});
+  mk(new T.BoxGeometry(0.06,2.8,0.06),shMat,shX-0.85,1.4,shZ-0.38);
+  mk(new T.BoxGeometry(0.06,2.8,0.06),shMat,shX+0.85,1.4,shZ-0.38);
+  mk(new T.BoxGeometry(0.06,2.8,0.06),shMat,shX-0.85,1.4,shZ+0.38);
+  mk(new T.BoxGeometry(0.06,2.8,0.06),shMat,shX+0.85,1.4,shZ+0.38);
+  [0.25,0.85,1.5,2.2].forEach(y=>{
+    mk(new T.BoxGeometry(1.75,0.04,0.8),shMat,shX,y,shZ);
+    // Teile auf dem Regal
+    for(let i=0;i<3;i++){
+      const cols=['#3a2810','#1a3858','#4a1810'];
+      mk(new T.BoxGeometry(0.2+Math.random()*0.15,0.16+Math.random()*0.1,0.18),
+         new T.MeshStandardMaterial({color:cols[i%3],roughness:0.8}),
+         shX-0.55+i*0.45,y+0.12,shZ);
+    }
+  });
+
+  // ══ BLAUE ÖLFÄSSER (rechts vorne) ══
+  [[6.2,0.35,1.2],[7.1,0.35,1.8],[6.5,0.35,3.0],[7.2,0.35,3.6]].forEach(([x,y,z],i)=>{
+    const col=i%2===0?blueMat:greenMat;
+    mk(new T.CylinderGeometry(0.28,0.28,0.72,14),col,x,y,z);
+    mk(new T.CylinderGeometry(0.285,0.285,0.05,14),yellowMat,x,y+0.19,z);
+    mk(new T.CylinderGeometry(0.285,0.285,0.05,14),yellowMat,x,y-0.19,z);
+  });
+  // Gelber Eimer
+  mk(new T.CylinderGeometry(0.13,0.1,0.3,12),yellowMat,5.4,0.15,2.5);
+  mk(new T.CylinderGeometry(0.09,0.09,0.04,12),new T.MeshStandardMaterial({color:0x888800,roughness:0.5}),5.4,0.32,2.5);
+
+  // ══ GRÜNE GASFLASCHE (links vorne) ══
+  mk(new T.CylinderGeometry(0.19,0.21,1.45,14),greenMat,-6.5,-0.07,2.2);
+  mk(new T.CylinderGeometry(0.09,0.13,0.22,12),metalMat,-6.5,0.79,2.2);
+  mk(new T.TorusGeometry(0.26,0.03,6,18),new T.MeshStandardMaterial({color:0x111111,roughness:0.9}),-6.5,0.55,2.5,Math.PI/2);
+
+  // ══ TREPPE (links) ══
+  for(let i=0;i<7;i++){
+    mk(new T.BoxGeometry(1.1,0.07,0.38),
+       new T.MeshStandardMaterial({color:0x3a3020,roughness:0.85,metalness:0.2}),
+       -7.5,0.45+i*0.48,-3.5+i*0.45);
+  }
+  // Treppengeländer
+  for(let i=0;i<7;i++) mk(new T.BoxGeometry(0.05,0.45,0.05),metalMat,-6.95,0.7+i*0.48,-3.5+i*0.45);
+  mk(new T.BoxGeometry(0.05,0.05,4.2),metalMat,-6.95,3.2,-1.2,0,0,Math.PI/12);
+
+  // ══ GALERIEGESCHOSS (rechts oben) ══
+  mk(new T.BoxGeometry(5.5,0.22,4.5),
+     new T.MeshStandardMaterial({color:0x28201a,roughness:0.8,metalness:0.3}),6,4.35,-5.8);
+  for(let i=0;i<5;i++){
+    mk(new T.BoxGeometry(0.07,1.0,0.07),metalMat,3.4+i*0.6,4.57,-3.6);
+  }
+  mk(new T.BoxGeometry(2.8,0.06,0.06),metalMat,4.7,5.08,-3.6); // Handlauf
+  // Kisten + Teile auf Galerie
+  [[5.2,4.58,-7.0],[6.5,4.58,-6.5],[7.5,4.58,-7.2]].forEach(([x,y,z])=>{
+    mk(new T.BoxGeometry(0.7,0.55,0.55),woodMat,x,y,z);
+  });
+
+  // ══ ROHRE AN DER RÜCKWAND ══
+  const pipeMat=new T.MeshStandardMaterial({color:0x5a5050,roughness:0.5,metalness:0.8});
+  mk(new T.CylinderGeometry(0.055,0.055,18,8),pipeMat,0,6.6,-7.95,0,0,Math.PI/2);
+  mk(new T.CylinderGeometry(0.04,0.04,18,8),pipeMat,0,5.9,-7.95,0,0,Math.PI/2);
+  // Kabel-Bündel
+  mk(new T.CylinderGeometry(0.035,0.035,18,6),new T.MeshStandardMaterial({color:0x1a1010,roughness:0.9}),0,7.2,-7.9,0,0,Math.PI/2);
+
+  // ══ DIVERSES ══
+  // Reifen-Stapel (links, hinter Gasflasche)
+  for(let i=0;i<4;i++){
+    mk(new T.TorusGeometry(0.38,0.16,8,18),
+       new T.MeshStandardMaterial({color:0x111111,roughness:0.95,metalness:0.05}),
+       -7.5,0.16+i*0.3,-5.5,Math.PI/2);
+  }
+  // Kleines rotes Auto-Wagenheber-Symbol (roter Klotz)
+  mk(new T.BoxGeometry(0.55,0.22,0.38),redMat,-5.5,0.11,3.5);
+  mk(new T.CylinderGeometry(0.06,0.06,0.4,8),metalMat,-5.5,0.31,3.5);
+
+  // ══ LOADING DISMISS ══
   const loadingEl=document.getElementById('garageLoading');
   if(loadingEl)loadingEl.style.display='none';
 
@@ -4945,7 +6162,12 @@ function initGarageScene(){
 // ════════════════════════════════════════════════
 
 function updateGarageCar(carId){
-  if(!garageScene||!window.THREE)return;
+  // Wenn Three.js nicht bereit: nur 2D-Preview aktualisieren
+  if(!garageScene||!window.THREE){
+    showGarage2DFallback(carId);
+    return;
+  }
+  garageSelCar=carId;
   const THREE=window.THREE;const T=THREE;
   const car=CARS.find(c=>c.id===carId)||CARS[0];
   const t=getTuning(carId);
@@ -4954,29 +6176,46 @@ function updateGarageCar(carId){
   const bodyCol=new T.Color(t.bodyHue!=null?`hsl(${t.bodyHue},${t.bodySat||70}%,${t.bodyLit||45}%)`:car.body);
   const roofCol=new T.Color(t.roofColor||car.roof);
 
-  // ── ERST GLB-Modell versuchen (echtes 3D), DANN prozedural als Fallback ──
+  // ── GLB-Modell laden (car.modelPath aus cars.js), DANN prozedural als Fallback ──
+  // A.5: Keine Farb-Übermalung — Original-GLB-Materialien bleiben erhalten.
   loadCarGLB(car,
     (glbScene)=>{
-      // GLB erfolgreich geladen — Body-Farbe anwenden + skalieren
-      const bodyHex='#'+bodyCol.getHexString();
-      tintGLBModel(glbScene,bodyHex);
-      // Auto-Sizing: Modell auf passende Höhe normalisieren (etwa 1.4 units)
+      // ── Schritt 1: Y-Achse zuerst aus car.rotationOffset ──
+      glbScene.rotation.y=car.rotationOffset||0;
+
+      // ── Schritt 2: Auto-Erkennung falscher X-Orientierung ──
+      // Problem: Manche GLBs sind Z-up → Auto steht auf der Nase oder liegt auf der Seite.
+      // Heuristik: bei korrektem Y-up ist size.y (Höhe) kleiner als max(size.x, size.z).
+      // Wenn size.y > max(X,Z)*1.4 → Modell falsch ausgerichtet → X-Rotation anwenden.
+      {
+        const tb=new T.Box3().setFromObject(glbScene);
+        const ts=new T.Vector3();tb.getSize(ts);
+        if(ts.y>Math.max(ts.x,ts.z)*1.4){
+          glbScene.rotation.x=-Math.PI/2; // Versuch 1: -90° X (Z-up → Y-up)
+          const b2=new T.Box3().setFromObject(glbScene);
+          const s2=new T.Vector3();b2.getSize(s2);
+          if(s2.y>Math.max(s2.x,s2.z)*1.4) glbScene.rotation.x=Math.PI/2; // Versuch 2: +90°
+        }
+      }
+
+      // ── Schritt 3: Größe normalisieren (NACH Rotationskorrektur) ──
       const bbox=new T.Box3().setFromObject(glbScene);
       const size=new T.Vector3();bbox.getSize(size);
       if(size.y>0.01){
-        const scale=1.4/size.y;
-        glbScene.scale.set(scale,scale,scale);
-        // Auf Boden setzen
+        const sc=1.4*(car.scale||1.0)/size.y;
+        glbScene.scale.set(sc,sc,sc);
         const newBbox=new T.Box3().setFromObject(glbScene);
-        glbScene.position.y=-newBbox.min.y;
+        const center=new T.Vector3();newBbox.getCenter(center);
+        glbScene.position.x-=center.x;
+        glbScene.position.z-=center.z;
+        glbScene.position.y-=newBbox.min.y;
       }
-      // Schatten aktivieren
       glbScene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
       garageMesh=glbScene;
       garageScene.add(garageMesh);
     },
     ()=>{
-      // GLB nicht verfügbar/fehlgeschlagen — prozedurales Modell bauen
+      // Fallback: prozedurales Modell (sollte bei 46 echten GLBs nicht mehr nötig sein)
       buildProceduralCarMesh(carId);
     }
   );
@@ -5278,37 +6517,203 @@ function switchGarageTab(tab){
   document.querySelectorAll('.gTab').forEach(b=>b.classList.toggle('active',b.dataset.gtab===tab));
   buildGarageTabContent();
 }
+// Neue Kategorie-Navigation (ersetzt Tabs im neuen 2-Spalten-Layout)
+function switchGarageCat(cat){
+  garageActiveTab=cat;
+  hapTap();
+  document.querySelectorAll('.gCatBtn').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));
+  buildGarageTabContent();
+}
 
 function buildGarageCarInfo(){
   const el=document.getElementById('garageCarInfo');if(!el)return;
   const car=CARS.find(c=>c.id===garageSelCar)||CARS[0];
   const cs=getCarStats(car);
-  const moneyFmt=saveData.money.toLocaleString('de');
-  const isAdmin=typeof adminMode!=='undefined'&&adminMode;
+  const u=getUpgrades(car.id);
+  const bar=(v,mx,col)=>`<div style="height:3px;flex:1;background:rgba(255,255,255,.08);border-radius:1px;overflow:hidden;"><div style="height:100%;background:${col};width:${Math.min(100,v/mx*100).toFixed(1)}%;border-radius:1px;"></div></div>`;
+  // Kompakt für 190px-Sidebar: Flagge + Jahr + Marke + Modell + 3 Mini-Bars + Upgrade-Chips
   el.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem;padding:.38rem .55rem;background:rgba(46,204,113,.07);border:1px solid rgba(46,204,113,.18);border-radius:4px;">
-      <span style="font-family:'Bebas Neue',sans-serif;font-size:.5rem;letter-spacing:.2em;color:rgba(255,255,255,.35);">${isAdmin?'⚙ ADMIN — ∞ GELD':'KONTOSTAND'}</span>
-      <span id="garageBalance" style="font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.08em;color:#2ecc71;">💰 ${moneyFmt} €</span>
+    <div style="font-size:.44rem;letter-spacing:.12em;color:rgba(255,255,255,.25);margin-bottom:.1rem;">${car.flag||''} ${car.year} · ${(car.cat||'').toUpperCase()}</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--white);line-height:1.05;margin-bottom:.05rem;">${car.brand}</div>
+    <div style="font-size:.82rem;color:var(--gold);font-weight:600;margin-bottom:.3rem;">${car.name}</div>
+    <div style="display:grid;grid-template-columns:auto 1fr auto;gap:.15rem .35rem;font-size:.42rem;align-items:center;color:rgba(255,255,255,.35);">
+      <span>VMax</span>${bar(cs.maxKmh,400,'#e74c3c')}<span style="color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:.54rem;">${Math.round(cs.maxKmh)}</span>
+      <span>Acc.</span>${bar(10-cs.accel100,10,'#f39c12')}<span style="color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:.54rem;">${cs.accel100.toFixed(1)}s</span>
+      <span>Grip</span>${bar(cs.grip*500,100,'#3498db')}<span style="color:var(--gold);font-family:'Bebas Neue',sans-serif;font-size:.54rem;">${Math.round(cs.grip*100)}</span>
     </div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:.62rem;letter-spacing:.15em;color:rgba(255,255,255,.28);">${car.flag||''} ${car.cat}</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.25rem;color:var(--white);line-height:1.1;">${car.brand} <span style="color:var(--gold);">${car.name}</span></div>
-    <div style="font-size:.53rem;color:rgba(255,255,255,.32);margin-bottom:.38rem;">${car.year} · ${car.desc}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.18rem .5rem;font-size:.54rem;">
-      <div style="color:rgba(255,255,255,.42);">VMax</div><div style="color:var(--gold);">${Math.round(cs.maxKmh)} km/h</div>
-      <div style="color:rgba(255,255,255,.42);">0–100</div><div style="color:var(--gold);">${cs.accel100.toFixed(1)}s</div>
-      <div style="color:rgba(255,255,255,.42);">Grip</div><div style="color:var(--gold);">${(cs.grip*400).toFixed(0)}%</div>
-    </div>`;
+    ${u.engine||u.grip||u.nitro?`<div style="display:flex;gap:.18rem;margin-top:.28rem;flex-wrap:wrap;">
+      ${u.engine?`<div style="font-size:.35rem;padding:.06rem .28rem;border-radius:10px;background:rgba(231,76,60,.15);color:#e74c3c;border:1px solid rgba(231,76,60,.3);">🔧${u.engine}</div>`:''}
+      ${u.grip?`<div style="font-size:.35rem;padding:.06rem .28rem;border-radius:10px;background:rgba(52,152,219,.15);color:#3498db;border:1px solid rgba(52,152,219,.3);">🏁${u.grip}</div>`:''}
+      ${u.nitro?`<div style="font-size:.35rem;padding:.06rem .28rem;border-radius:10px;background:rgba(241,196,15,.15);color:#f1c40f;border:1px solid rgba(241,196,15,.3);">⚡${u.nitro}</div>`:''}
+    </div>`:''}
+  `;
+  // Floating-Balance immer aktuell halten (auch garageBalance für Legacy-Kompatibilität)
+  const bal=document.getElementById('garageBalance');
+  if(bal)bal.textContent='💰 '+saveData.money.toLocaleString('de')+' €';
 }
 
 function buildGarageTabContent(){
   const el=document.getElementById('garageTabContent');if(!el)return;
   const car=CARS.find(c=>c.id===garageSelCar)||CARS[0];
   const t=getTuning(garageSelCar);
-  if(garageActiveTab==='TUNING') el.innerHTML=buildTuningTabHTML(garageSelCar,t);
-  else if(garageActiveTab==='LACK') el.innerHTML=buildLackTabHTML(garageSelCar,t,car);
-  else el.innerHTML=buildStatsTabHTML(car);
+  switch(garageActiveTab){
+    case 'LACK':       el.innerHTML=buildLackTabHTML(garageSelCar,t,car); break;
+    case 'MOTOR':      el.innerHTML=buildMotorTabHTML(garageSelCar,t); break;
+    case 'GETRIEBE':   el.innerHTML=buildGetriebeTabHTML(garageSelCar,t); break;
+    case 'REIFEN':     el.innerHTML=buildReifenTabHTML(garageSelCar,t); break;
+    case 'KAROSSERIE': el.innerHTML=buildKarosserieTabHTML(garageSelCar,t); break;
+    case 'AUSPUFF':    el.innerHTML=buildAuspuffTabHTML(); break;
+    case 'FENSTER':    el.innerHTML=buildFensterTabHTML(); break;
+    case 'STATS':      el.innerHTML=buildStatsTabHTML(car); break;
+    // Legacy fallback (alter TUNING-Tab)
+    case 'TUNING':     el.innerHTML=buildTuningTabHTML(garageSelCar,t); break;
+    default:           el.innerHTML=buildLackTabHTML(garageSelCar,t,car);
+  }
 }
 
+// P3: GTA-Style Upgrade-Karten für Garage TUNING-Tab
+function buildUpgradeCardsHTML(carId){
+  const u=getUpgrades(carId);
+  const ICONS={engine:'🔧',grip:'🏁',nitro:'⚡'};
+  const NAMES={engine:'ENGINE',grip:'GRIP',nitro:'NITRO'};
+  const EFFECTS={
+    engine:lvl=>`+${Math.round((Math.pow(1.06,lvl)-1)*100)}% VMax · +${lvl*4}% Akk.`,
+    grip:  lvl=>`+${Math.round((Math.pow(1.14,lvl)-1)*100)}% Grip`,
+    nitro: lvl=>`Kapaz. ${100+lvl*25} · Boost ×${(1.18+lvl*.08).toFixed(2)}`
+  };
+  const COL={engine:'#e74c3c',grip:'#3498db',nitro:'#f1c40f'};
+
+  return `<div style="margin-bottom:.5rem;">
+    <div style="font-size:.38rem;letter-spacing:.2em;color:rgba(255,255,255,.28);margin-bottom:.4rem;padding-bottom:.22rem;border-bottom:1px solid rgba(255,255,255,.06);">UPGRADES</div>
+    ${['engine','grip','nitro'].map(type=>{
+      const lvl=u[type]||0;
+      const maxLvl=5;
+      const cost=lvl<maxLvl?UPGRADE_COSTS[type][lvl]:null;
+      const canBuy=cost!==null&&saveData.money>=cost;
+      const dots=Array.from({length:maxLvl},(_,i)=>
+        `<div style="flex:1;height:5px;border-radius:2px;background:${i<lvl?COL[type]:'rgba(255,255,255,.1)'};transition:background .2s;"></div>`
+      ).join('');
+      return `<div style="background:rgba(255,255,255,.03);border:1px solid ${lvl>0?COL[type]+'44':'rgba(255,255,255,.07)'};border-radius:6px;padding:.42rem .5rem;margin-bottom:.3rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.28rem;">
+          <div style="display:flex;align-items:center;gap:.3rem;">
+            <span style="font-size:.75rem;">${ICONS[type]}</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:.72rem;letter-spacing:.15em;color:${COL[type]};">${NAMES[type]}</span>
+          </div>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:.6rem;color:${lvl>=maxLvl?COL[type]:'rgba(255,255,255,.35)'};">LV ${lvl}/${maxLvl}</span>
+        </div>
+        <div style="display:flex;gap:2px;margin-bottom:.25rem;">${dots}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:.4rem;color:rgba(255,255,255,.35);">${EFFECTS[type](lvl)}</span>
+          ${lvl>=maxLvl
+            ?`<span style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;color:${COL[type]};letter-spacing:.12em;">MAX ✓</span>`
+            :`<button onclick="buyGarageUpgrade('${type}','${carId}')" style="font-family:'Bebas Neue',sans-serif;font-size:.55rem;letter-spacing:.1em;padding:.2rem .5rem;border-radius:3px;cursor:${canBuy?'pointer':'not-allowed'};border:1px solid ${canBuy?COL[type]:'rgba(255,255,255,.12)'};background:${canBuy?COL[type]+'22':'rgba(255,255,255,.02)'};color:${canBuy?COL[type]:'rgba(255,255,255,.25)'};">${cost.toLocaleString('de')} €</button>`
+          }
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function buyGarageUpgrade(type,carId){
+  const u=getUpgrades(carId);
+  if(u[type]>=5){showToast('Bereits maximaler Level!','error');return;}
+  const cost=UPGRADE_COSTS[type][u[type]];
+  if(saveData.money<cost){
+    hapError();
+    showToast(`Zu wenig Geld — ${(cost-saveData.money).toLocaleString('de')} € fehlen`,'error');
+    return;
+  }
+  saveData.money-=cost;
+  if(!saveData.upgrades[carId])saveData.upgrades[carId]={engine:0,grip:0,nitro:0};
+  saveData.upgrades[carId][type]++;
+  save();
+  hapSuccess();
+  showToast(`✓ ${type.charAt(0).toUpperCase()+type.slice(1)} Lv.${saveData.upgrades[carId][type]}!`,'success');
+  flashMoney();
+  buildGarageTabContent();
+  buildGarageCarInfo();
+  updateGarageCar(carId);
+}
+
+// ════════════════════════════════════════════════
+// Kategorie-Builder (neues 2-Spalten-Garage-Layout)
+// ════════════════════════════════════════════════
+
+// 🔧 Motor — Upgrade-Karten (Engine / Grip / Nitro)
+function buildMotorTabHTML(carId,t){
+  return buildUpgradeCardsHTML(carId);
+}
+
+// ⚙️ Getriebe — Fahrwerk, Differenzial, Getriebe, Bremsen
+function buildGetriebeTabHTML(carId,t){
+  const sel=(label,key,opts)=>{
+    const cur=t[key]||Object.keys(opts)[0];
+    const btns=Object.entries(opts).map(([k,v])=>{
+      const isSel=cur===k;const price=v.price||0;
+      const lbl2=v.name+(price?` <span style="color:rgba(255,255,255,.35);font-size:.48rem;">— ${price.toLocaleString('de')}€</span>`:'');
+      return `<button onclick="buyAndSetTuning('${carId}','${key}','${k}',${price})" style="display:block;width:100%;text-align:left;margin:.1rem 0;font-size:.6rem;padding:.26rem .45rem;border-radius:3px;cursor:pointer;border:1px solid ${isSel?'var(--gold)':'rgba(255,255,255,.1)'};background:${isSel?'rgba(212,160,23,.1)':'rgba(255,255,255,.02)'};color:${isSel?'var(--gold)':'rgba(255,255,255,.5)'};">${lbl2}</button>`;
+    }).join('');
+    return `<div style="margin:.25rem 0;"><div style="font-size:.44rem;color:rgba(255,255,255,.32);letter-spacing:.12em;margin-bottom:.15rem;">${label}</div><div style="max-height:110px;overflow-y:auto;">${btns}</div></div>`;
+  };
+  const brkOpts=BRAKE_OPTIONS.map((b,i)=>`<button onclick="buyAndSetTuning('${carId}','brakes',${i},${b.price})" style="display:block;width:100%;text-align:left;margin:.12rem 0;font-size:.6rem;padding:.28rem .45rem;border-radius:3px;cursor:pointer;border:1px solid ${t.brakes===i?'var(--gold)':'rgba(255,255,255,.1)'};background:${t.brakes===i?'rgba(212,160,23,.1)':'rgba(255,255,255,.02)'};color:${t.brakes===i?'var(--gold)':'rgba(255,255,255,.45)'};">${b.name}${b.price?` — ${b.price.toLocaleString('de')}€`:''}</button>`).join('');
+  return `<div class="gSec">🔩 Fahrwerk</div>${sel('DÄMPFER','suspension',SUSPENSION_OPTIONS)}${sel('DIFFERENZIAL','diff',DIFF_OPTIONS)}${sel('GETRIEBE','gearbox',GEARBOX_OPTIONS)}<div class="gSec">🛑 Bremsen</div>${brkOpts}`;
+}
+
+// 🛞 Reifen — Compound, Breite
+function buildReifenTabHTML(carId,t){
+  const sel=(label,key,opts)=>{
+    const cur=t[key]||Object.keys(opts)[0];
+    const btns=Object.entries(opts).map(([k,v])=>{
+      const isSel=cur===k;const price=v.price||0;
+      const lbl2=v.name+(price?` <span style="color:rgba(255,255,255,.35);font-size:.48rem;">— ${price.toLocaleString('de')}€</span>`:'');
+      return `<button onclick="buyAndSetTuning('${carId}','${key}','${k}',${price})" style="display:block;width:100%;text-align:left;margin:.1rem 0;font-size:.6rem;padding:.26rem .45rem;border-radius:3px;cursor:pointer;border:1px solid ${isSel?'var(--gold)':'rgba(255,255,255,.1)'};background:${isSel?'rgba(212,160,23,.1)':'rgba(255,255,255,.02)'};color:${isSel?'var(--gold)':'rgba(255,255,255,.5)'};">${lbl2}</button>`;
+    }).join('');
+    return `<div style="margin:.25rem 0;"><div style="font-size:.44rem;color:rgba(255,255,255,.32);letter-spacing:.12em;margin-bottom:.15rem;">${label}</div><div style="max-height:130px;overflow-y:auto;">${btns}</div></div>`;
+  };
+  const tyreWOpts=['Normal','+ 20mm','+ 40mm (Wide-Body)'].map((n,i)=>
+    `<button onclick="buyAndSetTuning('${carId}','tyreWidth',${i},${[0,10000,22000][i]})" style="margin:.1rem;font-size:.58rem;padding:.22rem .45rem;border-radius:3px;cursor:pointer;border:1px solid ${t.tyreWidth===i?'var(--gold)':'rgba(255,255,255,.1)'};background:${t.tyreWidth===i?'rgba(212,160,23,.1)':'rgba(255,255,255,.02)'};color:${t.tyreWidth===i?'var(--gold)':'rgba(255,255,255,.45)'};">${n}</button>`
+  ).join('');
+  return `<div class="gSec">🏁 Compound</div>${sel('REIFENMISCHUNG','tyre',TYRE_COMPOUNDS)}<div class="gSec" style="margin-top:.6rem;">⬛ Breite</div><div>${tyreWOpts}</div>`;
+}
+
+// 🏎️ Karosserie — Bodykit-Toggles
+function buildKarosserieTabHTML(carId,t){
+  const tog=(label,key,price,eff)=>{
+    const on=!!t[key];
+    return `<div class="gOption${on?' active':''}">
+      <div><div style="font-size:.6rem;color:${on?'var(--gold)':'rgba(255,255,255,.7)'};">${label}</div>
+      <div style="font-size:.42rem;color:rgba(255,255,255,.32);">${eff}</div></div>
+      <button class="gOptBtn${on?' on':''}" onclick="buyAndToggleTuning('${carId}','${key}',${price})">${on?'✓ AN':price>0?price.toLocaleString('de')+'€':'AN'}</button>
+    </div>`;
+  };
+  return `<div class="gSec">🚗 Bodykit</div>
+    ${tog('Frontschürze','frontSplitter',18000,'Abtrieb +5%')}
+    ${tog('Heckspoiler','rearWingSmall',26000,'Abtrieb +8%, VMax −1%')}
+    ${tog('GT-Flügel','rearWingGT',52000,'Abtrieb +15%, VMax −3%')}
+    ${tog('Seitenschweller','sideskirts',15000,'Stabilität +3%')}
+    ${tog('Wide-Body-Kit','widebody',75000,'Reifenbreite +40mm')}
+    ${tog('Motorhauben-Hutze','hoodScoop',11000,'Turbo +5%')}`;
+}
+
+// 💨 Auspuff — Platzhalter (zukünftig)
+function buildAuspuffTabHTML(){
+  return `<div style="padding:2rem 1rem;text-align:center;">
+    <div style="font-size:2rem;margin-bottom:.6rem;">💨</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.3em;color:var(--gold);margin-bottom:.4rem;">AUSPUFF</div>
+    <div style="font-size:.55rem;color:rgba(255,255,255,.25);letter-spacing:.15em;">DEMNÄCHST VERFÜGBAR</div>
+  </div>`;
+}
+
+// 🪟 Fenster — Platzhalter (zukünftig)
+function buildFensterTabHTML(){
+  return `<div style="padding:2rem 1rem;text-align:center;">
+    <div style="font-size:2rem;margin-bottom:.6rem;">🪟</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.3em;color:var(--gold);margin-bottom:.4rem;">FENSTER & VERGLASUNG</div>
+    <div style="font-size:.55rem;color:rgba(255,255,255,.25);letter-spacing:.15em;">DEMNÄCHST VERFÜGBAR</div>
+  </div>`;
+}
+
+// Legacy: alter kombinierter TUNING-Tab (alle Kategorien auf einem Haufen)
 function buildTuningTabHTML(carId,t){
   const sec=(ic,lbl)=>`<div class="gSec">${ic} ${lbl}</div>`;
   // Styled button-row selector — replaces native <select> with dark-theme buttons
@@ -5336,7 +6741,8 @@ function buildTuningTabHTML(carId,t){
   const tyreWOpts=['Normal','+ 20mm','+ 40mm (Wide-Body)'].map((n,i)=>
     `<button onclick="buyAndSetTuning('${carId}','tyreWidth',${i},${[0,10000,22000][i]})" style="margin:.1rem;font-size:.58rem;padding:.22rem .45rem;border-radius:3px;cursor:pointer;border:1px solid ${t.tyreWidth===i?'var(--gold)':'rgba(255,255,255,.1)'};background:${t.tyreWidth===i?'rgba(212,160,23,.1)':'rgba(255,255,255,.02)'};color:${t.tyreWidth===i?'var(--gold)':'rgba(255,255,255,.45)'};">${n}</button>`
   ).join('');
-  return `${sec('🏁','Reifen')}${sel('COMPOUND','tyre',TYRE_COMPOUNDS)}
+  return `${buildUpgradeCardsHTML(carId)}
+    ${sec('🏁','Reifen')}${sel('COMPOUND','tyre',TYRE_COMPOUNDS)}
     <div style="font-size:.45rem;color:rgba(255,255,255,.35);letter-spacing:.12em;margin:.3rem 0 .1rem;">REIFENBREITE</div>
     <div>${tyreWOpts}</div>
     ${sec('🔩','Fahrwerk')}${sel('DÄMPFER','suspension',SUSPENSION_OPTIONS)}${sel('DIFFERENZIAL','diff',DIFF_OPTIONS)}${sel('GETRIEBE','gearbox',GEARBOX_OPTIONS)}

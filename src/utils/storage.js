@@ -46,6 +46,50 @@ if(!saveData.selCar||!CARS.find(c=>c.id===saveData.selCar))saveData.selCar='bmw2
 if(!saveData.tuning||typeof saveData.tuning!=='object')saveData.tuning={};
 if(!saveData.achievements||!Array.isArray(saveData.achievements))saveData.achievements=[];
 
+// ── Save-Migration: entfernte Autos bereinigen (A.4 — 46-Car-Set) ──────────
+// IDs, die aus dem CARS-Array entfernt wurden (kein GLB verfügbar).
+// Einträge in ownedCars/shopCars werden still entfernt.
+// selCar → bmw2002t falls ungültig.
+(function migrateCars(){
+  const REMOVED_IDS=new Set([
+    'bmw_635csi','lancia_037','mg_metro_6r4','ferrari_308',
+    'escort_rs1800','sierra_cosw','ford_gt40','challenger',
+    'celica_st185','saab_96'
+  ]);
+  const validIds=new Set(CARS.map(c=>c.id));
+  let changed=false;
+  if(Array.isArray(saveData.ownedCars)){
+    const before=saveData.ownedCars.length;
+    saveData.ownedCars=saveData.ownedCars.filter(id=>!REMOVED_IDS.has(id)&&validIds.has(id));
+    if(saveData.ownedCars.length!==before){changed=true;
+      console.log('[NE] Save-Migration: '+( before-saveData.ownedCars.length)+' veraltete Autos aus ownedCars entfernt');}
+  }
+  if(Array.isArray(saveData.shopCars)){
+    saveData.shopCars=saveData.shopCars.filter(id=>!REMOVED_IDS.has(id)&&validIds.has(id));
+  }
+  if(saveData.selCar&&(REMOVED_IDS.has(saveData.selCar)||!validIds.has(saveData.selCar))){
+    console.log('[NE] Save-Migration: selCar "'+saveData.selCar+'" nicht mehr verfügbar → bmw2002t');
+    saveData.selCar='bmw2002t';changed=true;
+  }
+  // A.7: Neue Autos (4 GLB-Only) in shopCars eintragen, wenn ihr Biom bereits
+  // freigeschaltet ist (für Spieler die Biome schon abgeschlossen haben).
+  for(const car of CARS){
+    if(saveData.shopCars.includes(car.id)) continue;
+    if(!car.unlockBiome){
+      // Kein Biom-Lock → immer im Shop
+      saveData.shopCars.push(car.id);changed=true;
+    } else if(saveData.unlocked&&saveData.unlocked[car.unlockBiome]){
+      // Biom bereits freigeschaltet → Auto in Shop aufnehmen
+      saveData.shopCars.push(car.id);changed=true;
+      console.log('[NE] Save-Migration: "'+car.id+'" in Shop aufgenommen (Biom "'+car.unlockBiome+'" freigeschaltet)');
+    }
+  }
+  // Sicherstellen: bmw2002t immer vorhanden
+  if(!saveData.ownedCars.includes('bmw2002t'))saveData.ownedCars.unshift('bmw2002t');
+  if(!saveData.shopCars.includes('bmw2002t'))saveData.shopCars.unshift('bmw2002t');
+  if(changed)save();
+})();
+
 // Upgrade-Level validieren: Jeder Wert muss 0–5 integer sein.
 // Werte außerhalb dieses Bereichs (NaN, Infinity, zu groß, negativ)
 // führen zu Math.pow()-Explosionen in getCarStats → Physics-Crash.
