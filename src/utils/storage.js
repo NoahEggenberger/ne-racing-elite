@@ -54,7 +54,8 @@ if(!saveData.achievements||!Array.isArray(saveData.achievements))saveData.achiev
   const REMOVED_IDS=new Set([
     'bmw_635csi','lancia_037','mg_metro_6r4','ferrari_308',
     'escort_rs1800','sierra_cosw','ford_gt40','challenger',
-    'celica_st185','saab_96'
+    'celica_st185','saab_96',
+    'lancia_fulvia','celica_imsa'  // GLB zu gross (>100MB), entfernt
   ]);
   const validIds=new Set(CARS.map(c=>c.id));
   let changed=false;

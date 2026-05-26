@@ -32,8 +32,8 @@
 // ENTFERNT (kein GLB verfügbar): bmw_635csi, lancia_037, mg_metro_6r4,
 //   ferrari_308, escort_rs1800, sierra_cosw, ford_gt40, challenger,
 //   celica_st185, saab_96
-// NEU (GLB vorhanden, kein alter Code-Eintrag): escort_coss, charger_dom,
-//   lancia_fulvia, celica_imsa
+// NEU (GLB vorhanden, kein alter Code-Eintrag): escort_coss, charger_dom
+// ENTFERNT (GLB zu gross >100MB, GitHub-Limit): lancia_fulvia, celica_imsa
 // ════════════════════════════════════════════════
 
 const CARS = [
@@ -111,13 +111,6 @@ const CARS = [
    w:17,h:25,speed:7.8,accel100:4.8,grip:.23,drift:.28,maxKmh:232,logo:'lancia',
    modelPath:'assets/models/cars/lancia_stratos/lancia_stratos.glb',scale:1.0,rotationOffset:0,
    desc:'Das reinste Rallyeauto aller Zeiten'},
-
-  {id:'lancia_fulvia',brand:'Lancia',name:'Fulvia HF',          year:'1972',cat:'Rally Legends',flag:'🇮🇹',price:32000, unlockBiome:'forest',
-   body:'#f5f0e8',roof:'#e0d8c8',trim:'#c0392b',acc:'#c0392b',stripes:['#c0392b'],raceNum:'4',
-   w:14,h:24,speed:5.4,accel100:9.2,grip:.19,drift:.23,maxKmh:175,logo:'lancia',
-   modelPath:'assets/models/cars/lancia_fulvia/lancia_fulvia.glb',scale:1.0,rotationOffset:0,
-   // TODO: Stats vom User bestätigen lassen
-   desc:'Monte-Carlo-Sieger – kleiner Lancia, großes Herz'},
 
   {id:'lancia_delta',brand:'Lancia',name:'Delta HF Integrale', year:'1992',cat:'Rally Legends',flag:'🇮🇹',price:65000, unlockBiome:'forest',
    body:'#c0392b',roof:'#960000',trim:'#fff',acc:'#f5e642',stripes:null,
@@ -305,13 +298,6 @@ const CARS = [
    modelPath:'assets/models/cars/mazda_787b/mazda_787b.glb',scale:1.0,rotationOffset:0,
    desc:'Einziger japan. Le-Mans-Sieger – Kreiskolbenmotor'},
 
-  {id:'celica_imsa', brand:'Toyota',name:'Celica IMSA GTO',        year:'1988',cat:'JDM Classics',flag:'🇯🇵',price:95000, unlockBiome:'rally',
-   body:'#f5f0e8',roof:'#e0d8c8',trim:'#c0392b',acc:'#1a4fa0',stripes:['#c0392b','#1a4fa0'],raceNum:'99',
-   w:17,h:27,speed:7.8,accel100:4.8,grip:.23,drift:.21,maxKmh:270,logo:'toyota',
-   modelPath:'assets/models/cars/celica_imsa/celica_imsa.glb',scale:1.0,rotationOffset:0,
-   // TODO: Stats vom User bestätigen lassen
-   desc:'IMSA GTO Monster – Böse Celica aus dem Motorsport'},
-
   // ── SWEDISH CLASSICS ─────────────────────────────────────────────────────────
   {id:'volvo_240t',  brand:'Volvo', name:'240 Turbo',              year:'1984',cat:'Swedish Classics',flag:'🇸🇪',price:15000, unlockBiome:'city',
    body:'#c8d8e0',roof:'#a8b8c0',trim:'#888',acc:'#888',stripes:null,
@@ -338,7 +324,7 @@ const CAR_DRIVETRAIN={
   p959:'awd', audi_s1:'awd',
   lancia_delta:'awd', peugeot_205t16:'awd', ford_rs200:'awd',
   subaru_impreza:'awd', skyline_r32:'awd',
-  escort_coss:'awd', celica_imsa:'awd',
+  escort_coss:'awd',
 };
 // Inject drv into car objects at startup (once, non-destructive)
 CARS.forEach(c=>{ if(!c.drv) c.drv=CAR_DRIVETRAIN[c.id]||'rwd'; });
