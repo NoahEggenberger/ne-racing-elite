@@ -31,8 +31,21 @@ try{
 }
 // Fehlende Felder auffüllen
 if(!saveData.stars||typeof saveData.stars!=='object')saveData.stars={};
-if(!saveData.unlocked||typeof saveData.unlocked!=='object')saveData.unlocked={city:true};
-else if(!saveData.unlocked.city)saveData.unlocked.city=true;
+// Neue 20 Biome-IDs — alte IDs (alpine, rally, monaco, etc.) werden ignoriert.
+// Nur 'city' bleibt als Pflicht-Unlock; alle anderen werden bei Bedarf durch
+// checkWorldUnlocks() freigeschaltet.
+const NEW_BIOME_IDS=new Set(['city','countryside','forest','coastal','industrial',
+  'mountain','snow','harbor','desert','savanna','arctic','racetrack',
+  'canyon','night_city','rainforest','ruins','salt_flats','wetlands','underground','volcano']);
+if(!saveData.unlocked||typeof saveData.unlocked!=='object'){
+  saveData.unlocked={city:true};
+} else {
+  // Alte Biom-IDs aus unlocked entfernen (würden zu Fehlern führen)
+  for(const k of Object.keys(saveData.unlocked)){
+    if(!NEW_BIOME_IDS.has(k)){delete saveData.unlocked[k];}
+  }
+  if(!saveData.unlocked.city)saveData.unlocked.city=true;
+}
 if(!isFinite(saveData.money)||saveData.money<0)saveData.money=0;
 saveData.money=Math.floor(saveData.money);
 if(!saveData.upgrades||typeof saveData.upgrades!=='object')saveData.upgrades={};

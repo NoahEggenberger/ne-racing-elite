@@ -57,7 +57,7 @@ const CARS = [
    modelPath:'assets/models/cars/bmwm3e30/bmwm3e30.glb',scale:1.0,rotationOffset:0,
    desc:'DTM & Rallye-König'},
 
-  {id:'bmw_m1',     brand:'BMW',    name:'M1 Procar',          year:'1979',cat:'German Performance',flag:'🇩🇪',price:120000,unlockBiome:'highland',
+  {id:'bmw_m1',     brand:'BMW',    name:'M1 Procar',          year:'1979',cat:'German Performance',flag:'🇩🇪',price:120000,unlockBiome:'mountain',
    body:'#1a1a2e',roof:'#111',trim:'#d4a017',acc:'#d4a017',stripes:['#d4a017','#2255aa','#c0392b'],raceNum:'76',
    w:18,h:28,speed:8.2,accel100:5.6,grip:.21,drift:.23,maxKmh:260,logo:'bmw',
    modelPath:'assets/models/cars/bmw_m1/bmw_m1.glb',scale:1.0,rotationOffset:0,
@@ -69,7 +69,7 @@ const CARS = [
    modelPath:'assets/models/cars/vw_golf_gti/vw_golf_gti.glb',scale:1.0,rotationOffset:0,
    desc:'Mutter aller Hot Hatches'},
 
-  {id:'p911_rs',    brand:'Porsche',name:'911 Carrera RS 2.7', year:'1972',cat:'German Performance',flag:'🇩🇪',price:85000, unlockBiome:'alpine',
+  {id:'p911_rs',    brand:'Porsche',name:'911 Carrera RS 2.7', year:'1972',cat:'German Performance',flag:'🇩🇪',price:85000, unlockBiome:'mountain',
    body:'#f5f0e8',roof:'#e8e0d0',trim:'#1a4fa0',acc:'#1a4fa0',stripes:['#1a4fa0'],
    w:17,h:26,speed:7.5,accel100:5.8,grip:.195,drift:.25,maxKmh:245,logo:'porsche',
    modelPath:'assets/models/cars/p911_rs/p911_rs.glb',scale:1.0,rotationOffset:0,
@@ -87,7 +87,7 @@ const CARS = [
    modelPath:'assets/models/cars/p935/p935.glb',scale:1.0,rotationOffset:0,
    desc:'Le-Mans-Monster – 845 PS'},
 
-  {id:'p959',       brand:'Porsche',name:'959',                 year:'1986',cat:'German Performance',flag:'🇩🇪',price:280000,unlockBiome:'pikes',
+  {id:'p959',       brand:'Porsche',name:'959',                 year:'1986',cat:'German Performance',flag:'🇩🇪',price:280000,unlockBiome:'canyon',
    body:'#f5f0e8',roof:'#e8e0d0',trim:'#111',acc:'#111',stripes:null,
    w:17,h:28,speed:9.0,accel100:3.7,grip:.24,drift:.16,maxKmh:317,logo:'porsche',
    modelPath:'assets/models/cars/p959/p959.glb',scale:1.0,rotationOffset:0,
@@ -99,7 +99,7 @@ const CARS = [
    modelPath:'assets/models/cars/audi_s1/audi_s1.glb',scale:1.0,rotationOffset:0,
    desc:'Gruppe-B – 476 PS Allradmonster'},
 
-  {id:'mercedes_sl',brand:'Mercedes-Benz',name:'300 SL Gullwing',year:'1954',cat:'German Performance',flag:'🇩🇪',price:220000,unlockBiome:'targa',
+  {id:'mercedes_sl',brand:'Mercedes-Benz',name:'300 SL Gullwing',year:'1954',cat:'German Performance',flag:'🇩🇪',price:220000,unlockBiome:'coastal',
    body:'#c8d8c0',roof:'#a8b8a0',trim:'#888',acc:'#888',stripes:null,
    w:17,h:28,speed:7.2,accel100:6.4,grip:.16,drift:.20,maxKmh:250,logo:'mercedes',
    modelPath:'assets/models/cars/mercedes_sl/mercedes_sl.glb',scale:1.0,rotationOffset:0,
@@ -118,87 +118,87 @@ const CARS = [
    modelPath:'assets/models/cars/lancia_delta/lancia_delta.glb',scale:1.0,rotationOffset:0,
    desc:'6 WRC-Titel in Folge – Legende'},
 
-  {id:'peugeot_205t16',brand:'Peugeot',name:'205 Turbo 16',    year:'1984',cat:'Rally Legends',flag:'🇫🇷',price:120000,unlockBiome:'rally',
+  {id:'peugeot_205t16',brand:'Peugeot',name:'205 Turbo 16',    year:'1984',cat:'Rally Legends',flag:'🇫🇷',price:120000,unlockBiome:'countryside',
    body:'#fff',roof:'#e0e0e0',trim:'#1a4fa0',acc:'#c0392b',stripes:['#1a4fa0','#c0392b'],raceNum:'4',
    w:17,h:26,speed:7.5,accel100:4.2,grip:.24,drift:.20,maxKmh:230,logo:'peugeot',
    modelPath:'assets/models/cars/peugeot_205t16/peugeot_205t16.glb',scale:1.0,rotationOffset:0,
    desc:'Gruppe B – Mittelmotorwunder'},
 
-  {id:'ford_rs200',  brand:'Ford',  name:'RS200',               year:'1986',cat:'Rally Legends',flag:'🇬🇧',price:180000,unlockBiome:'rally',
+  {id:'ford_rs200',  brand:'Ford',  name:'RS200',               year:'1986',cat:'Rally Legends',flag:'🇬🇧',price:180000,unlockBiome:'countryside',
    body:'#fff',roof:'#e0e0e0',trim:'#1a4fa0',acc:'#c0392b',stripes:['#c0392b','#1a4fa0'],raceNum:'7',
    w:17,h:27,speed:8.0,accel100:3.8,grip:.23,drift:.22,maxKmh:235,logo:'ford',
    modelPath:'assets/models/cars/ford_rs200/ford_rs200.glb',scale:1.0,rotationOffset:0,
    desc:'Gruppe B – Fords Wunderwaffe'},
 
-  {id:'subaru_impreza',brand:'Subaru',name:'Impreza WRX STI',  year:'1993',cat:'Rally Legends',flag:'🇯🇵',price:38000, unlockBiome:'rally',
+  {id:'subaru_impreza',brand:'Subaru',name:'Impreza WRX STI',  year:'1993',cat:'Rally Legends',flag:'🇯🇵',price:38000, unlockBiome:'countryside',
    body:'#1a4fa0',roof:'#1040a0',trim:'#f5e642',acc:'#f5e642',stripes:['#f5e642'],
    w:16,h:26,speed:6.9,accel100:5.4,grip:.24,drift:.17,maxKmh:225,logo:'subaru',
    modelPath:'assets/models/cars/subaru_impreza/subaru_impreza.glb',scale:1.0,rotationOffset:0,
    desc:'Der Blaue Blitz – WRC-Ikone der 90er'},
 
   // ── EUROPEAN GT & SPORTS ──────────────────────────────────────────────────────
-  {id:'ferrari_288gto',brand:'Ferrari',name:'288 GTO',          year:'1984',cat:'European GT',flag:'🇮🇹',price:180000,unlockBiome:'monaco',
+  {id:'ferrari_288gto',brand:'Ferrari',name:'288 GTO',          year:'1984',cat:'European GT',flag:'🇮🇹',price:180000,unlockBiome:'racetrack',
    body:'#c0392b',roof:'#900',trim:'#111',acc:'#f5c518',stripes:null,
    w:17,h:28,speed:8.8,accel100:4.9,grip:.21,drift:.24,maxKmh:305,logo:'ferrari',
    modelPath:'assets/models/cars/ferrari_288gto/ferrari_288gto.glb',scale:1.0,rotationOffset:0,
    desc:'Gruppe-B-Straßenversion – 400 PS Homologation'},
 
-  {id:'ferrari_f40', brand:'Ferrari',name:'F40',                year:'1987',cat:'European GT',flag:'🇮🇹',price:320000,unlockBiome:'pikes',
+  {id:'ferrari_f40', brand:'Ferrari',name:'F40',                year:'1987',cat:'European GT',flag:'🇮🇹',price:320000,unlockBiome:'canyon',
    body:'#c0392b',roof:'#900',trim:'#111',acc:'#f5c518',stripes:null,
    w:18,h:30,speed:9.2,accel100:4.1,grip:.22,drift:.25,maxKmh:324,logo:'ferrari',
    modelPath:'assets/models/cars/ferrari_f40/ferrari_f40.glb',scale:1.0,rotationOffset:0,
    desc:'Enzos letztes Auto – 478 PS, kein Schnickschnack'},
 
-  {id:'lambo_countach',brand:'Lamborghini',name:'Countach LP400',year:'1974',cat:'European GT',flag:'🇮🇹',price:120000,unlockBiome:'highland',
+  {id:'lambo_countach',brand:'Lamborghini',name:'Countach LP400',year:'1974',cat:'European GT',flag:'🇮🇹',price:120000,unlockBiome:'mountain',
    body:'#f5c518',roof:'#d4a017',trim:'#111',acc:'#111',stripes:null,
    w:19,h:29,speed:8.5,accel100:5.2,grip:.19,drift:.26,maxKmh:295,logo:'lamborghini',
    modelPath:'assets/models/cars/lambo_countach/lambo_countach.glb',scale:1.0,rotationOffset:0,
    desc:'Das Poster-Auto – Keilform-Legende'},
 
-  {id:'lambo_diablo', brand:'Lamborghini',name:'Diablo',         year:'1990',cat:'European GT',flag:'🇮🇹',price:160000,unlockBiome:'bonneville',
+  {id:'lambo_diablo', brand:'Lamborghini',name:'Diablo',         year:'1990',cat:'European GT',flag:'🇮🇹',price:160000,unlockBiome:'salt_flats',
    body:'#f39c12',roof:'#e67e22',trim:'#111',acc:'#111',stripes:null,
    w:19,h:31,speed:9.5,accel100:4.0,grip:.20,drift:.27,maxKmh:325,logo:'lamborghini',
    modelPath:'assets/models/cars/lambo_diablo/lambo_diablo.glb',scale:1.0,rotationOffset:0,
    desc:'Teufel auf Rädern – Anfang der 90er'},
 
-  {id:'alpine_a110', brand:'Alpine', name:'A110 1600S',          year:'1971',cat:'European GT',flag:'🇫🇷',price:55000, unlockBiome:'alpine',
+  {id:'alpine_a110', brand:'Alpine', name:'A110 1600S',          year:'1971',cat:'European GT',flag:'🇫🇷',price:55000, unlockBiome:'mountain',
    body:'#1a4fa0',roof:'#1040a0',trim:'#f5f0e8',acc:'#f5f0e8',stripes:null,
    w:15,h:25,speed:6.5,accel100:6.8,grip:.20,drift:.25,maxKmh:215,logo:'alpine',
    modelPath:'assets/models/cars/alpine_a110/alpine_a110.glb',scale:1.0,rotationOffset:0,
    desc:'Leichtbau-Meister aus Dieppe'},
 
-  {id:'r5_turbo',    brand:'Renault',name:'5 Turbo 2',           year:'1982',cat:'European GT',flag:'🇫🇷',price:45000, unlockBiome:'alpine',
+  {id:'r5_turbo',    brand:'Renault',name:'5 Turbo 2',           year:'1982',cat:'European GT',flag:'🇫🇷',price:45000, unlockBiome:'mountain',
    body:'#f5e642',roof:'#d4c420',trim:'#1a1a1a',acc:'#c0392b',stripes:null,raceNum:'5',
    w:16,h:25,speed:6.9,accel100:5.5,grip:.22,drift:.26,maxKmh:220,logo:'renault',
    modelPath:'assets/models/cars/r5_turbo/r5_turbo.glb',scale:1.0,rotationOffset:0,
    desc:'Mittelmotormonster im Kleinwagenkleid'},
 
-  {id:'de_tomaso',   brand:'De Tomaso',name:'Pantera GTS',       year:'1973',cat:'European GT',flag:'🇮🇹',price:55000, unlockBiome:'monaco',
+  {id:'de_tomaso',   brand:'De Tomaso',name:'Pantera GTS',       year:'1973',cat:'European GT',flag:'🇮🇹',price:55000, unlockBiome:'racetrack',
    body:'#1a1a2e',roof:'#111',trim:'#f5e642',acc:'#f5e642',stripes:null,
    w:18,h:28,speed:7.8,accel100:5.5,grip:.17,drift:.27,maxKmh:260,logo:'de_tomaso',
    modelPath:'assets/models/cars/de_tomaso/de_tomaso.glb',scale:1.0,rotationOffset:0,
    desc:'Ital. Design, US-V8 – das Beste zweier Welten'},
 
-  {id:'alfa_155',    brand:'Alfa Romeo',name:'155 V6 Ti DTM',    year:'1993',cat:'European GT',flag:'🇮🇹',price:70000, unlockBiome:'highland',
+  {id:'alfa_155',    brand:'Alfa Romeo',name:'155 V6 Ti DTM',    year:'1993',cat:'European GT',flag:'🇮🇹',price:70000, unlockBiome:'mountain',
    body:'#c0392b',roof:'#960000',trim:'#fff',acc:'#f5e642',stripes:['#f5e642'],raceNum:'8',
    w:16,h:27,speed:7.0,accel100:5.4,grip:.23,drift:.18,maxKmh:260,logo:'alfa',
    modelPath:'assets/models/cars/alfa_155/alfa_155.glb',scale:1.0,rotationOffset:0,
    desc:'DTM-Dominator 1993 – unschlagbar'},
 
   // ── BRITISH ICONS ────────────────────────────────────────────────────────────
-  {id:'jaguar_etype',brand:'Jaguar',name:'E-Type Serie 1',      year:'1961',cat:'British Icons',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',price:75000, unlockBiome:'monaco',
+  {id:'jaguar_etype',brand:'Jaguar',name:'E-Type Serie 1',      year:'1961',cat:'British Icons',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',price:75000, unlockBiome:'racetrack',
    body:'#c8d8c0',roof:'#a8b8a0',trim:'#888',acc:'#888',stripes:null,
    w:17,h:30,speed:7.0,accel100:6.8,grip:.16,drift:.20,maxKmh:240,logo:'jaguar',
    modelPath:'assets/models/cars/jaguar_etype/jaguar_etype.glb',scale:1.0,rotationOffset:0,
    desc:'Das schönste Auto der Welt – Enzo Ferrari'},
 
-  {id:'aston_db5',  brand:'Aston Martin',name:'DB5',             year:'1963',cat:'British Icons',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',price:90000, unlockBiome:'monaco',
+  {id:'aston_db5',  brand:'Aston Martin',name:'DB5',             year:'1963',cat:'British Icons',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',price:90000, unlockBiome:'racetrack',
    body:'#8aa8c8',roof:'#6888a8',trim:'#888',acc:'#888',stripes:null,
    w:17,h:29,speed:6.8,accel100:7.1,grip:.16,drift:.18,maxKmh:230,logo:'aston',
    modelPath:'assets/models/cars/aston_db5/aston_db5.glb',scale:1.0,rotationOffset:0,
    desc:'James Bonds Auto – ewige Ikone'},
 
-  {id:'lotus_esprit',brand:'Lotus',name:'Esprit Turbo',          year:'1980',cat:'British Icons',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',price:32000, unlockBiome:'alpine',
+  {id:'lotus_esprit',brand:'Lotus',name:'Esprit Turbo',          year:'1980',cat:'British Icons',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',price:32000, unlockBiome:'mountain',
    body:'#f5f0e8',roof:'#e8e0d0',trim:'#c0392b',acc:'#c0392b',stripes:['#c0392b','#1a4fa0'],
    w:16,h:28,speed:7.0,accel100:5.8,grip:.21,drift:.22,maxKmh:244,logo:'lotus',
    modelPath:'assets/models/cars/lotus_esprit/lotus_esprit.glb',scale:1.0,rotationOffset:0,
@@ -210,7 +210,7 @@ const CARS = [
    modelPath:'assets/models/cars/mini_cooper/mini_cooper.glb',scale:1.0,rotationOffset:0,
    desc:'Der Underdog – Monte-Carlo-Sieger'},
 
-  {id:'escort_coss', brand:'Ford',  name:'Escort RS Cosworth',   year:'1993',cat:'British Icons',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',price:48000, unlockBiome:'rally',
+  {id:'escort_coss', brand:'Ford',  name:'Escort RS Cosworth',   year:'1993',cat:'British Icons',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',price:48000, unlockBiome:'countryside',
    body:'#f5f0e8',roof:'#e0d8c8',trim:'#1a4fa0',acc:'#c0392b',stripes:['#1a4fa0','#c0392b'],raceNum:'5',
    w:16,h:26,speed:7.0,accel100:5.5,grip:.24,drift:.20,maxKmh:225,logo:'ford',
    modelPath:'assets/models/cars/escort_coss/escort_coss.glb',scale:1.0,rotationOffset:0,
@@ -218,7 +218,7 @@ const CARS = [
    desc:'Whaletail-Ikone – Gruppe A Rallye-Waffe'},
 
   // ── AMERICAN MUSCLE ──────────────────────────────────────────────────────────
-  {id:'mustang_gt350',brand:'Shelby',name:'Mustang GT350',       year:'1965',cat:'American Muscle',flag:'🇺🇸',price:75000, unlockBiome:'highland',
+  {id:'mustang_gt350',brand:'Shelby',name:'Mustang GT350',       year:'1965',cat:'American Muscle',flag:'🇺🇸',price:75000, unlockBiome:'mountain',
    body:'#f5f0e8',roof:'#e8e0d0',trim:'#1a4fa0',acc:'#1a4fa0',stripes:['#1a4fa0'],
    w:17,h:27,speed:7.5,accel100:5.5,grip:.18,drift:.30,maxKmh:235,logo:'shelby',
    modelPath:'assets/models/cars/mustang_gt350/mustang_gt350.glb',scale:1.0,rotationOffset:0,
@@ -237,7 +237,7 @@ const CARS = [
    // TODO: Stats vom User bestätigen lassen
    desc:'Schwarze Bestie – 426 Hemi, kein Pardon'},
 
-  {id:'corvette_c2',brand:'Chevrolet',name:'Corvette C2 Stingray',year:'1963',cat:'American Muscle',flag:'🇺🇸',price:55000,unlockBiome:'monaco',
+  {id:'corvette_c2',brand:'Chevrolet',name:'Corvette C2 Stingray',year:'1963',cat:'American Muscle',flag:'🇺🇸',price:55000,unlockBiome:'racetrack',
    body:'#1a4fa0',roof:'#1040a0',trim:'#f5f0e8',acc:'#f5f0e8',stripes:null,
    w:18,h:29,speed:7.0,accel100:6.0,grip:.17,drift:.28,maxKmh:245,logo:'chevrolet',
    modelPath:'assets/models/cars/corvette_c2/corvette_c2.glb',scale:1.0,rotationOffset:0,
@@ -249,14 +249,14 @@ const CARS = [
    modelPath:'assets/models/cars/camaro_z28/camaro_z28.glb',scale:1.0,rotationOffset:0,
    desc:'Trans-Am-Sieger – der klassische Muscle'},
 
-  {id:'shelby_cobra',brand:'Shelby',name:'Cobra 427 SC',          year:'1966',cat:'American Muscle',flag:'🇺🇸',price:180000,unlockBiome:'bonneville',
+  {id:'shelby_cobra',brand:'Shelby',name:'Cobra 427 SC',          year:'1966',cat:'American Muscle',flag:'🇺🇸',price:180000,unlockBiome:'salt_flats',
    body:'#1a4fa0',roof:'#1040a0',trim:'#f5c518',acc:'#f5c518',stripes:['#f5c518'],
    w:18,h:26,speed:9.5,accel100:4.2,grip:.18,drift:.35,maxKmh:265,logo:'shelby',
    modelPath:'assets/models/cars/shelby_cobra/shelby_cobra.glb',scale:1.0,rotationOffset:0,
    desc:'Roadster-Monster – kein Dach, kein Gnade'},
 
   // ── JDM CLASSICS ─────────────────────────────────────────────────────────────
-  {id:'toyota_2000gt',brand:'Toyota',name:'2000GT',               year:'1967',cat:'JDM Classics',flag:'🇯🇵',price:130000,unlockBiome:'targa',
+  {id:'toyota_2000gt',brand:'Toyota',name:'2000GT',               year:'1967',cat:'JDM Classics',flag:'🇯🇵',price:130000,unlockBiome:'coastal',
    body:'#f5f0e8',roof:'#e0d8c8',trim:'#888',acc:'#888',stripes:null,
    w:16,h:27,speed:6.8,accel100:7.0,grip:.19,drift:.19,maxKmh:220,logo:'toyota',
    modelPath:'assets/models/cars/toyota_2000gt/toyota_2000gt.glb',scale:1.0,rotationOffset:0,
@@ -268,7 +268,7 @@ const CARS = [
    modelPath:'assets/models/cars/supra_a70/supra_a70.glb',scale:1.0,rotationOffset:0,
    desc:'Pop-up-Scheinwerfer – Klassiker der 80er'},
 
-  {id:'skyline_r32', brand:'Nissan',name:'Skyline GT-R R32',      year:'1989',cat:'JDM Classics',flag:'🇯🇵',price:55000, unlockBiome:'outback',
+  {id:'skyline_r32', brand:'Nissan',name:'Skyline GT-R R32',      year:'1989',cat:'JDM Classics',flag:'🇯🇵',price:55000, unlockBiome:'savanna',
    body:'#808090',roof:'#606070',trim:'#e74c3c',acc:'#e74c3c',stripes:null,
    w:16,h:27,speed:7.8,accel100:5.4,grip:.24,drift:.19,maxKmh:265,logo:'nissan',
    modelPath:'assets/models/cars/skyline_r32/skyline_r32.glb',scale:1.0,rotationOffset:0,
@@ -280,7 +280,7 @@ const CARS = [
    modelPath:'assets/models/cars/nissan_240z/nissan_240z.glb',scale:1.0,rotationOffset:0,
    desc:'Japans Antwort auf den E-Type'},
 
-  {id:'honda_nsx',   brand:'Honda', name:'NSX Type R',             year:'1990',cat:'JDM Classics',flag:'🇯🇵',price:75000, unlockBiome:'safari',
+  {id:'honda_nsx',   brand:'Honda', name:'NSX Type R',             year:'1990',cat:'JDM Classics',flag:'🇯🇵',price:75000, unlockBiome:'savanna',
    body:'#c0392b',roof:'#960000',trim:'#fff',acc:'#fff',stripes:null,
    w:17,h:28,speed:7.5,accel100:5.8,grip:.23,drift:.18,maxKmh:270,logo:'honda',
    modelPath:'assets/models/cars/honda_nsx/honda_nsx.glb',scale:1.0,rotationOffset:0,
@@ -292,7 +292,7 @@ const CARS = [
    modelPath:'assets/models/cars/rx7_fc/rx7_fc.glb',scale:1.0,rotationOffset:0,
    desc:'Wankelmotor – leicht und drehfreudig'},
 
-  {id:'mazda_787b',  brand:'Mazda', name:'787B Le Mans',           year:'1991',cat:'JDM Classics',flag:'🇯🇵',price:280000,unlockBiome:'bonneville',
+  {id:'mazda_787b',  brand:'Mazda', name:'787B Le Mans',           year:'1991',cat:'JDM Classics',flag:'🇯🇵',price:280000,unlockBiome:'salt_flats',
    body:'#e8720c',roof:'#b85a08',trim:'#1a1a1a',acc:'#f39c12',stripes:['#2ecc71'],raceNum:'55',
    w:19,h:30,speed:9.9,accel100:3.8,grip:.22,drift:.22,maxKmh:360,logo:'mazda',
    modelPath:'assets/models/cars/mazda_787b/mazda_787b.glb',scale:1.0,rotationOffset:0,
