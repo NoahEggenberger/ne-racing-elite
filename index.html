@@ -1709,8 +1709,10 @@ function coherentWaypoints(wpts){
 // ════════════════════════════════════════════════
 // Liest TRACK_DATA[id].d (SVG viewBox 1000×700) und erzeugt
 // 240 smooth Catmull-Rom Punkte zentriert auf (2000,1400) im Spielraum.
-function parseSVGTrackPath(d){
-  const GAME_CX=2000,GAME_CY=1400,SCALE=4;
+// vw = viewBox-Breite der Quelldaten: 1000 → SCALE=4, 4000 → SCALE=1 (bereits Spielkoordinaten)
+function parseSVGTrackPath(d,vw){
+  const GAME_CX=2000,GAME_CY=1400;
+  const SCALE=4000/(vw||1000); // 1000→4, 4000→1
   const wpts=[];
   // Jedes SVG-Kommando extrahieren: M/L/Q/C/Z + folgende Zahlen
   const segs=d.match(/[MmLlQqCcZz][^MmLlQqCcZz]*/g)||[];
@@ -1780,7 +1782,7 @@ function generateTrack(worldId,levelIdx){
     if(ids&&ids[levelIdx]){
       const td=TRACK_DATA[ids[levelIdx]];
       if(td&&td.d){
-        const pts=parseSVGTrackPath(td.d);
+        const pts=parseSVGTrackPath(td.d,td.vw||1000);
         if(pts&&pts.length>10)return pts;
       }
     }

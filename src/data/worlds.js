@@ -12,7 +12,7 @@ function _bt(bid){
 
 const WORLDS=[
   // 1 — CITY (von Anfang an freigeschaltet)
-  {id:'city',name:'Stadt',icon:'🏙️',surface:'asphalt',
+  {id:'city',name:'Nordschleife',icon:'🏙️',surface:'asphalt',
    sky:['#6a9fd8','#a5c2dc'],ground:'#555555',road:'#2a2a2a',edge:'#888888',
    line:'rgba(255,255,255,.85)',curb1:'#d83a2b',curb2:'#f5f5f5',
    part:'#5599ff',acc:'rgba(40,80,200,.05)',
@@ -20,7 +20,7 @@ const WORLDS=[
    tracks:_bt('city'),unlocked:true},
 
   // 2 — COUNTRYSIDE
-  {id:'countryside',name:'Landstraße',icon:'🌾',surface:'gravel',
+  {id:'countryside',name:'Erzberg',icon:'🌾',surface:'gravel',
    sky:['#7ac8f0','#b8e0f8'],ground:'#5a8a3a',road:'#3a3020',edge:'#7a6a40',
    line:'rgba(255,240,180,.75)',curb1:'#4a8820',curb2:'#f0f0e0',
    part:'#88cc44',acc:'rgba(80,140,20,.06)',
@@ -28,7 +28,7 @@ const WORLDS=[
    tracks:_bt('countryside'),unlocked:false},
 
   // 3 — FOREST
-  {id:'forest',name:'Wald',icon:'🌲',surface:'asphalt',
+  {id:'forest',name:'Schwarzwald',icon:'🌲',surface:'asphalt',
    sky:['#6aaa6a','#a0c8a0'],ground:'#2d4a2d',road:'#333333',edge:'#4a6a4a',
    line:'rgba(220,255,220,.75)',curb1:'#22a548',curb2:'#e8ffe8',
    part:'#55ff88',acc:'rgba(40,180,70,.07)',
@@ -36,7 +36,7 @@ const WORLDS=[
    tracks:_bt('forest'),unlocked:false},
 
   // 4 — COASTAL
-  {id:'coastal',name:'Küste',icon:'🌊',surface:'asphalt',
+  {id:'coastal',name:'Targa Florio',icon:'🌊',surface:'asphalt',
    sky:['#4db8ff','#90d4ff'],ground:'#f0e090',road:'#3a3a3a',edge:'#708090',
    line:'rgba(255,255,255,.85)',curb1:'#1a6db5',curb2:'#f5f5f5',
    part:'#44aaff',acc:'rgba(20,80,200,.07)',
@@ -44,7 +44,7 @@ const WORLDS=[
    tracks:_bt('coastal'),unlocked:false},
 
   // 5 — INDUSTRIAL
-  {id:'industrial',name:'Industrie',icon:'🏭',surface:'asphalt',
+  {id:'industrial',name:'Ruhrgebiet',icon:'🏭',surface:'asphalt',
    sky:['#1a1a2e','#2a2a42'],ground:'#333333',road:'#404040',edge:'#555555',
    line:'rgba(255,165,0,.75)',curb1:'#ff6600',curb2:'#ffcc00',
    part:'#ffaa33',acc:'rgba(200,100,0,.07)',
@@ -52,7 +52,7 @@ const WORLDS=[
    tracks:_bt('industrial'),unlocked:false},
 
   // 6 — MOUNTAIN
-  {id:'mountain',name:'Gebirge',icon:'⛰️',surface:'gravel',
+  {id:'mountain',name:'Alpenpass',icon:'⛰️',surface:'gravel',
    sky:['#7a9abf','#b0c8e0'],ground:'#6a6a5a',road:'#4a4a4a',edge:'#707060',
    line:'rgba(255,255,200,.75)',curb1:'#cc8800',curb2:'#f5f5f5',
    part:'#ccaa44',acc:'rgba(120,100,20,.07)',
@@ -60,7 +60,7 @@ const WORLDS=[
    tracks:_bt('mountain'),unlocked:false},
 
   // 7 — SNOW
-  {id:'snow',name:'Schnee',icon:'❄️',surface:'snow',
+  {id:'snow',name:'Swedish Rally',icon:'❄️',surface:'snow',
    sky:['#c0d8f0','#e8f4ff'],ground:'#e8f0f8',road:'#d0e0f0',edge:'#a0b8d0',
    line:'rgba(0,60,150,.5)',curb1:'#0044aa',curb2:'#ffffff',
    part:'rgba(220,240,255,.7)',acc:'rgba(180,200,240,.05)',
@@ -68,7 +68,7 @@ const WORLDS=[
    tracks:_bt('snow'),unlocked:false},
 
   // 8 — HARBOR
-  {id:'harbor',name:'Hafen',icon:'⚓',surface:'asphalt',
+  {id:'harbor',name:'Isle of Man TT',icon:'⚓',surface:'asphalt',
    sky:['#4080b0','#6aa0c8'],ground:'#404048',road:'#2a2a30',edge:'#4a5060',
    line:'rgba(255,165,0,.75)',curb1:'#ff8800',curb2:'#ffffff',
    part:'#aaaacc',acc:'rgba(40,60,120,.07)',
@@ -76,7 +76,7 @@ const WORLDS=[
    tracks:_bt('harbor'),unlocked:false},
 
   // 9 — DESERT
-  {id:'desert',name:'Wüste',icon:'🏜️',surface:'sand',
+  {id:'desert',name:'Dakar',icon:'🏜️',surface:'sand',
    sky:['#f0a830','#f8d080'],ground:'#d4a86a',road:'#c8a060',edge:'#a08040',
    line:'rgba(255,248,200,.65)',curb1:'#c8880c',curb2:'#f5f0d0',
    part:'#ffbb55',acc:'rgba(255,175,50,.07)',
@@ -84,7 +84,7 @@ const WORLDS=[
    tracks:_bt('desert'),unlocked:false},
 
   // 10 — SAVANNA
-  {id:'savanna',name:'Savanne',icon:'🦁',surface:'dirt',
+  {id:'savanna',name:'Kenya Safari',icon:'🦁',surface:'dirt',
    sky:['#e8b840','#f8d880'],ground:'#c8a060',road:'#a08040',edge:'#886030',
    line:'rgba(255,240,160,.65)',curb1:'#d4a017',curb2:'#f0d080',
    part:'#cc9933',acc:'rgba(160,120,20,.07)',
@@ -92,7 +92,7 @@ const WORLDS=[
    tracks:_bt('savanna'),unlocked:false},
 
   // 11 — ARCTIC
-  {id:'arctic',name:'Arktis',icon:'🧊',surface:'ice',
+  {id:'arctic',name:'Arctic Circle',icon:'🧊',surface:'ice',
    sky:['#1a3a6a','#3060a0'],ground:'#c8d8e8',road:'#a0c0e0',edge:'#80a8c8',
    line:'rgba(255,255,255,.6)',curb1:'#0044aa',curb2:'#aaccff',
    part:'rgba(180,220,255,.6)',acc:'rgba(100,160,220,.06)',
@@ -100,7 +100,7 @@ const WORLDS=[
    tracks:_bt('arctic'),unlocked:false},
 
   // 12 — RACETRACK
-  {id:'racetrack',name:'Rennstrecke',icon:'🏁',surface:'asphalt',
+  {id:'racetrack',name:'Nordschleife GP',icon:'🏁',surface:'asphalt',
    sky:['#5090d0','#80b8f0'],ground:'#3a6a3a',road:'#111111',edge:'#333333',
    line:'rgba(255,255,255,.9)',curb1:'#cc0000',curb2:'#ffffff',
    part:'#5599bb',acc:'rgba(30,60,80,.07)',
@@ -108,7 +108,7 @@ const WORLDS=[
    tracks:_bt('racetrack'),unlocked:false},
 
   // 13 — CANYON
-  {id:'canyon',name:'Canyon',icon:'🪨',surface:'asphalt',
+  {id:'canyon',name:'Pikes Peak',icon:'🪨',surface:'asphalt',
    sky:['#e87830','#f0a870'],ground:'#c06030',road:'#8a5030',edge:'#a06040',
    line:'rgba(255,220,180,.7)',curb1:'#c0392b',curb2:'#f5f0e0',
    part:'#cc8844',acc:'rgba(180,100,30,.07)',
@@ -116,7 +116,7 @@ const WORLDS=[
    tracks:_bt('canyon'),unlocked:false},
 
   // 14 — NIGHT CITY
-  {id:'night_city',name:'Nachtstadt',icon:'🌃',surface:'asphalt',
+  {id:'night_city',name:'Monaco GP',icon:'🌃',surface:'asphalt',
    sky:['#05050f','#0a0a1a'],ground:'#222222',road:'#1a1a1a',edge:'#2a2a3a',
    line:'rgba(0,200,255,.7)',curb1:'#ff00aa',curb2:'#00ffff',
    part:'#44aaff',acc:'rgba(0,100,200,.08)',
@@ -124,7 +124,7 @@ const WORLDS=[
    tracks:_bt('night_city'),unlocked:false},
 
   // 15 — RAINFOREST
-  {id:'rainforest',name:'Regenwald',icon:'🌴',surface:'mud',
+  {id:'rainforest',name:'Panaméricaine',icon:'🌴',surface:'mud',
    sky:['#2a6a2a','#4a8a4a'],ground:'#1a3a1a',road:'#3a2a1a',edge:'#4a3a2a',
    line:'rgba(180,255,180,.6)',curb1:'#22aa22',curb2:'#ccffcc',
    part:'rgba(80,180,80,.7)',acc:'rgba(30,120,30,.08)',
@@ -132,7 +132,7 @@ const WORLDS=[
    tracks:_bt('rainforest'),unlocked:false},
 
   // 16 — RUINS
-  {id:'ruins',name:'Ruinen',icon:'🏛️',surface:'gravel',
+  {id:'ruins',name:'Targa Antica',icon:'🏛️',surface:'gravel',
    sky:['#8a7060','#b0a090'],ground:'#9a8070',road:'#706050',edge:'#888070',
    line:'rgba(255,230,180,.65)',curb1:'#8a6040',curb2:'#f0e8d8',
    part:'#ccaa88',acc:'rgba(140,100,50,.07)',
@@ -140,7 +140,7 @@ const WORLDS=[
    tracks:_bt('ruins'),unlocked:false},
 
   // 17 — SALT FLATS
-  {id:'salt_flats',name:'Salzwüste',icon:'🧂',surface:'saltflat',
+  {id:'salt_flats',name:'Bonneville',icon:'🧂',surface:'saltflat',
    sky:['#e0f0ff','#f8fbff'],ground:'#f8f8f8',road:'#f0f0f0',edge:'#d0d0d0',
    line:'rgba(0,0,0,.4)',curb1:'#333333',curb2:'#ffffff',
    part:'rgba(230,240,250,.6)',acc:'rgba(200,210,220,.04)',
@@ -148,7 +148,7 @@ const WORLDS=[
    tracks:_bt('salt_flats'),unlocked:false},
 
   // 18 — WETLANDS
-  {id:'wetlands',name:'Sumpf',icon:'🐊',surface:'mud',
+  {id:'wetlands',name:'Everglades',icon:'🐊',surface:'mud',
    sky:['#6a8a6a','#90a880'],ground:'#3a5a3a',road:'#4a5a3a',edge:'#5a6a4a',
    line:'rgba(200,230,180,.6)',curb1:'#4a8820',curb2:'#cceeaa',
    part:'rgba(100,160,80,.65)',acc:'rgba(60,100,40,.07)',
@@ -156,7 +156,7 @@ const WORLDS=[
    tracks:_bt('wetlands'),unlocked:false},
 
   // 19 — UNDERGROUND
-  {id:'underground',name:'Untergrund',icon:'🚇',surface:'asphalt',
+  {id:'underground',name:'Tunnel Run',icon:'🚇',surface:'asphalt',
    sky:['#000000','#050510'],ground:'#0a0a0a',road:'#1a1a1a',edge:'#222222',
    line:'rgba(255,200,0,.8)',curb1:'#ffaa00',curb2:'#ff4400',
    part:'#ff8800',acc:'rgba(200,100,0,.08)',
@@ -164,7 +164,7 @@ const WORLDS=[
    tracks:_bt('underground'),unlocked:false},
 
   // 20 — VOLCANO
-  {id:'volcano',name:'Vulkan',icon:'🌋',surface:'dirt',
+  {id:'volcano',name:'Tenerife',icon:'🌋',surface:'dirt',
    sky:['#2a1a0a','#4a2a10'],ground:'#3a2a1a',road:'#1a1a1a',edge:'#3a1a00',
    line:'rgba(255,100,0,.7)',curb1:'#ff4400',curb2:'#ff8800',
    part:'#ff6600',acc:'rgba(200,60,0,.09)',
