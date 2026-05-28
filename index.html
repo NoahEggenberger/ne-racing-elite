@@ -6106,8 +6106,8 @@ function openGarage(){
 //
 // Per-Kategorie-Fallbacks (vor prozedural): wenn kein spezifisches Modell,
 // versucht der Loader CAR_GLB_CATEGORY_URLS[car.cat] als zweite Wahl.
-// Echte GLB-Modelle — liegen in assets/models/cars/{id}/{id}.glb
-const _GLB_BASE='assets/models/cars/';
+// Echte GLB-Modelle — via jsDelivr CDN von GitHub
+const _GLB_BASE='https://cdn.jsdelivr.net/gh/NoahEggenberger/ne-racing-elite@master/assets/models/cars/';
 const _glbPath=id=>`${_GLB_BASE}${id}/${id}.glb`;
 const CAR_GLB_URLS={
   'bmw2002t':   _glbPath('bmw2002t'),
